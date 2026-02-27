@@ -17,7 +17,7 @@ import {
   type Platform,
   type DevelopmentStatus,
   type SoftwareType,
-} from '@dis-tools/core';
+} from '@godwana/publiccode-core';
 
 export const initCommand = new Command('init')
   .description('Skapa en ny publiccode.yml interaktivt')

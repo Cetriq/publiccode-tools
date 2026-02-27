@@ -270,7 +270,7 @@ export default function Home() {
                 <div className="space-y-4 font-mono text-sm">
                   <div>
                     <span className="text-slate-500">$</span>
-                    <span className="text-slate-300"> npm install -g @dis-tools/cli</span>
+                    <span className="text-slate-300"> npm install -g @godwana/publiccode-cli</span>
                   </div>
                   <div className="text-slate-500"># Skapa en ny projektbeskrivning</div>
                   <div>

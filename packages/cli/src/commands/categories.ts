@@ -8,7 +8,7 @@ import {
   getCategories,
   searchCategories,
   getDISFase1Categories,
-} from '@dis-tools/core';
+} from '@godwana/publiccode-core';
 
 export const categoriesCommand = new Command('categories')
   .description('Lista och sök kategorier')

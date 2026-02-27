@@ -1,5 +1,5 @@
 {
-  "name": "@dis-tools/action",
+  "name": "@godwana/publiccode-action",
   "version": "0.1.0",
   "description": "GitHub Action for publiccode.yml validation",
   "repository": {
@@ -30,6 +30,6 @@
   "dependencies": {
     "@actions/core": "^3.0.0",
     "@actions/github": "^9.0.0",
-    "@dis-tools/core": "workspace:*"
+    "@godwana/publiccode-core": "workspace:*"
   }
 }

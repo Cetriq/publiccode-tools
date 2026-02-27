@@ -1,5 +1,5 @@
 {
-  "name": "@dis-tools/core",
+  "name": "@godwana/publiccode-core",
   "version": "0.1.0",
   "description": "Core library for publiccode.yml validation and DIS-Readiness scoring",
   "repository": {

@@ -1,4 +1,4 @@
-// @dis-tools/core
+// @godwana/publiccode-core
 // Main entry point
 
 // Types

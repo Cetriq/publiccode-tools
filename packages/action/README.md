@@ -201,8 +201,8 @@ Poängen baseras på fem kategorier:
 
 ## Relaterade verktyg
 
-- [`@dis-tools/cli`](https://www.npmjs.com/package/@dis-tools/cli) - CLI för lokal validering
-- [`@dis-tools/core`](https://www.npmjs.com/package/@dis-tools/core) - Kärnbibliotek
+- [`@godwana/publiccode-cli`](https://www.npmjs.com/package/@godwana/publiccode-cli) - CLI för lokal validering
+- [`@godwana/publiccode-core`](https://www.npmjs.com/package/@godwana/publiccode-core) - Kärnbibliotek
 
 ## Licens
 

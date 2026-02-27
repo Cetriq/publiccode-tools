@@ -5,13 +5,13 @@ CLI-verktyg för att skapa, validera och poängsätta `publiccode.yml`-filer enl
 ## Installation
 
 ```bash
-npm install -g @dis-tools/cli
+npm install -g @godwana/publiccode-cli
 ```
 
 Eller med pnpm:
 
 ```bash
-pnpm add -g @dis-tools/cli
+pnpm add -g @godwana/publiccode-cli
 ```
 
 ## Kommandon
@@ -182,7 +182,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm install -g @dis-tools/cli
+      - run: npm install -g @godwana/publiccode-cli
       - run: pcode validate --strict
       - run: pcode score
 ```
@@ -191,7 +191,7 @@ jobs:
 
 ## Relaterade paket
 
-- [`@dis-tools/core`](https://www.npmjs.com/package/@dis-tools/core) - Kärnbibliotek för validering och scoring
+- [`@godwana/publiccode-core`](https://www.npmjs.com/package/@godwana/publiccode-core) - Kärnbibliotek för validering och scoring
 - [GitHub Action](https://github.com/Cetriq/publiccode-tools) - GitHub Action för automatisk validering
 
 ## Licens

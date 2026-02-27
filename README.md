@@ -22,10 +22,10 @@ DIS-Tools bedomerhur val forberedd en publiccode.yml ar for DIS (Dynamiskt Inkop
 
 | Paket | Beskrivning | npm |
 |-------|-------------|-----|
-| [@dis-tools/core](./packages/core) | Karnbibliotek for validering och scoring | [![npm](https://img.shields.io/npm/v/@dis-tools/core)](https://www.npmjs.com/package/@dis-tools/core) |
-| [@dis-tools/cli](./packages/cli) | CLI-verktyg (`pcode`) | [![npm](https://img.shields.io/npm/v/@dis-tools/cli)](https://www.npmjs.com/package/@dis-tools/cli) |
-| [@dis-tools/action](./packages/action) | GitHub Action | - |
-| [@dis-tools/web](./packages/web) | Webbredaktorn | - |
+| [@godwana/publiccode-core](./packages/core) | Kärnbibliotek för validering och scoring | [![npm](https://img.shields.io/npm/v/@godwana/publiccode-core)](https://www.npmjs.com/package/@godwana/publiccode-core) |
+| [@godwana/publiccode-cli](./packages/cli) | CLI-verktyg (`pcode`) | [![npm](https://img.shields.io/npm/v/@godwana/publiccode-cli)](https://www.npmjs.com/package/@godwana/publiccode-cli) |
+| [@godwana/publiccode-action](./packages/action) | GitHub Action | - |
+| @godwana/publiccode-web | Webbredaktören (privat) | - |
 
 ## Snabbstart
 
@@ -33,7 +33,7 @@ DIS-Tools bedomerhur val forberedd en publiccode.yml ar for DIS (Dynamiskt Inkop
 
 ```bash
 # Installera globalt
-npm install -g @dis-tools/cli
+npm install -g @godwana/publiccode-cli
 
 # Skapa en ny publiccode.yml
 pcode init
@@ -73,7 +73,7 @@ jobs:
 ### Core-biblioteket
 
 ```typescript
-import { validate, scoreYaml } from '@dis-tools/core';
+import { validate, scoreYaml } from '@godwana/publiccode-core';
 import fs from 'fs';
 
 const yaml = fs.readFileSync('publiccode.yml', 'utf-8');
@@ -108,7 +108,7 @@ pnpm build
 pnpm test
 
 # Starta webbutvecklingsserver
-pnpm --filter @dis-tools/web dev
+pnpm --filter @godwana/publiccode-web dev
 ```
 
 ## DIS Fas 1-kategorier

@@ -1,5 +1,5 @@
 {
-  "name": "@dis-tools/web",
+  "name": "@godwana/publiccode-web",
   "version": "0.1.0",
   "description": "Web editor for publiccode.yml",
   "private": true,
@@ -13,7 +13,7 @@
     "clean": "rm -rf .next"
   },
   "dependencies": {
-    "@dis-tools/core": "workspace:*",
+    "@godwana/publiccode-core": "workspace:*",
     "@tailwindcss/forms": "^0.5.11",
     "autoprefixer": "^10.4.27",
     "next": "^14.2.0",

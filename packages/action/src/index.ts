@@ -12,7 +12,7 @@ import {
   type ValidationResult,
   type ScoreResult,
   type Language,
-} from '@dis-tools/core';
+} from '@godwana/publiccode-core';
 
 async function run(): Promise<void> {
   try {

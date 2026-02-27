@@ -50,13 +50,13 @@ importers:
       '@actions/github':
         specifier: ^9.0.0
         version: 9.0.0
-      '@dis-tools/core':
+      '@godwana/publiccode-core':
         specifier: workspace:*
         version: link:../core
 
   packages/cli:
     dependencies:
-      '@dis-tools/core':
+      '@godwana/publiccode-core':
         specifier: workspace:*
         version: link:../core
       chalk:
@@ -93,7 +93,7 @@ importers:
 
   packages/web:
     dependencies:
-      '@dis-tools/core':
+      '@godwana/publiccode-core':
         specifier: workspace:*
         version: link:../core
       '@tailwindcss/forms':

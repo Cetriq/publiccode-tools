@@ -7,7 +7,7 @@ import { readFileSync, existsSync } from 'fs';
 import {
   validate,
   scoreYaml,
-} from '@dis-tools/core';
+} from '@godwana/publiccode-core';
 
 // Mock @actions/core
 const mockCore = {

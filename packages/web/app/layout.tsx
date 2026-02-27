@@ -59,7 +59,7 @@ function Header() {
               Redigerare
             </a>
             <a
-              href="https://github.com/dis-tools"
+              href="https://github.com/Cetriq/publiccode-tools"
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm font-medium text-slate-300 transition-colors hover:text-white"
@@ -125,7 +125,7 @@ function Footer() {
               </li>
               <li>
                 <a
-                  href="https://www.npmjs.com/package/@dis-tools/cli"
+                  href="https://www.npmjs.com/package/@godwana/publiccode-cli"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
@@ -154,7 +154,7 @@ function Footer() {
             <ul className="mt-4 space-y-3">
               <li>
                 <a
-                  href="https://github.com/dis-tools"
+                  href="https://github.com/Cetriq/publiccode-tools"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
@@ -164,7 +164,7 @@ function Footer() {
               </li>
               <li>
                 <a
-                  href="https://www.npmjs.com/org/dis-tools"
+                  href="https://www.npmjs.com/org/godwana"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
@@ -193,7 +193,7 @@ function Footer() {
           </p>
           <div className="flex items-center gap-6">
             <a
-              href="https://github.com/dis-tools"
+              href="https://github.com/Cetriq/publiccode-tools"
               target="_blank"
               rel="noopener noreferrer"
               className="text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-300"
@@ -204,7 +204,7 @@ function Footer() {
               </svg>
             </a>
             <a
-              href="https://www.npmjs.com/org/dis-tools"
+              href="https://www.npmjs.com/org/godwana"
               target="_blank"
               rel="noopener noreferrer"
               className="text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-300"
