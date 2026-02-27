@@ -1,0 +1,29 @@
+{
+  "name": "@dis-tools/web",
+  "version": "0.1.0",
+  "description": "Web editor for publiccode.yml",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest --passWithNoTests",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .next"
+  },
+  "dependencies": {
+    "@dis-tools/core": "workspace:*",
+    "@tailwindcss/forms": "^0.5.11",
+    "autoprefixer": "^10.4.27",
+    "next": "^14.2.0",
+    "postcss": "^8.5.6",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "tailwindcss": "^3.4.19"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0"
+  }
+}

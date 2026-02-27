@@ -1,0 +1,50 @@
+{
+  "name": "publiccode-tools",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Verktygskedja för publiccode.yml och DIS",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cetriq/publiccode-tools.git"
+  },
+  "homepage": "https://github.com/Cetriq/publiccode-tools#readme",
+  "bugs": {
+    "url": "https://github.com/Cetriq/publiccode-tools/issues"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "test": "turbo run test",
+    "lint": "eslint packages/*/src --ext .ts,.tsx",
+    "lint:fix": "eslint packages/*/src --ext .ts,.tsx --fix",
+    "format": "prettier --write \"packages/*/src/**/*.{ts,tsx}\"",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "keywords": [
+    "publiccode",
+    "dis",
+    "opensource",
+    "sweden"
+  ],
+  "author": "DIS-Tools",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@10.30.3",
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.3.2",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
+    "eslint": "^10.0.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "prettier": "^3.8.1",
+    "turbo": "^2.8.11",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}

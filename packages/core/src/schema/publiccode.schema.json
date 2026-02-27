@@ -1,0 +1,376 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dis-tools.se/schemas/publiccode.schema.json",
+  "title": "publiccode.yml schema",
+  "description": "Schema for publiccode.yml files based on https://yml.publiccode.tools/",
+  "type": "object",
+  "required": [
+    "publiccodeYmlVersion",
+    "name",
+    "url",
+    "platforms",
+    "categories",
+    "developmentStatus",
+    "softwareType",
+    "description",
+    "legal"
+  ],
+  "properties": {
+    "publiccodeYmlVersion": {
+      "type": "string",
+      "enum": ["0.4", "0.3"],
+      "description": "Version of the publiccode.yml standard"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "description": "Name of the software"
+    },
+    "applicationSuite": {
+      "type": "string",
+      "description": "Name of the application suite"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL of the source code repository"
+    },
+    "landingURL": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL of the landing page"
+    },
+    "isBasedOn": {
+      "oneOf": [
+        { "type": "string", "format": "uri" },
+        { "type": "array", "items": { "type": "string", "format": "uri" } }
+      ],
+      "description": "URL(s) of the original software this is based on"
+    },
+    "softwareVersion": {
+      "type": "string",
+      "description": "Current software version"
+    },
+    "releaseDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the latest release (YYYY-MM-DD)"
+    },
+    "logo": {
+      "type": "string",
+      "description": "Path or URL to the logo"
+    },
+    "monochromeLogo": {
+      "type": "string",
+      "description": "Path or URL to a monochrome logo"
+    },
+    "inputTypes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of input MIME types"
+    },
+    "outputTypes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of output MIME types"
+    },
+    "platforms": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": ["web", "windows", "mac", "linux", "ios", "android"]
+      },
+      "description": "Platforms the software runs on"
+    },
+    "categories": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": [
+          "ACCOUNTING",
+          "AGRI_ENVIRONMENT",
+          "ARCHIVING",
+          "CASE_MANAGEMENT",
+          "CIVIC_ENGAGEMENT",
+          "COLLABORATION",
+          "COMMUNICATIONS",
+          "CONTENT_MANAGEMENT",
+          "DATA_ANALYTICS",
+          "DATA_COLLECTION",
+          "DOCUMENT_MANAGEMENT",
+          "E_COMMERCE",
+          "E_SIGNATURE",
+          "EDUCATION",
+          "EMAIL_MANAGEMENT",
+          "EVENT_MANAGEMENT",
+          "FACILITY_MANAGEMENT",
+          "FINANCIAL_REPORTING",
+          "GEOGRAPHIC_INFORMATION",
+          "GOVERNMENT_WEBSITES",
+          "HEALTHCARE",
+          "HELPDESK",
+          "HR",
+          "IDENTITY_MANAGEMENT",
+          "IT_ASSET_MANAGEMENT",
+          "IT_DEVELOPMENT",
+          "IT_SECURITY",
+          "IT_SERVICE_MANAGEMENT",
+          "KNOWLEDGE_MANAGEMENT",
+          "LEARNING_MANAGEMENT",
+          "LEGAL_DOCUMENT_MANAGEMENT",
+          "LOCAL_GOVERNMENT",
+          "MARKETING",
+          "MOBILE_APPS",
+          "OFFICE",
+          "OPEN_DATA",
+          "PAYMENTS",
+          "PERMITS",
+          "POLICY_AUTHORING",
+          "PROCUREMENT",
+          "PROJECT_MANAGEMENT",
+          "PUBLIC_PARTICIPATION",
+          "RECORDS_MANAGEMENT",
+          "REPORTING_ISSUES",
+          "SOCIAL_MEDIA_MANAGEMENT",
+          "SOCIAL_SERVICES",
+          "TRANSPORTATION",
+          "VISITOR_MANAGEMENT",
+          "VOTING",
+          "WASTE_MANAGEMENT",
+          "WEBSITE_MANAGEMENT",
+          "WORKFLOW_MANAGEMENT"
+        ]
+      },
+      "description": "Software categories"
+    },
+    "developmentStatus": {
+      "type": "string",
+      "enum": ["concept", "development", "beta", "stable", "obsolete"],
+      "description": "Development status of the software"
+    },
+    "softwareType": {
+      "type": "string",
+      "enum": [
+        "standalone/mobile",
+        "standalone/iot",
+        "standalone/desktop",
+        "standalone/web",
+        "standalone/backend",
+        "standalone/other",
+        "addon",
+        "library",
+        "configurationFiles"
+      ],
+      "description": "Type of software"
+    },
+    "description": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/definitions/description"
+      },
+      "description": "Localized descriptions (language code as key)"
+    },
+    "legal": {
+      "type": "object",
+      "required": ["license", "repoOwner"],
+      "properties": {
+        "license": {
+          "type": "string",
+          "description": "SPDX license identifier"
+        },
+        "mainCopyrightOwner": {
+          "type": "string",
+          "description": "Main copyright owner"
+        },
+        "repoOwner": {
+          "type": "string",
+          "description": "Repository owner"
+        },
+        "authorsFile": {
+          "type": "string",
+          "description": "Path to the authors file"
+        }
+      }
+    },
+    "maintenance": {
+      "type": "object",
+      "required": ["type", "contacts"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["internal", "contract", "community", "none"],
+          "description": "Type of maintenance"
+        },
+        "contractors": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/contractor" }
+        },
+        "contacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/contact" }
+        }
+      }
+    },
+    "localisation": {
+      "type": "object",
+      "required": ["localisationReady", "availableLanguages"],
+      "properties": {
+        "localisationReady": {
+          "type": "boolean",
+          "description": "Whether the software supports localisation"
+        },
+        "availableLanguages": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "description": "List of available language codes"
+        }
+      }
+    },
+    "dependsOn": {
+      "type": "object",
+      "properties": {
+        "open": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/dependency" }
+        },
+        "proprietary": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/dependency" }
+        },
+        "hardware": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/dependency" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "description": {
+      "type": "object",
+      "required": ["shortDescription"],
+      "properties": {
+        "localisedName": {
+          "type": "string",
+          "description": "Localized name"
+        },
+        "shortDescription": {
+          "type": "string",
+          "maxLength": 150,
+          "description": "Short description (max 150 characters)"
+        },
+        "longDescription": {
+          "type": "string",
+          "minLength": 150,
+          "maxLength": 10000,
+          "description": "Long description (150-10000 characters)"
+        },
+        "documentation": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to documentation"
+        },
+        "apiDocumentation": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to API documentation"
+        },
+        "features": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of features"
+        },
+        "screenshots": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Paths or URLs to screenshots"
+        },
+        "videos": {
+          "type": "array",
+          "items": { "type": "string", "format": "uri" },
+          "description": "URLs to videos"
+        },
+        "awards": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Awards received"
+        }
+      }
+    },
+    "contact": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Contact name"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Contact email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Contact phone"
+        },
+        "affiliation": {
+          "type": "string",
+          "description": "Organization affiliation"
+        }
+      }
+    },
+    "contractor": {
+      "type": "object",
+      "required": ["name", "until"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Contractor name"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Contractor email"
+        },
+        "website": {
+          "type": "string",
+          "format": "uri",
+          "description": "Contractor website"
+        },
+        "until": {
+          "type": "string",
+          "format": "date",
+          "description": "Contract end date"
+        }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Dependency name"
+        },
+        "versionMin": {
+          "type": "string",
+          "description": "Minimum version"
+        },
+        "versionMax": {
+          "type": "string",
+          "description": "Maximum version"
+        },
+        "optional": {
+          "type": "boolean",
+          "description": "Whether the dependency is optional"
+        }
+      }
+    }
+  }
+}

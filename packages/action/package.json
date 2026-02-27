@@ -1,0 +1,35 @@
+{
+  "name": "@dis-tools/action",
+  "version": "0.1.0",
+  "description": "GitHub Action for publiccode.yml validation",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cetriq/publiccode-tools.git",
+    "directory": "packages/action"
+  },
+  "homepage": "https://github.com/Cetriq/publiccode-tools#readme",
+  "bugs": {
+    "url": "https://github.com/Cetriq/publiccode-tools/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest --passWithNoTests",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist action-dist"
+  },
+  "keywords": [
+    "publiccode",
+    "github-action",
+    "dis"
+  ],
+  "author": "DIS-Tools",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@actions/core": "^3.0.0",
+    "@actions/github": "^9.0.0",
+    "@dis-tools/core": "workspace:*"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "name": "@dis-tools/cli",
+  "version": "0.1.0",
+  "description": "CLI tool for publiccode.yml validation and generation",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cetriq/publiccode-tools.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/Cetriq/publiccode-tools#readme",
+  "bugs": {
+    "url": "https://github.com/Cetriq/publiccode-tools/issues"
+  },
+  "type": "module",
+  "bin": {
+    "pcode": "./bin/pcode.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest --passWithNoTests",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "keywords": [
+    "publiccode",
+    "cli",
+    "dis"
+  ],
+  "author": "DIS-Tools",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@dis-tools/core": "workspace:*",
+    "chalk": "^5.6.2",
+    "commander": "^14.0.3",
+    "inquirer": "^13.3.0",
+    "ora": "^9.3.0",
+    "yaml": "^2.8.2"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.9"
+  }
+}
