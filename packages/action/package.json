@@ -14,7 +14,7 @@
   "type": "module",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && ncc build dist/index.js -o action-dist --minify",
     "dev": "tsc --watch",
     "test": "vitest --passWithNoTests",
     "typecheck": "tsc --noEmit",
@@ -31,5 +31,8 @@
     "@actions/core": "^3.0.0",
     "@actions/github": "^9.0.0",
     "@godwana/publiccode-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.4"
   }
 }

@@ -1,0 +1,50 @@
+name: 'DIS publiccode.yml Validator'
+description: 'Validera och poängsätt publiccode.yml enligt DIS-standarden för öppen källkod i offentlig sektor'
+author: 'Cetriq'
+
+branding:
+  icon: 'check-circle'
+  color: 'blue'
+
+inputs:
+  path:
+    description: 'Sökväg till publiccode.yml'
+    required: false
+    default: './publiccode.yml'
+
+  fail-on-warnings:
+    description: 'Misslyckas om varningar hittas'
+    required: false
+    default: 'false'
+
+  min-score:
+    description: 'Minsta godkända DIS-Readiness Score (0-100)'
+    required: false
+    default: '0'
+
+  annotate:
+    description: 'Skapa PR-annotationer för fel och varningar'
+    required: false
+    default: 'true'
+
+  lang:
+    description: 'Språk för meddelanden (sv/en)'
+    required: false
+    default: 'sv'
+
+outputs:
+  valid:
+    description: 'true om filen är giltig'
+
+  score:
+    description: 'DIS-Readiness Score (0-100)'
+
+  errors:
+    description: 'Antal valideringsfel'
+
+  warnings:
+    description: 'Antal varningar'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

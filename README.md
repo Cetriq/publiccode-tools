@@ -1,21 +1,21 @@
 # publiccode-tools
 
-Verktygskedja for `publiccode.yml` - standarden for att beskriva oppen kallkod i offentlig sektor.
+Verktygskedja för `publiccode.yml` - standarden för att beskriva öppen källkod i offentlig sektor.
 
-## Vad ar publiccode.yml?
+## Vad är publiccode.yml?
 
-[publiccode.yml](https://docs.italia.it/italia/developers-italia/publiccodeyml/en/master/) ar en metadatastandard for mjukvarurepositorier i offentlig sektor. Filen placeras i rotmappen pa ett Git-repo och gor mjukvaran maskinlasbar och sokbar.
+[publiccode.yml](https://docs.italia.it/italia/developers-italia/publiccodeyml/en/master/) är en metadatastandard för mjukvarurepositorier i offentlig sektor. Filen placeras i rotmappen på ett Git-repo och gör mjukvaran maskinläsbar och sökbar.
 
 ## DIS-Readiness Score
 
-DIS-Tools bedomerhur val forberedd en publiccode.yml ar for DIS (Dynamiskt Inkopssystem for digitala tjanster). Poangen (0-100) baseras pa:
+DIS-Tools bedömer hur väl förberedd en publiccode.yml är för DIS (Dynamiskt Inköpssystem för digitala tjänster). Poängen (0-100) baseras på:
 
 | Kategori | Max | Beskrivning |
 |----------|-----|-------------|
-| Obligatoriska falt | 40p | name, url, license, categories, etc. |
+| Obligatoriska fält | 40p | name, url, license, categories, etc. |
 | Dokumentation | 20p | longDescription, screenshots, features |
 | Lokalisering | 15p | Svenska beskrivningar |
-| Underhall | 15p | maintenance.type, contacts |
+| Underhåll | 15p | maintenance.type, contacts |
 | DIS-specifikt | 10p | DIS Fas 1-kategorier |
 
 ## Paket
@@ -41,7 +41,7 @@ pcode init
 # Validera
 pcode validate
 
-# Berakna DIS-Readiness Score
+# Beräkna DIS-Readiness Score
 pcode score --detailed
 
 # Kolla ett GitHub-repo
@@ -84,7 +84,7 @@ console.log(result.valid); // true/false
 console.log(result.errors); // []
 console.log(result.warnings); // []
 
-// Berakna poang
+// Beräkna poäng
 const score = scoreYaml(yaml, { lang: 'sv' });
 console.log(score.total); // 0-100
 console.log(score.breakdown); // { requiredFields, documentation, ... }
@@ -104,7 +104,7 @@ pnpm install
 # Bygg alla paket
 pnpm build
 
-# Kor tester
+# Kör tester
 pnpm test
 
 # Starta webbutvecklingsserver
@@ -113,17 +113,17 @@ pnpm --filter @godwana/publiccode-web dev
 
 ## DIS Fas 1-kategorier
 
-Dessa 9 kategorier ar prioriterade i DIS-initiativet:
+Dessa 9 kategorier är prioriterade i DIS-initiativet:
 
-- `CASE_MANAGEMENT` - Arendehantering
+- `CASE_MANAGEMENT` - Ärendehantering
 - `CIVIC_ENGAGEMENT` - Medborgarengagemang
 - `DATA_ANALYTICS` - Dataanalys
 - `DOCUMENT_MANAGEMENT` - Dokumenthantering
 - `IDENTITY_MANAGEMENT` - Identitetshantering
-- `LOCAL_GOVERNMENT` - Kommunal forvaltning
+- `LOCAL_GOVERNMENT` - Kommunal förvaltning
 - `PUBLIC_PARTICIPATION` - Medborgardeltagande
-- `REPORTING_ISSUES` - Felanmalan
-- `WORKFLOW_MANAGEMENT` - Arbetsfloden
+- `REPORTING_ISSUES` - Felanmälan
+- `WORKFLOW_MANAGEMENT` - Arbetsflöden
 
 ## Licens
 
@@ -131,8 +131,8 @@ Apache-2.0
 
 ## Bidra
 
-Pull requests valkommen! Se [CONTRIBUTING.md](./CONTRIBUTING.md) for riktlinjer.
+Pull requests välkomna! Se [CONTRIBUTING.md](./CONTRIBUTING.md) för riktlinjer.
 
 ---
 
-Byggt med hjarta for svensk offentlig sektor.
+Byggt med kärlek för svensk offentlig sektor.

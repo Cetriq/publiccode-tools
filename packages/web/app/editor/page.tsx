@@ -89,6 +89,206 @@ function calculateScore(data: PubliccodeData): ScoreBreakdown {
   return { total, categories };
 }
 
+// Generate improvement suggestions
+interface Suggestion {
+  id: string;
+  title: string;
+  description: string;
+  points: number;
+  step: number;
+  priority: 'high' | 'medium' | 'low';
+  action?: string;
+}
+
+function generateSuggestions(data: PubliccodeData): Suggestion[] {
+  const suggestions: Suggestion[] = [];
+
+  // Step 1: Basic info
+  if (!data.name) {
+    suggestions.push({
+      id: 'name',
+      title: 'Lägg till projektnamn',
+      description: 'Ett tydligt namn hjälper andra hitta projektet',
+      points: 8,
+      step: 1,
+      priority: 'high',
+      action: 'Fyll i Projektnamn',
+    });
+  }
+
+  if (!data.url) {
+    suggestions.push({
+      id: 'url',
+      title: 'Lägg till kodarkiv-URL',
+      description: 'Länk till där källkoden finns',
+      points: 8,
+      step: 1,
+      priority: 'high',
+      action: 'Fyll i Kodarkiv URL',
+    });
+  }
+
+  if (!data.developmentStatus) {
+    suggestions.push({
+      id: 'status',
+      title: 'Välj utvecklingsstatus',
+      description: 'Visa om projektet är stabilt eller under utveckling',
+      points: 5,
+      step: 1,
+      priority: 'medium',
+      action: 'Välj status',
+    });
+  }
+
+  // Step 2: Categories
+  if (data.categories.length === 0) {
+    suggestions.push({
+      id: 'categories',
+      title: 'Välj minst en kategori',
+      description: 'Kategorier gör projektet sökbart',
+      points: 4,
+      step: 2,
+      priority: 'high',
+      action: 'Välj kategorier',
+    });
+  }
+
+  const priorityCategories = ['case-management', 'civic-engagement', 'data-analytics', 'document-management', 'identity', 'local-government', 'participation', 'reporting', 'workflow-automation'];
+  const hasPriorityCategory = data.categories.some(c => priorityCategories.includes(c));
+
+  if (!hasPriorityCategory && data.categories.length > 0) {
+    suggestions.push({
+      id: 'priority-cat',
+      title: 'Överväg en DIS Fas 1-kategori',
+      description: 'Projekt inom prioriterade områden får extra synlighet',
+      points: 3,
+      step: 2,
+      priority: 'low',
+      action: 'Se prioriterade kategorier',
+    });
+  }
+
+  // Step 3: Description
+  if (!data.description.sv?.shortDescription) {
+    suggestions.push({
+      id: 'short-desc',
+      title: 'Lägg till kort beskrivning',
+      description: 'En sammanfattning visas i sökresultat',
+      points: 10,
+      step: 3,
+      priority: 'high',
+      action: 'Skriv beskrivning',
+    });
+  }
+
+  if (!data.description.sv?.longDescription || data.description.sv.longDescription.length < 50) {
+    suggestions.push({
+      id: 'long-desc',
+      title: 'Lägg till längre beskrivning',
+      description: 'Förklara vad projektet gör och för vem',
+      points: 10,
+      step: 3,
+      priority: 'medium',
+      action: 'Skriv detaljerad beskrivning',
+    });
+  }
+
+  if (!data.description.sv?.features || data.description.sv.features.length === 0) {
+    suggestions.push({
+      id: 'features',
+      title: 'Lista projektets funktioner',
+      description: 'Visa vad användare kan göra med projektet',
+      points: 5,
+      step: 3,
+      priority: 'low',
+      action: 'Lägg till funktioner',
+    });
+  }
+
+  // Step 4: License
+  if (!data.legal.license) {
+    suggestions.push({
+      id: 'license',
+      title: 'Välj en licens',
+      description: 'Obligatoriskt för öppen källkod',
+      points: 15,
+      step: 4,
+      priority: 'high',
+      action: 'Välj licens',
+    });
+  }
+
+  if (!data.legal.repoOwner) {
+    suggestions.push({
+      id: 'owner',
+      title: 'Ange ägare',
+      description: 'Vem ansvarar för kodarkivet?',
+      points: 5,
+      step: 4,
+      priority: 'low',
+      action: 'Ange organisation',
+    });
+  }
+
+  if (!data.sv?.disFas1 && hasPriorityCategory) {
+    suggestions.push({
+      id: 'dis-fas1',
+      title: 'Aktivera DIS Fas 1-markering',
+      description: 'Du har valt en prioriterad kategori',
+      points: 4,
+      step: 4,
+      priority: 'medium',
+      action: 'Aktivera DIS Fas 1',
+    });
+  }
+
+  // Step 5: Maintenance
+  if (!data.maintenance.type) {
+    suggestions.push({
+      id: 'maint-type',
+      title: 'Välj underhållstyp',
+      description: 'Hur underhålls projektet?',
+      points: 5,
+      step: 5,
+      priority: 'medium',
+      action: 'Välj underhållstyp',
+    });
+  }
+
+  if (!data.maintenance.contacts[0]?.name) {
+    suggestions.push({
+      id: 'contact-name',
+      title: 'Lägg till kontaktperson',
+      description: 'Vem kan svara på frågor?',
+      points: 10,
+      step: 5,
+      priority: 'high',
+      action: 'Ange kontaktperson',
+    });
+  }
+
+  if (!data.maintenance.contacts[0]?.email && data.maintenance.contacts[0]?.name) {
+    suggestions.push({
+      id: 'contact-email',
+      title: 'Lägg till e-post',
+      description: 'Gör det lätt att nå kontaktpersonen',
+      points: 5,
+      step: 5,
+      priority: 'medium',
+      action: 'Ange e-post',
+    });
+  }
+
+  // Sort by priority and points
+  const priorityOrder = { high: 0, medium: 1, low: 2 };
+  return suggestions.sort((a, b) => {
+    if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
+      return priorityOrder[a.priority] - priorityOrder[b.priority];
+    }
+    return b.points - a.points;
+  });
+}
+
 // Types for publiccode.yml
 interface PubliccodeData {
   publiccodeYmlVersion: string;
@@ -241,6 +441,7 @@ export default function EditorPage() {
   const [showScore, setShowScore] = useState(true);
 
   const scoreBreakdown = useMemo(() => calculateScore(data), [data]);
+  const suggestions = useMemo(() => generateSuggestions(data), [data]);
 
   const updateData = (path: string, value: unknown) => {
     setData((prev) => {
@@ -650,31 +851,51 @@ export default function EditorPage() {
                   ))}
                 </div>
 
-                {/* Missing items hint - styled as tips */}
-                {scoreBreakdown.total < 100 && (
+                {/* Improvement suggestions - clickable with step navigation */}
+                {suggestions.length > 0 && (
                   <div className="mt-6 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 p-4 dark:from-slate-800 dark:to-slate-800/50">
                     <p className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
                       <svg className="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                       </svg>
-                      Snabba vinster
+                      Förbättringsförslag
                     </p>
                     <ul className="mt-3 space-y-2">
-                      {scoreBreakdown.categories
-                        .flatMap((cat) => cat.items.filter((i) => !i.fulfilled))
-                        .slice(0, 3)
-                        .map((item, i) => (
-                          <li
-                            key={i}
-                            className="flex items-center gap-2 text-xs"
+                      {suggestions.slice(0, 4).map((suggestion) => (
+                        <li key={suggestion.id}>
+                          <button
+                            onClick={() => setCurrentStep(suggestion.step)}
+                            className="group flex w-full items-start gap-2 rounded-lg p-1.5 text-left transition-colors hover:bg-white dark:hover:bg-slate-700/50"
                           >
-                            <span className="rounded-full bg-amber-100 px-2 py-0.5 font-bold text-amber-700 dark:bg-amber-900/50 dark:text-amber-400">
-                              +{item.points}
+                            <span className={`mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-xs font-bold ${
+                              suggestion.priority === 'high'
+                                ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400'
+                                : suggestion.priority === 'medium'
+                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400'
+                                : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-400'
+                            }`}>
+                              +{suggestion.points}
                             </span>
-                            <span className="text-slate-600 dark:text-slate-400">{item.label}</span>
-                          </li>
-                        ))}
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-medium text-slate-700 group-hover:text-slate-900 dark:text-slate-300 dark:group-hover:text-white">
+                                {suggestion.title}
+                              </p>
+                              <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                                {suggestion.description}
+                              </p>
+                            </div>
+                            <svg className="h-4 w-4 shrink-0 text-slate-400 opacity-0 transition-opacity group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </button>
+                        </li>
+                      ))}
                     </ul>
+                    {suggestions.length > 4 && (
+                      <p className="mt-2 text-center text-[10px] text-slate-500">
+                        +{suggestions.length - 4} till
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
@@ -730,11 +951,60 @@ function Step1({
   data,
   updateData,
   developmentStatusOptions,
+  onImport,
 }: {
   data: PubliccodeData;
   updateData: (path: string, value: unknown) => void;
   developmentStatusOptions: Array<{ value: string; label: string; description: string }>;
+  onImport?: (importData: { name: string; url: string; description: string; license: string; repoOwner: string; releaseDate: string }) => void;
 }) {
+  const [githubUrl, setGithubUrl] = useState('');
+  const [isImporting, setIsImporting] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [importSuccess, setImportSuccess] = useState(false);
+
+  const handleImport = async () => {
+    if (!githubUrl.trim()) return;
+
+    setIsImporting(true);
+    setImportError(null);
+    setImportSuccess(false);
+
+    try {
+      const response = await fetch('/api/github/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: githubUrl }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setImportError(result.error || 'Ett fel uppstod');
+        return;
+      }
+
+      // Update form data with imported values
+      if (result.name) updateData('name', result.name);
+      if (result.url) updateData('url', result.url);
+      if (result.description) updateData('description.sv.shortDescription', result.description.slice(0, 150));
+      if (result.license) updateData('legal.license', result.license);
+      if (result.repoOwner) updateData('legal.repoOwner', result.repoOwner);
+      if (result.releaseDate) updateData('releaseDate', result.releaseDate);
+
+      if (onImport) {
+        onImport(result);
+      }
+
+      setImportSuccess(true);
+      setTimeout(() => setImportSuccess(false), 3000);
+    } catch {
+      setImportError('Kunde inte ansluta till servern');
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   return (
     <div className="relative space-y-8">
       <div>
@@ -747,6 +1017,68 @@ function Step1({
         <p className="mt-2 text-slate-600 dark:text-slate-400">
           Berätta vad projektet heter och var det finns
         </p>
+      </div>
+
+      {/* GitHub Import */}
+      <div className="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 p-5 dark:border-slate-700 dark:from-slate-800/50 dark:to-slate-900/50">
+        <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
+          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+          Importera från GitHub
+        </div>
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          Fyll i formuläret automatiskt från ett GitHub-arkiv
+        </p>
+        <div className="mt-3 flex gap-2">
+          <input
+            type="text"
+            value={githubUrl}
+            onChange={(e) => setGithubUrl(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleImport())}
+            placeholder="https://github.com/owner/repo eller owner/repo"
+            className="input flex-1"
+            disabled={isImporting}
+          />
+          <button
+            onClick={handleImport}
+            disabled={isImporting || !githubUrl.trim()}
+            className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-700 dark:hover:bg-slate-600"
+          >
+            {isImporting ? (
+              <>
+                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Hämtar...
+              </>
+            ) : (
+              <>
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                Importera
+              </>
+            )}
+          </button>
+        </div>
+        {importError && (
+          <p className="mt-2 flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {importError}
+          </p>
+        )}
+        {importSuccess && (
+          <p className="mt-2 flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            Data importerad! Kontrollera och fyll i resten.
+          </p>
+        )}
       </div>
 
       <div>

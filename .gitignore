@@ -1,8 +1,9 @@
 # Dependencies
 node_modules/
 
-# Build output
-dist/
+# Build output (packages only, root dist is for GitHub Action)
+packages/**/dist/
+!dist/
 .next/
 out/
 
