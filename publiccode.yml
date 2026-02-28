@@ -6,9 +6,9 @@ softwareVersion: 0.1.0
 platforms:
   - web
 categories:
-  - software-development
   - it-development
   - compliance-management
+  - government-websites
   - workflow-management
 developmentStatus: development
 softwareType: standalone/web
