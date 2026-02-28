@@ -7,8 +7,8 @@ platforms:
   - web
 categories:
   - workflow-management
-  - data-analytics
-  - it-management
+  - application-development
+  - digital-asset-management
   - it-asset-management
   - it-development
 developmentStatus: development
@@ -16,20 +16,17 @@ softwareType: standalone/web
 description:
   sv:
     shortDescription: Verktygskedja för publiccode.yml och DIS-Readiness
-    longDescription: |-
-      DIS-Tools är en samling verktyg för att hjälpa svenska myndigheter och kommuner att beskriva sina öppen källkod-projekt enligt publiccode.yml-standarden.
-
-                  Verktygskedjan inkluderar:
-                  - En visuell webbredigerare med steg-för-steg-guide
-                  - Ett CLI-verktyg för validering och scoring
-                  - En GitHub Action för automatisk kontroll
-                  - Ett core-bibliotek för programmatisk användning
+    longDescription: |
+      Publiccode Tools är en svensk verktygslåda för att skapa, validera och publicera publiccode.yml-filer enligt den internationella standarden.
+        Systemet hjälper offentliga organisationer och myndigheter att enkelt dokumentera sina öppna källkodsprojekt på ett strukturerat sätt. Med inbyggd
+        DIS-Readiness-poängsättning får du direkt feedback på hur väl din dokumentation uppfyller svenska krav för digital informationssamverkan. Verktyget
+         stödjer alla 117 standardkategorier, erbjuder realtidsvalidering mot JSON-schema, och genererar YAML-filer som kan läggas direkt i ditt kodarkiv.
+        Katalogfunktionen ger överblick över registrerade projekt och underlättar återanvändning av öppen programvara inom offentlig sektor.
     features:
-      - Visuell redigerare för publiccode.yml
-      - DIS-Readiness Score (0-100 poäng)
-      - Validering mot publiccode.yml-standarden
-      - CLI-verktyg för automation
-      - GitHub Action för CI/CD-integration
+      - En visuell webbredigerare med steg-för-steg-guide
+      - Ett CLI-verktyg för validering och scoring
+      - En GitHub Action för automatisk kontroll
+      - Ett core-bibliotek för programmatisk användning
     localisedName: DIS-Tools
 legal:
   license: Apache-2.0
@@ -39,6 +36,7 @@ maintenance:
   contacts:
     - name: Clas Törnquist
       email: clas.tornquist@hotmail.com
+      phone: "+46764951061"
 localisation:
   localisationReady: false
   availableLanguages:
