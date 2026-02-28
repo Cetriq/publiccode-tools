@@ -18,6 +18,14 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./categories": {
+      "import": "./dist/categories/index.js",
+      "types": "./dist/categories/index.d.ts"
+    },
+    "./scorer": {
+      "import": "./dist/scorer/index.js",
+      "types": "./dist/scorer/index.d.ts"
     }
   },
   "scripts": {

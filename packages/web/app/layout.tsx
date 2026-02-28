@@ -1,10 +1,12 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import SessionProvider from '@/components/SessionProvider';
+import Header from '@/components/Header';
 
 export const metadata: Metadata = {
-  title: 'DIS-Tools - publiccode.yml Editor',
-  description: 'Skapa och validera publiccode.yml för svenska OSS-projekt',
-  keywords: ['publiccode', 'DIS', 'open source', 'Sverige', 'offentlig sektor'],
+  title: 'Digital Infrastruktur för Samhällsservice - publiccode.yml',
+  description: 'Verktyg för att beskriva och dela öppen programvara i svensk offentlig sektor',
+  keywords: ['publiccode', 'DIS', 'open source', 'Sverige', 'offentlig sektor', 'digital infrastruktur'],
 };
 
 export default function RootLayout({
@@ -14,80 +16,26 @@ export default function RootLayout({
 }) {
   return (
     <html lang="sv" suppressHydrationWarning>
-      <body className="min-h-screen bg-slate-50 dark:bg-slate-950">
-        <Header />
-        <main>{children}</main>
-        <Footer />
+      <body className="min-h-screen">
+        <SessionProvider>
+          <Header />
+          <main>{children}</main>
+          <Footer />
+        </SessionProvider>
       </body>
     </html>
   );
 }
 
-function Header() {
-  return (
-    <header className="absolute top-0 z-50 w-full">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-20 items-center justify-between">
-          <a href="/" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500">
-              <svg
-                className="h-6 w-6 text-white"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-              </svg>
-            </div>
-            <span className="text-xl font-bold text-white">
-              DIS-Tools
-            </span>
-          </a>
-          <nav className="hidden items-center gap-8 md:flex">
-            <a
-              href="#hur-det-fungerar"
-              className="text-sm font-medium text-slate-300 transition-colors hover:text-white"
-            >
-              Hur det fungerar
-            </a>
-            <a
-              href="/editor"
-              className="text-sm font-medium text-slate-300 transition-colors hover:text-white"
-            >
-              Redigerare
-            </a>
-            <a
-              href="https://github.com/Cetriq/publiccode-tools"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-medium text-slate-300 transition-colors hover:text-white"
-            >
-              Källkod
-            </a>
-            <a
-              href="/editor"
-              className="rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/20"
-            >
-              Kom igång
-            </a>
-          </nav>
-        </div>
-      </div>
-    </header>
-  );
-}
-
 function Footer() {
   return (
-    <footer className="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+    <footer className="border-t border-slate-800 bg-slate-900">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="grid gap-8 lg:grid-cols-4">
           {/* Brand */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-blue-500">
                 <svg
                   className="h-6 w-6 text-white"
                   viewBox="0 0 24 24"
@@ -99,26 +47,39 @@ function Footer() {
                   <polyline points="14 2 14 8 20 8" />
                 </svg>
               </div>
-              <span className="text-xl font-bold text-slate-900 dark:text-white">
-                DIS-Tools
-              </span>
+              <div className="flex flex-col">
+                <span className="text-lg font-bold leading-tight text-white">
+                  Digital Infrastruktur
+                </span>
+                <span className="text-sm font-medium leading-tight text-slate-400">
+                  för Samhällsservice
+                </span>
+              </div>
             </div>
-            <p className="mt-4 max-w-md text-slate-600 dark:text-slate-400">
+            <p className="mt-4 max-w-md text-slate-400">
               Verktyg för att beskriva och dela öppen programvara i svensk offentlig sektor.
-              En del av initiativet Digital Infrastruktur för Samhällsservice.
+              Tillsammans bygger vi en digital infrastruktur för samhället.
             </p>
           </div>
 
           {/* Links */}
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-white">
               Verktyg
             </h3>
             <ul className="mt-4 space-y-3">
               <li>
                 <a
+                  href="/catalog"
+                  className="text-slate-400 transition-colors hover:text-white"
+                >
+                  Projektkatalog
+                </a>
+              </li>
+              <li>
+                <a
                   href="/editor"
-                  className="text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                  className="text-slate-400 transition-colors hover:text-white"
                 >
                   Visuell redigerare
                 </a>
@@ -128,7 +89,7 @@ function Footer() {
                   href="https://www.npmjs.com/package/@godwana/publiccode-cli"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                  className="text-slate-400 transition-colors hover:text-white"
                 >
                   Kommandoradsverktyg
                 </a>
@@ -138,7 +99,7 @@ function Footer() {
                   href="https://github.com/marketplace/actions/dis-publiccode-yml-validator"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                  className="text-slate-400 transition-colors hover:text-white"
                 >
                   GitHub-integration
                 </a>
@@ -148,7 +109,7 @@ function Footer() {
 
           {/* Resources */}
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-white">
               Resurser
             </h3>
             <ul className="mt-4 space-y-3">
@@ -157,7 +118,7 @@ function Footer() {
                   href="https://github.com/Cetriq/publiccode-tools"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                  className="text-slate-400 transition-colors hover:text-white"
                 >
                   Källkod på GitHub
                 </a>
@@ -167,7 +128,7 @@ function Footer() {
                   href="https://www.npmjs.com/org/godwana"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                  className="text-slate-400 transition-colors hover:text-white"
                 >
                   Paket på npm
                 </a>
@@ -177,7 +138,7 @@ function Footer() {
                   href="https://yml.publiccode.tools/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                  className="text-slate-400 transition-colors hover:text-white"
                 >
                   publiccode.yml-standard
                 </a>
@@ -187,8 +148,8 @@ function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 dark:border-slate-800 sm:flex-row">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-8 sm:flex-row">
+          <p className="text-sm text-slate-400">
             Öppen källkod under MIT-licens. Bidra gärna!
           </p>
           <div className="flex items-center gap-6">
@@ -196,7 +157,7 @@ function Footer() {
               href="https://github.com/Cetriq/publiccode-tools"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-300"
+              className="text-slate-400 transition-colors hover:text-white"
               aria-label="GitHub"
             >
               <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
@@ -207,7 +168,7 @@ function Footer() {
               href="https://www.npmjs.com/org/godwana"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-300"
+              className="text-slate-400 transition-colors hover:text-white"
               aria-label="npm"
             >
               <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">

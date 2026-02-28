@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import CopyButton from '@/components/CopyButton';
 
 export default function Home() {
   return (
@@ -268,19 +269,22 @@ export default function Home() {
               </div>
               <div className="p-6">
                 <div className="space-y-4 font-mono text-sm">
-                  <div>
+                  <div className="group inline-flex items-center">
                     <span className="text-slate-500">$</span>
                     <span className="text-slate-300"> npm install -g @godwana/publiccode-cli</span>
+                    <CopyButton text="npm install -g @godwana/publiccode-cli" className="ml-2 opacity-0 group-hover:opacity-100" />
                   </div>
                   <div className="text-slate-500"># Skapa en ny projektbeskrivning</div>
-                  <div>
+                  <div className="group inline-flex items-center">
                     <span className="text-slate-500">$</span>
                     <span className="text-slate-300"> pcode init</span>
+                    <CopyButton text="pcode init" className="ml-2 opacity-0 group-hover:opacity-100" />
                   </div>
                   <div className="text-slate-500"># Kontrollera kvaliteten</div>
-                  <div>
+                  <div className="group inline-flex items-center">
                     <span className="text-slate-500">$</span>
                     <span className="text-slate-300"> pcode score --detailed</span>
+                    <CopyButton text="pcode score --detailed" className="ml-2 opacity-0 group-hover:opacity-100" />
                   </div>
                   <div className="mt-4 rounded-lg bg-slate-800 p-4">
                     <div className="text-green-400">Kvalitetspoäng: 85/100</div>

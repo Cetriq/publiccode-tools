@@ -6,13 +6,36 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { readFileSync, existsSync } from 'fs';
+import { load as parseYaml } from 'js-yaml';
 import {
   validate,
   scoreYaml,
+  CATEGORIES,
   type ValidationResult,
   type ScoreResult,
   type Language,
 } from '@godwana/publiccode-core';
+
+interface RegistrationPayload {
+  url: string;
+  name: string;
+  description: string;
+  score: number;
+  categories: string[];
+  disFase1: boolean;
+  owner: string;
+  license: string;
+  developmentStatus: string;
+  maintenanceType: string;
+}
+
+interface RegistrationResponse {
+  success: boolean;
+  message: string;
+  id?: string;
+  registered?: boolean;
+  updated?: boolean;
+}
 
 async function run(): Promise<void> {
   try {
@@ -22,6 +45,9 @@ async function run(): Promise<void> {
     const minScore = parseInt(core.getInput('min-score') || '0', 10);
     const annotate = core.getInput('annotate') !== 'false';
     const lang = (core.getInput('lang') || 'sv') as Language;
+    const shouldRegister = core.getInput('register') === 'true';
+    const registryApiKey = core.getInput('registry-api-key');
+    const registryUrl = core.getInput('registry-url') || 'https://publiccode.dis.tools/api/registry';
 
     core.info(lang === 'sv' ? `Validerar ${path}...` : `Validating ${path}...`);
 
@@ -89,6 +115,34 @@ async function run(): Promise<void> {
           ? `✓ Validering lyckades! DIS-Readiness Score: ${scoreResult.total}/100`
           : `✓ Validation passed! DIS-Readiness Score: ${scoreResult.total}/100`
       );
+
+      // Register in catalog if requested and score >= 60
+      if (shouldRegister && scoreResult.total >= 60) {
+        if (!registryApiKey) {
+          core.warning(
+            lang === 'sv'
+              ? 'Registrering kräver registry-api-key'
+              : 'Registration requires registry-api-key'
+          );
+          core.setOutput('registered', false);
+        } else {
+          const registered = await registerRepository(
+            yaml,
+            scoreResult,
+            registryApiKey,
+            registryUrl,
+            lang
+          );
+          core.setOutput('registered', registered);
+        }
+      } else if (shouldRegister && scoreResult.total < 60) {
+        core.info(
+          lang === 'sv'
+            ? `Registrering hoppad - score ${scoreResult.total} är under 60`
+            : `Registration skipped - score ${scoreResult.total} is below 60`
+        );
+        core.setOutput('registered', false);
+      }
     }
   } catch (error) {
     if (error instanceof Error) {
@@ -292,6 +346,95 @@ async function createSummary(
       )
       .addRaw(suggestionList)
       .write();
+  }
+}
+
+/**
+ * Register repository in the DIS catalog
+ */
+async function registerRepository(
+  yaml: string,
+  scoreResult: ScoreResult,
+  apiKey: string,
+  registryUrl: string,
+  lang: Language
+): Promise<boolean> {
+  try {
+    core.info(
+      lang === 'sv'
+        ? '📤 Registrerar i DIS-katalogen...'
+        : '📤 Registering in DIS catalog...'
+    );
+
+    // Parse YAML to extract data
+    const data = parseYaml(yaml) as Record<string, unknown>;
+
+    // Get repo URL from GitHub context
+    const repoUrl = `https://github.com/${github.context.repo.owner}/${github.context.repo.repo}`;
+
+    // Get categories from publiccode.yml
+    const rawCategories = (data.categories as string[]) || [];
+    const validCategories = rawCategories.filter(cat =>
+      CATEGORIES.some(c => c.id === cat)
+    );
+
+    // Check if any category is DIS Fase 1
+    const disFase1 = validCategories.some(cat =>
+      CATEGORIES.find(c => c.id === cat)?.disFase1 === true
+    );
+
+    // Build payload
+    const payload: RegistrationPayload = {
+      url: (data.url as string) || repoUrl,
+      name: (data.name as string) || github.context.repo.repo,
+      description: ((data.description as Record<string, string>)?.sv ||
+        (data.description as Record<string, string>)?.en ||
+        Object.values(data.description as Record<string, string> || {})[0] ||
+        '').slice(0, 300),
+      score: scoreResult.total,
+      categories: validCategories,
+      disFase1,
+      owner: github.context.repo.owner,
+      license: (data.legal as Record<string, string>)?.license || '',
+      developmentStatus: (data.developmentStatus as string) || 'development',
+      maintenanceType: (data.maintenance as Record<string, string>)?.type || 'internal',
+    };
+
+    // POST to registry
+    const response = await fetch(registryUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const result = (await response.json()) as RegistrationResponse;
+
+    if (response.ok && result.success) {
+      core.info(
+        lang === 'sv'
+          ? `✓ ${result.updated ? 'Uppdaterad' : 'Registrerad'} i DIS-katalogen`
+          : `✓ ${result.updated ? 'Updated' : 'Registered'} in DIS catalog`
+      );
+      return true;
+    } else {
+      core.warning(
+        lang === 'sv'
+          ? `Registrering misslyckades: ${result.message}`
+          : `Registration failed: ${result.message}`
+      );
+      return false;
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    core.warning(
+      lang === 'sv'
+        ? `Registrering misslyckades: ${message}`
+        : `Registration failed: ${message}`
+    );
+    return false;
   }
 }
 

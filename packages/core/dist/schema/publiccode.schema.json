@@ -1,0 +1,441 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://dis-tools.se/schemas/publiccode.schema.json",
+    "title": "publiccode.yml schema",
+    "description": "Schema for publiccode.yml files based on https://yml.publiccode.tools/",
+    "type": "object",
+    "required": [
+        "publiccodeYmlVersion",
+        "name",
+        "url",
+        "platforms",
+        "categories",
+        "developmentStatus",
+        "softwareType",
+        "description",
+        "legal"
+    ],
+    "properties": {
+        "publiccodeYmlVersion": {
+            "type": "string",
+            "enum": ["0.4", "0.3"],
+            "description": "Version of the publiccode.yml standard"
+        },
+        "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "description": "Name of the software"
+        },
+        "applicationSuite": {
+            "type": "string",
+            "description": "Name of the application suite"
+        },
+        "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL of the source code repository"
+        },
+        "landingURL": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL of the landing page"
+        },
+        "isBasedOn": {
+            "oneOf": [
+                { "type": "string", "format": "uri" },
+                { "type": "array", "items": { "type": "string", "format": "uri" } }
+            ],
+            "description": "URL(s) of the original software this is based on"
+        },
+        "softwareVersion": {
+            "type": "string",
+            "description": "Current software version"
+        },
+        "releaseDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Date of the latest release (YYYY-MM-DD)"
+        },
+        "logo": {
+            "type": "string",
+            "description": "Path or URL to the logo"
+        },
+        "monochromeLogo": {
+            "type": "string",
+            "description": "Path or URL to a monochrome logo"
+        },
+        "inputTypes": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of input MIME types"
+        },
+        "outputTypes": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of output MIME types"
+        },
+        "platforms": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "string",
+                "enum": ["web", "windows", "mac", "linux", "ios", "android"]
+            },
+            "description": "Platforms the software runs on"
+        },
+        "categories": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "string",
+                "enum": [
+                    "accounting",
+                    "agile-project-management",
+                    "applicant-tracking",
+                    "application-development",
+                    "appointment-scheduling",
+                    "backup",
+                    "billing-and-invoicing",
+                    "blog",
+                    "budgeting",
+                    "business-intelligence",
+                    "business-process-management",
+                    "cad",
+                    "call-center-management",
+                    "case-management",
+                    "civic-engagement",
+                    "cloud-management",
+                    "collaboration",
+                    "communications",
+                    "compliance-management",
+                    "contact-management",
+                    "content-management",
+                    "crm",
+                    "customer-service-and-support",
+                    "data-analytics",
+                    "data-collection",
+                    "data-visualization",
+                    "design",
+                    "design-system",
+                    "digital-asset-management",
+                    "digital-citizenship",
+                    "document-management",
+                    "donor-management",
+                    "e-commerce",
+                    "e-signature",
+                    "educational-content",
+                    "email-management",
+                    "email-marketing",
+                    "employee-management",
+                    "enterprise-project-management",
+                    "enterprise-social-networking",
+                    "erp",
+                    "event-management",
+                    "facility-management",
+                    "feedback-and-reviews-management",
+                    "financial-reporting",
+                    "fleet-management",
+                    "fundraising",
+                    "gamification",
+                    "geographic-information-systems",
+                    "government-websites",
+                    "grant-management",
+                    "graphic-design",
+                    "healthcare",
+                    "help-desk",
+                    "hr",
+                    "ide",
+                    "identity-management",
+                    "instant-messaging",
+                    "integrated-library-system",
+                    "inventory-management",
+                    "it-asset-management",
+                    "it-development",
+                    "it-management",
+                    "it-security",
+                    "it-service-management",
+                    "knowledge-management",
+                    "learning-management-system",
+                    "local-government",
+                    "marketing",
+                    "mind-mapping",
+                    "mobile-marketing",
+                    "mobile-payment",
+                    "network-management",
+                    "office",
+                    "online-booking",
+                    "online-community",
+                    "payment-gateway",
+                    "payroll",
+                    "predictive-analysis",
+                    "procurement",
+                    "productivity-suite",
+                    "project-collaboration",
+                    "project-management",
+                    "property-management",
+                    "public-participation",
+                    "real-estate-management",
+                    "regulations-and-directives",
+                    "remote-support",
+                    "reporting-issues",
+                    "resource-management",
+                    "sales-management",
+                    "seo",
+                    "service-desk",
+                    "social-media-management",
+                    "social-services",
+                    "survey",
+                    "talent-management",
+                    "task-management",
+                    "taxes-management",
+                    "test-management",
+                    "time-management",
+                    "time-tracking",
+                    "translation",
+                    "transportation",
+                    "video-conferencing",
+                    "video-editing",
+                    "visitor-management",
+                    "voip",
+                    "voting",
+                    "warehouse-management",
+                    "waste-management",
+                    "web-collaboration",
+                    "web-conferencing",
+                    "website-builder",
+                    "website-management",
+                    "whistleblowing",
+                    "workflow-management"
+                ]
+            },
+            "description": "Software categories"
+        },
+        "developmentStatus": {
+            "type": "string",
+            "enum": ["concept", "development", "beta", "stable", "obsolete"],
+            "description": "Development status of the software"
+        },
+        "softwareType": {
+            "type": "string",
+            "enum": [
+                "standalone/mobile",
+                "standalone/iot",
+                "standalone/desktop",
+                "standalone/web",
+                "standalone/backend",
+                "standalone/other",
+                "addon",
+                "library",
+                "configurationFiles"
+            ],
+            "description": "Type of software"
+        },
+        "description": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+                "$ref": "#/definitions/description"
+            },
+            "description": "Localized descriptions (language code as key)"
+        },
+        "legal": {
+            "type": "object",
+            "required": ["license", "repoOwner"],
+            "properties": {
+                "license": {
+                    "type": "string",
+                    "description": "SPDX license identifier"
+                },
+                "mainCopyrightOwner": {
+                    "type": "string",
+                    "description": "Main copyright owner"
+                },
+                "repoOwner": {
+                    "type": "string",
+                    "description": "Repository owner"
+                },
+                "authorsFile": {
+                    "type": "string",
+                    "description": "Path to the authors file"
+                }
+            }
+        },
+        "maintenance": {
+            "type": "object",
+            "required": ["type", "contacts"],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": ["internal", "contract", "community", "none"],
+                    "description": "Type of maintenance"
+                },
+                "contractors": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/contractor" }
+                },
+                "contacts": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": { "$ref": "#/definitions/contact" }
+                }
+            }
+        },
+        "localisation": {
+            "type": "object",
+            "required": ["localisationReady", "availableLanguages"],
+            "properties": {
+                "localisationReady": {
+                    "type": "boolean",
+                    "description": "Whether the software supports localisation"
+                },
+                "availableLanguages": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": { "type": "string" },
+                    "description": "List of available language codes"
+                }
+            }
+        },
+        "dependsOn": {
+            "type": "object",
+            "properties": {
+                "open": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/dependency" }
+                },
+                "proprietary": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/dependency" }
+                },
+                "hardware": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/dependency" }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "description": {
+            "type": "object",
+            "required": ["shortDescription"],
+            "properties": {
+                "localisedName": {
+                    "type": "string",
+                    "description": "Localized name"
+                },
+                "shortDescription": {
+                    "type": "string",
+                    "maxLength": 150,
+                    "description": "Short description (max 150 characters)"
+                },
+                "longDescription": {
+                    "type": "string",
+                    "minLength": 150,
+                    "maxLength": 10000,
+                    "description": "Long description (150-10000 characters)"
+                },
+                "documentation": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "URL to documentation"
+                },
+                "apiDocumentation": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "URL to API documentation"
+                },
+                "features": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "List of features"
+                },
+                "screenshots": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Paths or URLs to screenshots"
+                },
+                "videos": {
+                    "type": "array",
+                    "items": { "type": "string", "format": "uri" },
+                    "description": "URLs to videos"
+                },
+                "awards": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Awards received"
+                }
+            }
+        },
+        "contact": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Contact name"
+                },
+                "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Contact email"
+                },
+                "phone": {
+                    "type": "string",
+                    "description": "Contact phone"
+                },
+                "affiliation": {
+                    "type": "string",
+                    "description": "Organization affiliation"
+                }
+            }
+        },
+        "contractor": {
+            "type": "object",
+            "required": ["name", "until"],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Contractor name"
+                },
+                "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Contractor email"
+                },
+                "website": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "Contractor website"
+                },
+                "until": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Contract end date"
+                }
+            }
+        },
+        "dependency": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Dependency name"
+                },
+                "versionMin": {
+                    "type": "string",
+                    "description": "Minimum version"
+                },
+                "versionMax": {
+                    "type": "string",
+                    "description": "Maximum version"
+                },
+                "optional": {
+                    "type": "boolean",
+                    "description": "Whether the dependency is optional"
+                }
+            }
+        }
+    }
+}

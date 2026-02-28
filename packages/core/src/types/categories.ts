@@ -20,13 +20,14 @@ export interface CategoryTranslation {
  * DIS Phase 1 categories that give bonus points
  */
 export const DIS_FASE1_CATEGORIES: Category[] = [
-  'CASE_MANAGEMENT',
-  'CIVIC_ENGAGEMENT',
-  'DATA_ANALYTICS',
-  'DOCUMENT_MANAGEMENT',
-  'IDENTITY_MANAGEMENT',
-  'LOCAL_GOVERNMENT',
-  'PUBLIC_PARTICIPATION',
-  'REPORTING_ISSUES',
-  'WORKFLOW_MANAGEMENT',
+  'case-management',
+  'civic-engagement',
+  'data-analytics',
+  'digital-citizenship',
+  'document-management',
+  'identity-management',
+  'local-government',
+  'public-participation',
+  'reporting-issues',
+  'workflow-management',
 ];

@@ -32,6 +32,21 @@ inputs:
     required: false
     default: 'sv'
 
+  register:
+    description: 'Registrera i DIS-katalogen om score >= 60'
+    required: false
+    default: 'false'
+
+  registry-api-key:
+    description: 'API-nyckel för registrering i DIS-katalogen'
+    required: false
+    default: ''
+
+  registry-url:
+    description: 'URL till registry API'
+    required: false
+    default: 'https://publiccode.dis.tools/api/registry'
+
 outputs:
   valid:
     description: 'true om filen är giltig'
@@ -44,6 +59,9 @@ outputs:
 
   warnings:
     description: 'Antal varningar'
+
+  registered:
+    description: 'true om repot registrerades i katalogen'
 
 runs:
   using: 'node20'

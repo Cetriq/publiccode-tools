@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { parse as parseYaml } from 'yaml';
 
 interface GitHubRepo {
   name: string;
@@ -30,6 +31,8 @@ interface ImportResult {
   topics: string[];
   language: string | null;
   releaseDate: string;
+  publiccodeYml?: Record<string, unknown>;
+  hasPubliccodeYml: boolean;
 }
 
 // Map common SPDX license IDs to publiccode format
@@ -74,6 +77,33 @@ function parseGitHubUrl(url: string): { owner: string; repo: string } | null {
     return { owner: simpleMatch[1], repo: simpleMatch[2] };
   }
 
+  return null;
+}
+
+async function fetchPubliccodeYml(owner: string, repo: string): Promise<Record<string, unknown> | null> {
+  // Try different locations and file names
+  const paths = [
+    'publiccode.yml',
+    'publiccode.yaml',
+    '.publiccode.yml',
+    '.publiccode.yaml',
+  ];
+
+  for (const path of paths) {
+    try {
+      const response = await fetch(
+        `https://raw.githubusercontent.com/${owner}/${repo}/HEAD/${path}`,
+        { headers: { 'User-Agent': 'publiccode-tools' } }
+      );
+      if (response.ok) {
+        const content = await response.text();
+        const parsed = parseYaml(content);
+        return parsed as Record<string, unknown>;
+      }
+    } catch {
+      continue;
+    }
+  }
   return null;
 }
 
@@ -130,6 +160,9 @@ export async function POST(request: NextRequest) {
 
     const data: GitHubRepo = await response.json();
 
+    // Try to fetch existing publiccode.yml
+    const publiccodeYml = await fetchPubliccodeYml(owner, repo);
+
     // Map to publiccode format
     const result: ImportResult = {
       name: data.name,
@@ -140,6 +173,8 @@ export async function POST(request: NextRequest) {
       topics: data.topics || [],
       language: data.language,
       releaseDate: data.pushed_at ? data.pushed_at.split('T')[0] : new Date().toISOString().split('T')[0],
+      publiccodeYml: publiccodeYml || undefined,
+      hasPubliccodeYml: !!publiccodeYml,
     };
 
     return NextResponse.json(result);

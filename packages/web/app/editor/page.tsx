@@ -2,8 +2,13 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { stringify } from 'yaml';
+// Importera endast CATEGORIES (inte validator som använder fs)
+import { CATEGORIES } from '@godwana/publiccode-core/categories';
+// Importera scorer för poängberäkning (samma som används vid registrering)
+import { score as coreScore } from '@godwana/publiccode-core/scorer';
 
-// Score calculation
+// Score calculation - använder samma logik som core-paketet
 interface ScoreBreakdown {
   total: number;
   categories: {
@@ -14,79 +19,87 @@ interface ScoreBreakdown {
   }[];
 }
 
+// Kategorinamn på svenska
+const CATEGORY_NAMES: Record<string, string> = {
+  requiredFields: 'Obligatoriska fält',
+  documentation: 'Dokumentation',
+  localisation: 'Lokalisering',
+  maintenance: 'Underhåll',
+  disSpecific: 'DIS-specifikt',
+};
+
+// Fältnamn på svenska
+const FIELD_NAMES: Record<string, string> = {
+  name: 'Projektnamn',
+  url: 'Kodarkiv (URL)',
+  softwareVersion: 'Programversion',
+  releaseDate: 'Releasedatum',
+  platforms: 'Plattformar',
+  categories: 'Kategorier',
+  developmentStatus: 'Utvecklingsstatus',
+  softwareType: 'Programtyp',
+  description: 'Beskrivning',
+  'legal.license': 'Licens',
+  'legal.repoOwner': 'Ägare av kodarkiv',
+  longDescription: 'Lång beskrivning (>500 tecken)',
+  documentation: 'Dokumentations-URL',
+  screenshots: 'Skärmdumpar',
+  features: 'Funktioner (minst 3)',
+  videos: 'Videor',
+  'description.sv': 'Svensk beskrivning',
+  swedishContact: 'Svensk kontakt (.se eller +46)',
+  'localisation.sv': 'Svenska i availableLanguages',
+  'maintenance.type': 'Underhållstyp (internal/contract)',
+  'maintenance.contacts': 'Kontaktpersoner',
+  recentRelease: 'Nyligen uppdaterad (inom 6 mån)',
+  disFase1Category: 'DIS Fas 1-kategori',
+  multipleCategories: 'Minst 2 kategorier',
+  dependencies: 'Beroenden specificerade',
+};
+
 function calculateScore(data: PubliccodeData): ScoreBreakdown {
+  // Konvertera till PublicCode-format som core-paketet förväntar sig
+  const publiccodeData = {
+    publiccodeYmlVersion: '0.5.0',
+    name: data.name,
+    url: data.url,
+    softwareVersion: data.softwareVersion || '',
+    releaseDate: data.releaseDate || '',
+    platforms: data.platforms || [],
+    categories: data.categories,
+    developmentStatus: data.developmentStatus,
+    softwareType: data.softwareType || 'standalone/other',
+    description: data.description,
+    legal: data.legal,
+    maintenance: data.maintenance,
+    localisation: data.localisation || { localisationReady: false, availableLanguages: [] },
+    dependsOn: data.dependsOn,
+    isBasedOn: data.isBasedOn,
+  };
+
+  // Använd core-paketets poängberäkning
+  const result = coreScore(publiccodeData as never);
+
+  // Konvertera till UI-format
   const categories: ScoreBreakdown['categories'] = [];
 
-  // Category 1: Basic Information (25 points)
-  const basicItems = [
-    { label: 'Projektnamn', fulfilled: !!data.name, points: 8 },
-    { label: 'Kodarkiv (URL)', fulfilled: !!data.url, points: 8 },
-    { label: 'Utvecklingsstatus', fulfilled: !!data.developmentStatus, points: 5 },
-    { label: 'Kategorier', fulfilled: data.categories.length > 0, points: 4 },
-  ];
-  categories.push({
-    name: 'Grundinformation',
-    score: basicItems.filter(i => i.fulfilled).reduce((sum, i) => sum + i.points, 0),
-    maxScore: 25,
-    items: basicItems,
-  });
+  // Mappa breakdown till UI-kategorier
+  const breakdownEntries = Object.entries(result.breakdown) as [string, { score: number; maxScore: number; items: Array<{ name: string; score: number; maxScore: number; met: boolean }> }][];
 
-  // Category 2: Description (25 points)
-  const descItems = [
-    { label: 'Kort beskrivning', fulfilled: !!(data.description.sv?.shortDescription), points: 10 },
-    { label: 'Lång beskrivning', fulfilled: !!(data.description.sv?.longDescription && data.description.sv.longDescription.length > 50), points: 10 },
-    { label: 'Funktioner', fulfilled: !!(data.description.sv?.features && data.description.sv.features.length > 0), points: 5 },
-  ];
-  categories.push({
-    name: 'Beskrivning',
-    score: descItems.filter(i => i.fulfilled).reduce((sum, i) => sum + i.points, 0),
-    maxScore: 25,
-    items: descItems,
-  });
+  for (const [key, category] of breakdownEntries) {
+    categories.push({
+      name: CATEGORY_NAMES[key] || key,
+      score: category.score,
+      maxScore: category.maxScore,
+      items: category.items.map(item => ({
+        label: FIELD_NAMES[item.name] || item.name,
+        fulfilled: item.met,
+        points: item.maxScore,
+      })),
+    });
+  }
 
-  // Category 3: Legal (20 points)
-  const legalItems = [
-    { label: 'Licens', fulfilled: !!data.legal.license, points: 15 },
-    { label: 'Ägare', fulfilled: !!data.legal.repoOwner, points: 5 },
-  ];
-  categories.push({
-    name: 'Juridik',
-    score: legalItems.filter(i => i.fulfilled).reduce((sum, i) => sum + i.points, 0),
-    maxScore: 20,
-    items: legalItems,
-  });
-
-  // Category 4: Maintenance (20 points)
-  const maintItems = [
-    { label: 'Underhållstyp', fulfilled: !!data.maintenance.type, points: 5 },
-    { label: 'Kontaktperson namn', fulfilled: !!data.maintenance.contacts[0]?.name, points: 10 },
-    { label: 'Kontakt e-post', fulfilled: !!data.maintenance.contacts[0]?.email, points: 5 },
-  ];
-  categories.push({
-    name: 'Underhåll',
-    score: maintItems.filter(i => i.fulfilled).reduce((sum, i) => sum + i.points, 0),
-    maxScore: 20,
-    items: maintItems,
-  });
-
-  // Category 5: Swedish extras (10 points)
-  const priorityCategories = ['case-management', 'civic-engagement', 'data-analytics', 'document-management', 'identity', 'local-government', 'participation', 'reporting', 'workflow-automation'];
-  const hasPriorityCategory = data.categories.some(c => priorityCategories.includes(c));
-  const sweItems = [
-    { label: 'Svensk beskrivning', fulfilled: !!(data.description.sv?.shortDescription), points: 3 },
-    { label: 'DIS Fas 1-projekt', fulfilled: data.sv?.disFas1 === true, points: 4 },
-    { label: 'Prioriterad kategori', fulfilled: hasPriorityCategory, points: 3 },
-  ];
-  categories.push({
-    name: 'Sverige-specifikt',
-    score: sweItems.filter(i => i.fulfilled).reduce((sum, i) => sum + i.points, 0),
-    maxScore: 10,
-    items: sweItems,
-  });
-
-  const total = categories.reduce((sum, c) => sum + c.score, 0);
-
-  return { total, categories };
+  return { total: result.total, categories };
 }
 
 // Generate improvement suggestions
@@ -153,7 +166,7 @@ function generateSuggestions(data: PubliccodeData): Suggestion[] {
     });
   }
 
-  const priorityCategories = ['case-management', 'civic-engagement', 'data-analytics', 'document-management', 'identity', 'local-government', 'participation', 'reporting', 'workflow-automation'];
+  const priorityCategories = CATEGORIES.filter(c => c.disFase1).map(c => c.id);
   const hasPriorityCategory = data.categories.some(c => priorityCategories.includes(c));
 
   if (!hasPriorityCategory && data.categories.length > 0) {
@@ -341,6 +354,12 @@ interface PubliccodeData {
     countryExtensionVersion: string;
     disFas1: boolean;
   };
+  dependsOn?: {
+    open?: Array<{ name: string; versionMin?: string; versionMax?: string; optional?: boolean }>;
+    proprietary?: Array<{ name: string; versionMin?: string; versionMax?: string; optional?: boolean }>;
+    hardware?: Array<{ name: string; versionMin?: string; versionMax?: string; optional?: boolean }>;
+  };
+  isBasedOn?: string | string[];
 }
 
 const initialData: PubliccodeData = {
@@ -386,28 +405,82 @@ const steps = [
   { id: 6, name: 'Exportera', description: 'Ladda ner filen' },
 ];
 
-const categoryOptions = [
-  { value: 'case-management', label: 'Ärendehantering', description: 'System för att hantera ärenden och förfrågningar', priority: true },
-  { value: 'civic-engagement', label: 'Medborgarengagemang', description: 'Verktyg för dialog med medborgare', priority: true },
-  { value: 'data-analytics', label: 'Dataanalys', description: 'Analysera och visualisera information', priority: true },
-  { value: 'document-management', label: 'Dokumenthantering', description: 'Hantera och dela dokument', priority: true },
-  { value: 'identity', label: 'Identitetshantering', description: 'Inloggning och behörighetskontroll', priority: true },
-  { value: 'local-government', label: 'Kommunal förvaltning', description: 'System för kommunernas verksamhet', priority: true },
-  { value: 'participation', label: 'Medborgardeltagande', description: 'Samråd och demokratiska processer', priority: true },
-  { value: 'reporting', label: 'Felanmälan', description: 'Rapportera och spåra problem', priority: true },
-  { value: 'workflow-automation', label: 'Arbetsflöden', description: 'Automatisera processer och rutiner', priority: true },
-  { value: 'accounting', label: 'Bokföring', description: 'Ekonomisystem och fakturahantering' },
-  { value: 'collaboration', label: 'Samarbete', description: 'Verktyg för teamarbete' },
-  { value: 'communications', label: 'Kommunikation', description: 'E-post, chatt och meddelanden' },
-  { value: 'crm', label: 'Kundrelationer', description: 'Hantera relationer och kontakter' },
-  { value: 'content-management', label: 'Innehållshantering', description: 'Webbplatser och publicering' },
-  { value: 'database', label: 'Databas', description: 'Lagra och organisera data' },
-  { value: 'education', label: 'Utbildning', description: 'Lärplattformar och kurser' },
-  { value: 'gis', label: 'Geografiska system', description: 'Kartor och platsdata' },
-  { value: 'hr', label: 'Personal', description: 'Personaladministration och rekrytering' },
-  { value: 'it-development', label: 'Utveckling', description: 'Verktyg för programutveckling' },
-  { value: 'it-security', label: 'IT-säkerhet', description: 'Skydda system och data' },
-];
+// Category aliases - map common invalid categories to valid ones
+const CATEGORY_ALIASES: Record<string, string> = {
+  'software-development': 'application-development',
+  'software': 'application-development',
+  'development': 'application-development',
+  'coding': 'application-development',
+  'programming': 'application-development',
+  'web-development': 'application-development',
+  'app-development': 'application-development',
+  'customer-support': 'customer-service-and-support',
+  'support': 'customer-service-and-support',
+  'helpdesk': 'help-desk',
+  'devops': 'it-development',
+  'ci-cd': 'it-development',
+  'automation': 'workflow-management',
+  'process-automation': 'workflow-management',
+  'government': 'local-government',
+  'public-sector': 'local-government',
+  'municipality': 'local-government',
+  'kommun': 'local-government',
+  'security': 'it-security',
+  'cybersecurity': 'it-security',
+  'authentication': 'identity-management',
+  'auth': 'identity-management',
+  'login': 'identity-management',
+  'sso': 'identity-management',
+  'analytics': 'data-analytics',
+  'reporting': 'data-analytics',
+  'dashboard': 'data-visualization',
+  'charts': 'data-visualization',
+  'documents': 'document-management',
+  'files': 'document-management',
+  'file-management': 'document-management',
+  'tasks': 'task-management',
+  'todo': 'task-management',
+  'projects': 'project-management',
+};
+
+// Generera categoryOptions från CATEGORIES (alla 117 kategorier enligt standarden)
+// DIS Fas 1-kategorier visas först, sedan övriga i alfabetisk ordning
+const categoryOptions = CATEGORIES
+  .map((cat) => ({
+    value: cat.id,
+    label: cat.sv.name,
+    description: cat.sv.description,
+    priority: cat.disFase1,
+  }))
+  .sort((a, b) => {
+    // Prioriterade först, sedan alfabetiskt
+    if (a.priority && !b.priority) return -1;
+    if (!a.priority && b.priority) return 1;
+    return a.label.localeCompare(b.label, 'sv');
+  });
+
+// Valid category IDs for filtering and validation
+const validCategoryIds = new Set(categoryOptions.map(c => c.value));
+
+// Helper function to validate and map categories
+function validateAndMapCategories(categories: string[]): string[] {
+  const result: string[] = [];
+  for (const cat of categories) {
+    // First check if it's already valid
+    if (validCategoryIds.has(cat)) {
+      result.push(cat);
+    } else {
+      // Try to map it using aliases
+      const mapped = CATEGORY_ALIASES[cat.toLowerCase()];
+      if (mapped && validCategoryIds.has(mapped)) {
+        result.push(mapped);
+      }
+      // Otherwise skip the invalid category
+    }
+  }
+  // Remove duplicates
+  return [...new Set(result)];
+}
 
 const licenseOptions = [
   { value: 'MIT', label: 'MIT', description: 'Enkel och tillåtande licens. Populär för öppen källkod.' },
@@ -496,48 +569,7 @@ export default function EditorPage() {
     };
 
     const cleaned = removeEmpty(cleanData);
-    return toYaml(cleaned, 0);
-  };
-
-  const toYaml = (obj: unknown, indent: number): string => {
-    const spaces = '  '.repeat(indent);
-
-    if (Array.isArray(obj)) {
-      if (obj.length === 0) return '[]';
-      return obj.map((item) => {
-        if (typeof item === 'object' && item !== null) {
-          const lines = toYaml(item, indent + 1).split('\n');
-          return `${spaces}- ${lines[0].trim()}\n${lines.slice(1).map(l => spaces + '  ' + l.trim()).join('\n')}`.trimEnd();
-        }
-        return `${spaces}- ${item}`;
-      }).join('\n');
-    }
-
-    if (typeof obj === 'object' && obj !== null) {
-      return Object.entries(obj as Record<string, unknown>)
-        .map(([key, value]) => {
-          if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-            return `${spaces}${key}:\n${toYaml(value, indent + 1)}`;
-          }
-          if (Array.isArray(value)) {
-            if (value.length === 0) return `${spaces}${key}: []`;
-            if (typeof value[0] === 'string') {
-              return `${spaces}${key}:\n${value.map(v => `${spaces}  - ${v}`).join('\n')}`;
-            }
-            return `${spaces}${key}:\n${toYaml(value, indent + 1)}`;
-          }
-          if (typeof value === 'boolean') {
-            return `${spaces}${key}: ${value}`;
-          }
-          if (typeof value === 'string' && (value.includes(':') || value.includes('#') || value.includes('\n'))) {
-            return `${spaces}${key}: "${value}"`;
-          }
-          return `${spaces}${key}: ${value}`;
-        })
-        .join('\n');
-    }
-
-    return String(obj);
+    return stringify(cleaned, { lineWidth: 0 });
   };
 
   const downloadYaml = () => {
@@ -559,7 +591,7 @@ export default function EditorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Hero Header - matches landing page style */}
       <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-20" />
@@ -661,7 +693,7 @@ export default function EditorPage() {
       <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-5">
           {/* Form - takes 3 of 5 columns */}
-          <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-xl dark:border-slate-800 dark:bg-slate-900 lg:col-span-3">
+          <div className="relative overflow-hidden rounded-3xl border border-slate-700 bg-slate-800/50 p-8 shadow-xl backdrop-blur lg:col-span-3">
             {/* Decorative gradient */}
             <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-gradient-to-br from-blue-500/10 to-cyan-500/10 blur-3xl" />
             {currentStep === 1 && (
@@ -704,11 +736,11 @@ export default function EditorPage() {
             )}
 
             {/* Navigation */}
-            <div className="relative mt-10 flex items-center justify-between border-t border-slate-200 pt-8 dark:border-slate-800">
+            <div className="relative mt-10 flex items-center justify-between border-t border-slate-700 pt-8">
               <button
                 onClick={prevStep}
                 disabled={currentStep === 1}
-                className="group inline-flex items-center gap-2 rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-700 transition-all hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800"
+                className="group inline-flex items-center gap-2 rounded-full border border-slate-600 px-6 py-3 text-sm font-semibold text-slate-300 transition-all hover:border-slate-500 hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <svg className="h-4 w-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -717,7 +749,7 @@ export default function EditorPage() {
               </button>
 
               {/* Step indicator for mobile */}
-              <span className="text-sm font-medium text-slate-500 dark:text-slate-400 sm:hidden">
+              <span className="text-sm font-medium text-slate-400 sm:hidden">
                 {currentStep} / {steps.length}
               </span>
 
@@ -749,16 +781,16 @@ export default function EditorPage() {
           <div className="space-y-6 lg:col-span-2">
             {/* Score Panel - Always visible, redesigned */}
             {showScore && (
-              <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-900">
+              <div className="relative overflow-hidden rounded-3xl border border-slate-700 bg-slate-800/50 p-6 shadow-xl backdrop-blur">
                 <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br from-green-500/10 to-emerald-500/10 blur-2xl" />
 
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">
                     Kvalitetspoäng
                   </h3>
                   <button
                     onClick={() => setShowScore(false)}
-                    className="rounded-full p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
+                    className="rounded-full p-1 text-slate-400 transition-colors hover:bg-slate-700 hover:text-slate-300"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -777,7 +809,7 @@ export default function EditorPage() {
                         stroke="currentColor"
                         strokeWidth="10"
                         fill="none"
-                        className="text-slate-100 dark:text-slate-800"
+                        className="text-slate-700"
                       />
                       <circle
                         cx="72"
@@ -799,9 +831,9 @@ export default function EditorPage() {
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <span className={`text-4xl font-bold ${
-                        scoreBreakdown.total >= 80 ? 'text-green-600 dark:text-green-400' :
-                        scoreBreakdown.total >= 50 ? 'text-amber-600 dark:text-amber-400' :
-                        'text-red-600 dark:text-red-400'
+                        scoreBreakdown.total >= 80 ? 'text-green-400' :
+                        scoreBreakdown.total >= 50 ? 'text-amber-400' :
+                        'text-red-400'
                       }`}>
                         {scoreBreakdown.total}
                       </span>
@@ -809,9 +841,9 @@ export default function EditorPage() {
                     </div>
                   </div>
                   <p className={`mt-3 text-sm font-semibold ${
-                    scoreBreakdown.total >= 80 ? 'text-green-600 dark:text-green-400' :
-                    scoreBreakdown.total >= 50 ? 'text-amber-600 dark:text-amber-400' :
-                    'text-slate-600 dark:text-slate-400'
+                    scoreBreakdown.total >= 80 ? 'text-green-400' :
+                    scoreBreakdown.total >= 50 ? 'text-amber-400' :
+                    'text-slate-400'
                   }`}>
                     {scoreBreakdown.total >= 80
                       ? 'Utmärkt! Redo att delas'
@@ -826,23 +858,23 @@ export default function EditorPage() {
                   {scoreBreakdown.categories.map((cat) => (
                     <div key={cat.name}>
                       <div className="flex items-center justify-between text-xs">
-                        <span className="font-medium text-slate-700 dark:text-slate-300">{cat.name}</span>
+                        <span className="font-medium text-slate-300">{cat.name}</span>
                         <span className={`font-bold ${
-                          cat.score === cat.maxScore ? 'text-green-600 dark:text-green-400' :
-                          cat.score > 0 ? 'text-blue-600 dark:text-blue-400' :
+                          cat.score === cat.maxScore ? 'text-green-400' :
+                          cat.score > 0 ? 'text-blue-400' :
                           'text-slate-400'
                         }`}>
                           {cat.score}/{cat.maxScore}
                         </span>
                       </div>
-                      <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                      <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-700">
                         <div
                           className={`h-full rounded-full transition-all duration-300 ${
                             cat.score === cat.maxScore
                               ? 'bg-green-500'
                               : cat.score > 0
                               ? 'bg-blue-500'
-                              : 'bg-slate-200 dark:bg-slate-700'
+                              : 'bg-slate-600'
                           }`}
                           style={{ width: `${(cat.score / cat.maxScore) * 100}%` }}
                         />
@@ -853,8 +885,8 @@ export default function EditorPage() {
 
                 {/* Improvement suggestions - clickable with step navigation */}
                 {suggestions.length > 0 && (
-                  <div className="mt-6 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 p-4 dark:from-slate-800 dark:to-slate-800/50">
-                    <p className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <div className="mt-6 rounded-2xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 p-4">
+                    <p className="flex items-center gap-2 text-xs font-bold text-slate-300">
                       <svg className="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                       </svg>
@@ -865,22 +897,22 @@ export default function EditorPage() {
                         <li key={suggestion.id}>
                           <button
                             onClick={() => setCurrentStep(suggestion.step)}
-                            className="group flex w-full items-start gap-2 rounded-lg p-1.5 text-left transition-colors hover:bg-white dark:hover:bg-slate-700/50"
+                            className="group flex w-full items-start gap-2 rounded-lg p-1.5 text-left transition-colors hover:bg-slate-700/50"
                           >
                             <span className={`mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-xs font-bold ${
                               suggestion.priority === 'high'
-                                ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400'
+                                ? 'bg-red-900/50 text-red-400'
                                 : suggestion.priority === 'medium'
-                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400'
-                                : 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-400'
+                                ? 'bg-amber-900/50 text-amber-400'
+                                : 'bg-slate-700 text-slate-400'
                             }`}>
                               +{suggestion.points}
                             </span>
                             <div className="min-w-0 flex-1">
-                              <p className="text-xs font-medium text-slate-700 group-hover:text-slate-900 dark:text-slate-300 dark:group-hover:text-white">
+                              <p className="text-xs font-medium text-slate-300 group-hover:text-white">
                                 {suggestion.title}
                               </p>
-                              <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                              <p className="text-[10px] text-slate-400">
                                 {suggestion.description}
                               </p>
                             </div>
@@ -930,7 +962,7 @@ export default function EditorPage() {
             {!showScore && (
               <button
                 onClick={() => setShowScore(true)}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600"
+                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-700 bg-slate-800/50 px-4 py-4 text-sm font-semibold text-slate-300 shadow-sm backdrop-blur transition-all hover:border-slate-600 hover:shadow-md"
               >
                 <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -962,6 +994,7 @@ function Step1({
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const [importSuccess, setImportSuccess] = useState(false);
+  const [foundPubliccodeYml, setFoundPubliccodeYml] = useState(false);
 
   const handleImport = async () => {
     if (!githubUrl.trim()) return;
@@ -969,6 +1002,7 @@ function Step1({
     setIsImporting(true);
     setImportError(null);
     setImportSuccess(false);
+    setFoundPubliccodeYml(false);
 
     try {
       const response = await fetch('/api/github/import', {
@@ -984,19 +1018,99 @@ function Step1({
         return;
       }
 
-      // Update form data with imported values
-      if (result.name) updateData('name', result.name);
-      if (result.url) updateData('url', result.url);
-      if (result.description) updateData('description.sv.shortDescription', result.description.slice(0, 150));
-      if (result.license) updateData('legal.license', result.license);
-      if (result.repoOwner) updateData('legal.repoOwner', result.repoOwner);
-      if (result.releaseDate) updateData('releaseDate', result.releaseDate);
+      // If we found an existing publiccode.yml, use it to populate all fields
+      if (result.hasPubliccodeYml && result.publiccodeYml) {
+        const yml = result.publiccodeYml;
+
+        // Basic info
+        if (yml.name) updateData('name', yml.name);
+        if (yml.url) updateData('url', yml.url);
+        if (yml.softwareVersion) updateData('softwareVersion', yml.softwareVersion);
+        if (yml.releaseDate) updateData('releaseDate', yml.releaseDate);
+        if (yml.platforms && Array.isArray(yml.platforms)) updateData('platforms', yml.platforms);
+        if (yml.categories && Array.isArray(yml.categories)) {
+          // Validate and map categories to ensure only valid ones are used
+          const validatedCategories = validateAndMapCategories(yml.categories as string[]);
+          updateData('categories', validatedCategories);
+        }
+        if (yml.developmentStatus) updateData('developmentStatus', yml.developmentStatus);
+        if (yml.softwareType) updateData('softwareType', yml.softwareType);
+
+        // Legal
+        if (yml.legal) {
+          const legal = yml.legal as Record<string, unknown>;
+          if (legal.license) updateData('legal.license', legal.license);
+          if (legal.repoOwner) updateData('legal.repoOwner', legal.repoOwner);
+        }
+
+        // Description (handle both sv and en)
+        if (yml.description) {
+          const desc = yml.description as Record<string, Record<string, unknown>>;
+          // Try Swedish first, then English
+          const langDesc = desc.sv || desc.en || Object.values(desc)[0];
+          if (langDesc) {
+            if (langDesc.shortDescription) updateData('description.sv.shortDescription', langDesc.shortDescription);
+            if (langDesc.longDescription) updateData('description.sv.longDescription', langDesc.longDescription);
+            if (langDesc.features && Array.isArray(langDesc.features)) {
+              updateData('description.sv.features', langDesc.features);
+            }
+            if (langDesc.screenshots && Array.isArray(langDesc.screenshots)) {
+              updateData('description.sv.screenshots', langDesc.screenshots);
+            }
+            if (langDesc.videos && Array.isArray(langDesc.videos)) {
+              updateData('description.sv.videos', langDesc.videos);
+            }
+            if (langDesc.documentation) updateData('description.sv.documentation', langDesc.documentation);
+          }
+        }
+
+        // Maintenance
+        if (yml.maintenance) {
+          const maint = yml.maintenance as Record<string, unknown>;
+          if (maint.type) updateData('maintenance.type', maint.type);
+          if (maint.contacts && Array.isArray(maint.contacts)) {
+            updateData('maintenance.contacts', maint.contacts);
+          }
+        }
+
+        // Localisation
+        if (yml.localisation) {
+          const loc = yml.localisation as Record<string, unknown>;
+          if (typeof loc.localisationReady === 'boolean') {
+            updateData('localisation.localisationReady', loc.localisationReady);
+          }
+          if (loc.availableLanguages && Array.isArray(loc.availableLanguages)) {
+            updateData('localisation.availableLanguages', loc.availableLanguages);
+          }
+        }
+
+        // Dependencies
+        if (yml.dependsOn) {
+          updateData('dependsOn', yml.dependsOn);
+        }
+        if (yml.isBasedOn) {
+          updateData('isBasedOn', yml.isBasedOn);
+        }
+
+        setImportSuccess(true);
+        setImportError(null);
+        setFoundPubliccodeYml(true);
+      } else {
+        // No publiccode.yml found - use GitHub repo data
+        if (result.name) updateData('name', result.name);
+        if (result.url) updateData('url', result.url);
+        if (result.description) updateData('description.sv.shortDescription', result.description.slice(0, 150));
+        if (result.license) updateData('legal.license', result.license);
+        if (result.repoOwner) updateData('legal.repoOwner', result.repoOwner);
+        if (result.releaseDate) updateData('releaseDate', result.releaseDate);
+
+        setImportSuccess(true);
+      }
 
       if (onImport) {
         onImport(result);
       }
 
-      setImportSuccess(true);
       setTimeout(() => setImportSuccess(false), 3000);
     } catch {
       setImportError('Kunde inte ansluta till servern');
@@ -1008,26 +1122,26 @@ function Step1({
   return (
     <div className="relative space-y-8">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+        <p className="text-sm font-semibold uppercase tracking-wider text-blue-400">
           Steg 1 av 6
         </p>
-        <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        <h2 className="mt-2 text-2xl font-bold tracking-tight text-white">
           Grundläggande information
         </h2>
-        <p className="mt-2 text-slate-600 dark:text-slate-400">
+        <p className="mt-2 text-slate-400">
           Berätta vad projektet heter och var det finns
         </p>
       </div>
 
       {/* GitHub Import */}
-      <div className="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 p-5 dark:border-slate-700 dark:from-slate-800/50 dark:to-slate-900/50">
-        <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
+      <div className="rounded-xl border border-slate-700 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-5">
+        <div className="flex items-center gap-2 text-sm font-semibold text-white">
           <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
           </svg>
           Importera från GitHub
         </div>
-        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+        <p className="mt-1 text-xs text-slate-400">
           Fyll i formuläret automatiskt från ett GitHub-arkiv
         </p>
         <div className="mt-3 flex gap-2">
@@ -1043,7 +1157,7 @@ function Step1({
           <button
             onClick={handleImport}
             disabled={isImporting || !githubUrl.trim()}
-            className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-700 dark:hover:bg-slate-600"
+            className="inline-flex items-center gap-2 rounded-xl bg-slate-700 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-slate-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isImporting ? (
               <>
@@ -1064,7 +1178,7 @@ function Step1({
           </button>
         </div>
         {importError && (
-          <p className="mt-2 flex items-center gap-1 text-xs text-red-600 dark:text-red-400">
+          <p className="mt-2 flex items-center gap-1 text-xs text-red-400">
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -1072,11 +1186,13 @@ function Step1({
           </p>
         )}
         {importSuccess && (
-          <p className="mt-2 flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+          <p className={`mt-2 flex items-center gap-1 text-xs ${foundPubliccodeYml ? 'text-emerald-400' : 'text-green-400'}`}>
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
-            Data importerad! Kontrollera och fyll i resten.
+            {foundPubliccodeYml
+              ? 'Hittade publiccode.yml! Alla fält har fyllts i från befintlig fil.'
+              : 'Data importerad från GitHub! Kontrollera och fyll i resten.'}
           </p>
         )}
       </div>
@@ -1117,8 +1233,8 @@ function Step1({
               key={option.value}
               className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${
                 data.developmentStatus === option.value
-                  ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/20'
-                  : 'border-slate-200 hover:border-slate-300 dark:border-slate-700 dark:hover:border-slate-600'
+                  ? 'border-blue-400 bg-blue-900/20'
+                  : 'border-slate-700 hover:border-slate-600'
               }`}
             >
               <input
@@ -1130,10 +1246,10 @@ function Step1({
                 className="mt-1"
               />
               <div>
-                <div className="font-medium text-slate-900 dark:text-white">
+                <div className="font-medium text-white">
                   {option.label}
                 </div>
-                <div className="text-xs text-slate-500 dark:text-slate-400">
+                <div className="text-xs text-slate-400">
                   {option.description}
                 </div>
               </div>
@@ -1154,102 +1270,298 @@ function Step2({
   updateData: (path: string, value: unknown) => void;
   categoryOptions: Array<{ value: string; label: string; description: string; priority?: boolean }>;
 }) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showAllCategories, setShowAllCategories] = useState(false);
+  const [isLoadingAI, setIsLoadingAI] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
+
+  // Filter categories based on search
+  const filteredCategories = useMemo(() => {
+    if (!searchQuery.trim()) return categoryOptions;
+    const query = searchQuery.toLowerCase();
+    return categoryOptions.filter(
+      (c) =>
+        c.label.toLowerCase().includes(query) ||
+        c.description.toLowerCase().includes(query) ||
+        c.value.toLowerCase().includes(query)
+    );
+  }, [categoryOptions, searchQuery]);
+
+  const priorityCategories = filteredCategories.filter((c) => c.priority);
+  const otherCategories = filteredCategories.filter((c) => !c.priority);
+
+  // Get selected categories info
+  const selectedCategories = categoryOptions.filter((c) => data.categories.includes(c.value));
+
+  const suggestCategories = async () => {
+    if (!data.url) {
+      setAiError('Ange GitHub-URL först i steg 1');
+      return;
+    }
+
+    setIsLoadingAI(true);
+    setAiError(null);
+    setAiSuggestions([]);
+
+    try {
+      const response = await fetch('/api/ai/suggest-categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: data.url,
+          name: data.name,
+          description: data.description?.sv?.shortDescription || '',
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setAiError(result.error || 'Kunde inte hämta förslag');
+        return;
+      }
+
+      // Filter to only include valid categories from our list
+      const validCategoryIds = categoryOptions.map(c => c.value);
+      const validSuggestions = result.categories.filter((cat: string) => validCategoryIds.includes(cat));
+
+      setAiSuggestions(validSuggestions);
+
+      // Add suggested categories that aren't already selected
+      const newCategories = [...data.categories];
+      for (const cat of validSuggestions) {
+        if (!newCategories.includes(cat)) {
+          newCategories.push(cat);
+        }
+      }
+      updateData('categories', newCategories);
+    } catch {
+      setAiError('Ett fel uppstod vid AI-analys');
+    } finally {
+      setIsLoadingAI(false);
+    }
+  };
+
+  const toggleCategory = (value: string, checked: boolean) => {
+    if (checked) {
+      updateData('categories', [...data.categories, value]);
+    } else {
+      updateData('categories', data.categories.filter((c) => c !== value));
+    }
+  };
+
+  const CategoryCheckbox = ({ category, suggested }: { category: typeof categoryOptions[0]; suggested?: boolean }) => (
+    <label
+      className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
+        data.categories.includes(category.value)
+          ? suggested
+            ? 'border-green-400 bg-green-900/20'
+            : 'border-blue-400 bg-blue-900/20'
+          : 'border-slate-700 hover:border-slate-600'
+      }`}
+    >
+      <input
+        type="checkbox"
+        checked={data.categories.includes(category.value)}
+        onChange={(e) => toggleCategory(category.value, e.target.checked)}
+        className="mt-0.5"
+      />
+      <div className="flex-1">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-white">{category.label}</span>
+          {suggested && (
+            <span className="rounded bg-green-600/30 px-1.5 py-0.5 text-[10px] font-medium text-green-300">
+              AI
+            </span>
+          )}
+          {category.priority && (
+            <span className="rounded bg-blue-600/30 px-1.5 py-0.5 text-[10px] font-medium text-blue-300">
+              DIS
+            </span>
+          )}
+        </div>
+        <div className="text-xs text-slate-500">{category.description}</div>
+      </div>
+    </label>
+  );
+
   return (
-    <div className="relative space-y-8">
+    <div className="relative space-y-6">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+        <p className="text-sm font-semibold uppercase tracking-wider text-blue-400">
           Steg 2 av 6
         </p>
-        <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        <h2 className="mt-2 text-2xl font-bold tracking-tight text-white">
           Kategorier
         </h2>
-        <p className="mt-2 text-slate-600 dark:text-slate-400">
+        <p className="mt-2 text-slate-400">
           Välj en eller flera kategorier som beskriver vad programvaran gör
         </p>
       </div>
 
-      <div className="space-y-4">
-        <div>
-          <p className="text-sm font-semibold text-blue-600 dark:text-blue-400">
-            Prioriterade områden (DIS Fas 1)
-          </p>
-          <p className="mt-1 text-xs text-slate-500">
-            Projekt inom dessa områden får extra synlighet
-          </p>
+      {/* AI Suggestion Button */}
+      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-medium text-white">AI-förslag</p>
+            <p className="text-sm text-slate-400">
+              Låt AI analysera README och föreslå kategorier
+            </p>
+          </div>
+          <button
+            onClick={suggestCategories}
+            disabled={isLoadingAI || !data.url}
+            className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-2 font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isLoadingAI ? (
+              <>
+                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Analyserar...
+              </>
+            ) : (
+              <>
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                Föreslå kategorier
+              </>
+            )}
+          </button>
         </div>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {categoryOptions
-            .filter((c) => c.priority)
-            .map((category) => (
-              <label
-                key={category.value}
-                className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
-                  data.categories.includes(category.value)
-                    ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/20'
-                    : 'border-slate-200 hover:border-slate-300 dark:border-slate-700 dark:hover:border-slate-600'
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={data.categories.includes(category.value)}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      updateData('categories', [...data.categories, category.value]);
-                    } else {
-                      updateData('categories', data.categories.filter((c) => c !== category.value));
-                    }
-                  }}
-                  className="mt-0.5"
-                />
-                <div>
-                  <div className="text-sm font-medium text-slate-900 dark:text-white">
-                    {category.label}
-                  </div>
-                  <div className="text-xs text-slate-500">{category.description}</div>
-                </div>
-              </label>
-            ))}
-        </div>
+        {aiError && (
+          <p className="mt-2 text-sm text-red-400">{aiError}</p>
+        )}
+        {aiSuggestions.length > 0 && (
+          <p className="mt-2 text-sm text-green-400">
+            AI föreslog {aiSuggestions.length} kategorier som har lagts till
+          </p>
+        )}
       </div>
 
-      <div className="space-y-4">
-        <p className="text-sm font-semibold text-slate-600 dark:text-slate-400">
-          Övriga kategorier
-        </p>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {categoryOptions
-            .filter((c) => !c.priority)
-            .map((category) => (
-              <label
-                key={category.value}
-                className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
-                  data.categories.includes(category.value)
-                    ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/20'
-                    : 'border-slate-200 hover:border-slate-300 dark:border-slate-700 dark:hover:border-slate-600'
-                }`}
+      {/* Selected Categories */}
+      {selectedCategories.length > 0 && (
+        <div className="space-y-3">
+          <p className="text-sm font-semibold text-green-400">
+            Valda kategorier ({selectedCategories.length})
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {selectedCategories.map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => toggleCategory(cat.value, false)}
+                className="group flex items-center gap-1 rounded-full border border-blue-400 bg-blue-900/30 px-3 py-1 text-sm text-blue-300 transition-colors hover:border-red-400 hover:bg-red-900/30 hover:text-red-300"
               >
-                <input
-                  type="checkbox"
-                  checked={data.categories.includes(category.value)}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      updateData('categories', [...data.categories, category.value]);
-                    } else {
-                      updateData('categories', data.categories.filter((c) => c !== category.value));
-                    }
-                  }}
-                  className="mt-0.5"
-                />
-                <div>
-                  <div className="text-sm font-medium text-slate-900 dark:text-white">
-                    {category.label}
-                  </div>
-                  <div className="text-xs text-slate-500">{category.description}</div>
-                </div>
-              </label>
+                {cat.label}
+                <svg className="h-3 w-3 opacity-50 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             ))}
+          </div>
         </div>
+      )}
+
+      {/* Search */}
+      <div className="relative">
+        <svg
+          className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Sök kategorier..."
+          className="input w-full pl-10"
+        />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
       </div>
+
+      {/* Priority Categories */}
+      {priorityCategories.length > 0 && (
+        <div className="space-y-3">
+          <div>
+            <p className="text-sm font-semibold text-blue-400">
+              Prioriterade områden (DIS Fas 1)
+            </p>
+            <p className="mt-1 text-xs text-slate-500">
+              Projekt inom dessa områden får extra synlighet
+            </p>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {priorityCategories.map((category) => (
+              <CategoryCheckbox
+                key={category.value}
+                category={category}
+                suggested={aiSuggestions.includes(category.value)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Other Categories (Collapsible) */}
+      {otherCategories.length > 0 && (
+        <div className="space-y-3">
+          <button
+            onClick={() => setShowAllCategories(!showAllCategories)}
+            className="flex w-full items-center justify-between rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-3 text-left transition-colors hover:border-slate-600"
+          >
+            <div>
+              <p className="text-sm font-semibold text-slate-300">
+                Övriga kategorier ({otherCategories.length})
+              </p>
+              <p className="text-xs text-slate-500">
+                Klicka för att {showAllCategories ? 'dölja' : 'visa'} alla kategorier
+              </p>
+            </div>
+            <svg
+              className={`h-5 w-5 text-slate-400 transition-transform ${showAllCategories ? 'rotate-180' : ''}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {showAllCategories && (
+            <div className="grid gap-2 sm:grid-cols-2">
+              {otherCategories.map((category) => (
+                <CategoryCheckbox
+                  key={category.value}
+                  category={category}
+                  suggested={aiSuggestions.includes(category.value)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* No results */}
+      {searchQuery && filteredCategories.length === 0 && (
+        <p className="text-center text-slate-500">
+          Inga kategorier matchar &ldquo;{searchQuery}&rdquo;
+        </p>
+      )}
     </div>
   );
 }
@@ -1279,13 +1591,13 @@ function Step3({
   return (
     <div className="relative space-y-8">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+        <p className="text-sm font-semibold uppercase tracking-wider text-blue-400">
           Steg 3 av 6
         </p>
-        <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        <h2 className="mt-2 text-2xl font-bold tracking-tight text-white">
           Beskrivning
         </h2>
-        <p className="mt-2 text-slate-600 dark:text-slate-400">
+        <p className="mt-2 text-slate-400">
           Hjälp andra förstå vad programvaran gör
         </p>
       </div>
@@ -1314,9 +1626,25 @@ function Step3({
           rows={6}
           className="input"
         />
-        <p className="mt-1 text-xs text-slate-500">
-          Använd gärna Markdown för formatering
-        </p>
+        <div className="mt-1 flex items-center justify-between">
+          <p className="text-xs text-slate-500">
+            Använd gärna Markdown för formatering
+          </p>
+          <span
+            className={`text-xs font-medium ${
+              (data.description.sv?.longDescription?.length || 0) >= 500
+                ? 'text-green-400'
+                : (data.description.sv?.longDescription?.length || 0) >= 150
+                  ? 'text-yellow-400'
+                  : 'text-red-400'
+            }`}
+          >
+            {data.description.sv?.longDescription?.length || 0} tecken
+            {(data.description.sv?.longDescription?.length || 0) < 500 && (
+              <span className="text-slate-500"> (minst 500 för full poäng)</span>
+            )}
+          </span>
+        </div>
       </div>
 
       <div>
@@ -1336,7 +1664,7 @@ function Step3({
           <button
             onClick={addFeature}
             type="button"
-            className="rounded-lg bg-slate-100 px-4 py-2 font-medium text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
+            className="rounded-lg bg-slate-700 px-4 py-2 font-medium text-slate-300 hover:bg-slate-600"
           >
             Lägg till
           </button>
@@ -1346,9 +1674,9 @@ function Step3({
             {data.description.sv?.features?.map((feature, index) => (
               <li
                 key={index}
-                className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 dark:bg-slate-800"
+                className="flex items-center justify-between rounded-lg bg-slate-700 px-3 py-2"
               >
-                <span className="text-sm text-slate-700 dark:text-slate-300">
+                <span className="text-sm text-slate-300">
                   {feature}
                 </span>
                 <button
@@ -1389,19 +1717,19 @@ function Step4({
   licenseOptions: Array<{ value: string; label: string; description: string }>;
 }) {
   const isPriorityCategory = data.categories.some((c) =>
-    ['case-management', 'civic-engagement', 'data-analytics', 'document-management', 'identity', 'local-government', 'participation', 'reporting', 'workflow-automation'].includes(c)
+    ['case-management', 'civic-engagement', 'data-analytics', 'document-management', 'identity-management', 'local-government', 'public-participation', 'reporting-issues', 'workflow-management'].includes(c)
   );
 
   return (
     <div className="relative space-y-8">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+        <p className="text-sm font-semibold uppercase tracking-wider text-blue-400">
           Steg 4 av 6
         </p>
-        <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        <h2 className="mt-2 text-2xl font-bold tracking-tight text-white">
           Licens och juridik
         </h2>
-        <p className="mt-2 text-slate-600 dark:text-slate-400">
+        <p className="mt-2 text-slate-400">
           Vilken licens används och vem äger koden?
         </p>
       </div>
@@ -1414,8 +1742,8 @@ function Step4({
               key={option.value}
               className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${
                 data.legal.license === option.value
-                  ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/20'
-                  : 'border-slate-200 hover:border-slate-300 dark:border-slate-700 dark:hover:border-slate-600'
+                  ? 'border-blue-400 bg-blue-900/20'
+                  : 'border-slate-700 hover:border-slate-600'
               }`}
             >
               <input
@@ -1427,10 +1755,10 @@ function Step4({
                 className="mt-1"
               />
               <div>
-                <div className="font-medium text-slate-900 dark:text-white">
+                <div className="font-medium text-white">
                   {option.label}
                 </div>
-                <div className="text-xs text-slate-500 dark:text-slate-400">
+                <div className="text-xs text-slate-400">
                   {option.description}
                 </div>
               </div>
@@ -1454,18 +1782,18 @@ function Step4({
       </div>
 
       {/* DIS Fas 1 toggle */}
-      <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+      <div className="rounded-xl border border-blue-800 bg-blue-900/20 p-4">
         <div className="flex items-start gap-4">
           <div className="flex-1">
-            <h3 className="font-semibold text-blue-900 dark:text-blue-100">
+            <h3 className="font-semibold text-blue-100">
               Digital Infrastruktur för Samhällsservice - Fas 1
             </h3>
-            <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
+            <p className="mt-1 text-sm text-blue-300">
               Markera om detta projekt är del av DIS Fas 1-initiativet.
               Detta ger extra synlighet i kataloger.
             </p>
             {!isPriorityCategory && (
-              <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+              <p className="mt-2 text-xs text-amber-400">
                 Tips: Välj en prioriterad kategori i steg 1 för att kvalificera för DIS Fas 1
               </p>
             )}
@@ -1477,7 +1805,7 @@ function Step4({
               onChange={(e) => updateData('sv.disFas1', e.target.checked)}
               className="peer sr-only"
             />
-            <div className="peer h-6 w-11 rounded-full bg-slate-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-300 dark:bg-slate-700 dark:peer-focus:ring-blue-800" />
+            <div className="peer h-6 w-11 rounded-full bg-slate-700 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-500 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-800" />
           </label>
         </div>
       </div>
@@ -1497,13 +1825,13 @@ function Step5({
   return (
     <div className="relative space-y-8">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+        <p className="text-sm font-semibold uppercase tracking-wider text-blue-400">
           Steg 5 av 6
         </p>
-        <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        <h2 className="mt-2 text-2xl font-bold tracking-tight text-white">
           Underhåll och kontakt
         </h2>
-        <p className="mt-2 text-slate-600 dark:text-slate-400">
+        <p className="mt-2 text-slate-400">
           Vem ansvarar för projektet och hur kan man nå dem?
         </p>
       </div>
@@ -1516,8 +1844,8 @@ function Step5({
               key={option.value}
               className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${
                 data.maintenance.type === option.value
-                  ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/20'
-                  : 'border-slate-200 hover:border-slate-300 dark:border-slate-700 dark:hover:border-slate-600'
+                  ? 'border-blue-400 bg-blue-900/20'
+                  : 'border-slate-700 hover:border-slate-600'
               }`}
             >
               <input
@@ -1529,10 +1857,10 @@ function Step5({
                 className="mt-1"
               />
               <div>
-                <div className="font-medium text-slate-900 dark:text-white">
+                <div className="font-medium text-white">
                   {option.label}
                 </div>
-                <div className="text-xs text-slate-500 dark:text-slate-400">
+                <div className="text-xs text-slate-400">
                   {option.description}
                 </div>
               </div>
@@ -1615,13 +1943,13 @@ function Step6({
   return (
     <div className="relative space-y-8">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-wider text-green-600 dark:text-green-400">
+        <p className="text-sm font-semibold uppercase tracking-wider text-green-400">
           Steg 6 av 6
         </p>
-        <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        <h2 className="mt-2 text-2xl font-bold tracking-tight text-white">
           Redo att exportera!
         </h2>
-        <p className="mt-2 text-slate-600 dark:text-slate-400">
+        <p className="mt-2 text-slate-400">
           Din projektbeskrivning är klar. Ladda ner filen och lägg den i roten av ditt kodarkiv.
         </p>
       </div>
@@ -1681,7 +2009,7 @@ function Step6({
         </button>
         <button
           onClick={handleCopy}
-          className="group flex items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-6 py-4 font-semibold text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600"
+          className="group flex items-center justify-center gap-3 rounded-2xl border border-slate-700 bg-slate-800 px-6 py-4 font-semibold text-slate-300 shadow-sm transition-all hover:border-slate-600 hover:shadow-md"
         >
           <svg className="h-5 w-5 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -1691,8 +2019,8 @@ function Step6({
       </div>
 
       {/* Next steps */}
-      <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 p-6 dark:border-slate-800 dark:from-slate-800/50 dark:to-slate-900/50">
-        <h3 className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
+      <div className="rounded-2xl border border-slate-700 bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-6">
+        <h3 className="flex items-center gap-2 font-bold text-white">
           <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
           </svg>
@@ -1700,16 +2028,16 @@ function Step6({
         </h3>
         <ol className="mt-4 space-y-3">
           <li className="flex items-start gap-3 text-sm">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-600 dark:bg-blue-900/50 dark:text-blue-400">1</span>
-            <span className="text-slate-600 dark:text-slate-400">Ladda ner filen och lägg den i roten av ditt kodarkiv</span>
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-900/50 text-xs font-bold text-blue-400">1</span>
+            <span className="text-slate-400">Ladda ner filen och lägg den i roten av ditt kodarkiv</span>
           </li>
           <li className="flex items-start gap-3 text-sm">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-600 dark:bg-blue-900/50 dark:text-blue-400">2</span>
-            <span className="text-slate-600 dark:text-slate-400">Pusha ändringen till ditt kodarkiv (t.ex. GitHub)</span>
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-900/50 text-xs font-bold text-blue-400">2</span>
+            <span className="text-slate-400">Pusha ändringen till ditt kodarkiv (t.ex. GitHub)</span>
           </li>
           <li className="flex items-start gap-3 text-sm">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-600 dark:bg-blue-900/50 dark:text-blue-400">3</span>
-            <span className="text-slate-600 dark:text-slate-400">Lägg till automatisk validering med vår GitHub-integration</span>
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-900/50 text-xs font-bold text-blue-400">3</span>
+            <span className="text-slate-400">Lägg till automatisk validering med vår GitHub-integration</span>
           </li>
         </ol>
       </div>
