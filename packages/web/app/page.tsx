@@ -68,13 +68,29 @@ export default function Home() {
           </a>
         </div>
 
-        {/* Contact */}
-        <p className="mt-16 text-sm text-slate-600">
-          Frågor? Kontakta oss på{' '}
-          <a href="mailto:dis-tools@cetriq.se" className="text-slate-400 hover:text-white">
-            dis-tools@cetriq.se
-          </a>
-        </p>
+        {/* Contact Form */}
+        <div className="mt-16">
+          <p className="mb-4 text-sm text-slate-500">Vill du veta mer? Lämna din e-post:</p>
+          <form
+            action="https://formspree.io/f/xlgwvqol"
+            method="POST"
+            className="flex flex-col gap-3 sm:flex-row sm:justify-center"
+          >
+            <input
+              type="email"
+              name="email"
+              placeholder="din@email.se"
+              required
+              className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+            <button
+              type="submit"
+              className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition hover:bg-blue-500"
+            >
+              Håll mig uppdaterad
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
