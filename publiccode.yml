@@ -11,6 +11,8 @@ categories:
   - digital-asset-management
   - it-asset-management
   - it-development
+  - software-development
+  - compliance-management
 developmentStatus: development
 softwareType: standalone/web
 description:
@@ -27,7 +29,6 @@ description:
       - Ett CLI-verktyg för validering och scoring
       - En GitHub Action för automatisk kontroll
       - Ett core-bibliotek för programmatisk användning
-    localisedName: DIS-Tools
 legal:
   license: Apache-2.0
   repoOwner: CETRIQ
