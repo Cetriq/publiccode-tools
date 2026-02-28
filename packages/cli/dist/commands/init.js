@@ -7,7 +7,7 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 import ora from 'ora';
 import { stringify } from 'yaml';
-import { getCategories, getDISFase1Categories, scoreYaml, } from '@godwana/publiccode-core';
+import { getCategories, getDISFase1Categories, scoreYaml, } from '@samhallskodex/core';
 export const initCommand = new Command('init')
     .description('Skapa en ny publiccode.yml interaktivt')
     .option('-o, --output <path>', 'Output-fil', './publiccode.yml')

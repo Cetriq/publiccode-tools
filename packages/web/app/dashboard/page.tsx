@@ -5,14 +5,27 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
+type OrgType = 'developer' | 'service_provider' | 'municipality' | 'public_sector' | 'other';
+
 interface Organization {
   id: string;
   name: string;
   slug: string;
+  type: OrgType;
+  verified: boolean;
   avatarUrl: string;
   repoCount: number;
+  capabilities: string[];
   createdAt: string | null;
 }
+
+const ORG_TYPE_LABELS: Record<OrgType, string> = {
+  developer: 'Utvecklare',
+  service_provider: 'Tjänsteleverantör',
+  municipality: 'Kommun',
+  public_sector: 'Offentlig sektor',
+  other: 'Övrig',
+};
 
 interface MyRepo {
   id: string;
@@ -248,10 +261,45 @@ export default function DashboardPage() {
                     className="h-16 w-16 rounded-xl"
                   />
                   <div className="flex-1">
-                    <h2 className="text-xl font-semibold text-white">
-                      {org.name}
-                    </h2>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <h2 className="text-xl font-semibold text-white">
+                        {org.name}
+                      </h2>
+                      <span className="rounded-full bg-slate-700 px-3 py-0.5 text-xs font-medium text-slate-300">
+                        {ORG_TYPE_LABELS[org.type] || 'Utvecklare'}
+                      </span>
+                      {org.verified ? (
+                        <span className="flex items-center gap-1 rounded-full bg-green-500/20 px-3 py-0.5 text-xs font-medium text-green-300">
+                          <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          Verifierad
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 rounded-full bg-yellow-500/20 px-3 py-0.5 text-xs font-medium text-yellow-300">
+                          <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                          Ej verifierad
+                        </span>
+                      )}
+                    </div>
                     <p className="text-slate-400">/{org.slug}</p>
+
+                    {/* Capabilities for service providers */}
+                    {org.type === 'service_provider' && org.capabilities && org.capabilities.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {org.capabilities.map((cap) => (
+                          <span
+                            key={cap}
+                            className="rounded bg-blue-500/20 px-2 py-0.5 text-xs font-medium text-blue-300"
+                          >
+                            {cap}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
                     <div className="mt-4 flex flex-wrap gap-4">
                       <div className="rounded-lg bg-white/5 px-4 py-2">
                         <span className="text-2xl font-bold text-white">
@@ -273,12 +321,56 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
+                {/* Verification info banner for unverified orgs */}
+                {!org.verified && (
+                  <div className="mt-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20 p-4">
+                    <div className="flex items-start gap-3">
+                      <svg className="h-5 w-5 text-yellow-400 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
+                      <div>
+                        <h4 className="font-medium text-yellow-300">Verifiering pagar</h4>
+                        <p className="mt-1 text-sm text-yellow-200/70">
+                          Din organisation väntar på verifiering av en administratör.
+                          Dina projekt syns i katalogen men markeras som ej verifierade.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Quick Actions */}
                 <div className="mt-6 border-t border-white/10 pt-6">
                   <h3 className="text-sm font-semibold text-slate-300">
                     Snabbåtgärder
                   </h3>
-                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div className="mt-4 grid gap-4 sm:grid-cols-3">
+                    <Link
+                      href={`/organization/${org.id}`}
+                      className="flex items-center gap-3 rounded-lg bg-white/5 p-4 transition hover:bg-white/10"
+                    >
+                      <svg
+                        className="h-5 w-5 text-slate-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                      <div>
+                        <div className="font-medium text-white">
+                          Redigera profil
+                        </div>
+                        <div className="text-sm text-slate-400">
+                          Ändra typ och tjänster
+                        </div>
+                      </div>
+                    </Link>
                     <a
                       href={`https://github.com/${org.name}`}
                       target="_blank"
@@ -372,7 +464,7 @@ export default function DashboardPage() {
                 Dokumentation
               </h3>
               <p className="mt-1 text-sm text-slate-400">
-                Läs mer om hur du använder DIS-Tools
+                Läs mer om hur du använder SamhällsKodex
               </p>
             </a>
             <a

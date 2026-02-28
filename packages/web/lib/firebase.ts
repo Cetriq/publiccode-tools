@@ -45,6 +45,7 @@ export const COLLECTIONS = {
   REGISTRY_TOKENS: 'registry_tokens',
   ORGANIZATIONS: 'organizations',
   COMMENTS: 'comments',
+  USERS: 'users',
 } as const;
 
 // Hash a URL to create a document ID

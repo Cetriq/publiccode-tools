@@ -156,12 +156,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!project) {
     return {
-      title: 'Projekt hittades inte - DIS-Tools',
+      title: 'Projekt hittades inte - SamhällsKodex',
     };
   }
 
   return {
-    title: `${project.name} - DIS-Tools`,
+    title: `${project.name} - SamhällsKodex`,
     description: project.shortDescription || `${project.name} - ett öppenkällkodsprojekt i svenska offentliga sektorn`,
   };
 }

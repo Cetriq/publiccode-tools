@@ -4,7 +4,7 @@
 import { Command } from 'commander';
 import { readFileSync, existsSync } from 'fs';
 import chalk from 'chalk';
-import { validate } from '@godwana/publiccode-core';
+import { validate } from '@samhallskodex/core';
 export const validateCommand = new Command('validate')
     .description('Validera en publiccode.yml-fil')
     .argument('[path]', 'Sökväg till publiccode.yml', './publiccode.yml')

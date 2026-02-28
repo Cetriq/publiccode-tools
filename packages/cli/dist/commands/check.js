@@ -3,7 +3,7 @@
  */
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { validate, scoreYaml } from '@godwana/publiccode-core';
+import { validate, scoreYaml } from '@samhallskodex/core';
 /**
  * Parse GitHub URL to extract owner and repo
  */

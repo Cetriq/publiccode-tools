@@ -1,7 +1,7 @@
 {
-  "name": "@godwana/publiccode-web",
+  "name": "@samhallskodex/web",
   "version": "0.1.0",
-  "description": "Web editor for publiccode.yml",
+  "description": "SamhällsKodex web editor for publiccode.yml",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
-    "@godwana/publiccode-core": "workspace:*",
+    "@samhallskodex/core": "workspace:*",
     "@tailwindcss/forms": "^0.5.11",
     "autoprefixer": "^10.4.27",
     "firebase": "^12.10.0",
@@ -24,6 +24,7 @@
     "postcss": "^8.5.6",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
+    "resend": "^6.9.3",
     "tailwindcss": "^3.4.19",
     "yaml": "^2.8.2"
   },

@@ -1,5 +1,5 @@
 /**
- * @dis-tools/action
+ * @samhallskodex/action
  * GitHub Action for publiccode.yml validation and scoring
  */
 export {};

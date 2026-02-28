@@ -1,17 +1,17 @@
-# @dis-tools/cli
+# @samhallskodex/cli
 
-CLI-verktyg för att skapa, validera och poängsätta `publiccode.yml`-filer enligt den svenska DIS-standarden (Digital Infrastruktur för Samhällsservice).
+CLI-verktyg för att skapa, validera och poängsätta `publiccode.yml`-filer enligt SamhällsKodex-standarden för svensk offentlig sektor.
 
 ## Installation
 
 ```bash
-npm install -g @godwana/publiccode-cli
+npm install -g @samhallskodex/cli
 ```
 
 Eller med pnpm:
 
 ```bash
-pnpm add -g @godwana/publiccode-cli
+pnpm add -g @samhallskodex/cli
 ```
 
 ## Kommandon
@@ -182,17 +182,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm install -g @godwana/publiccode-cli
+      - run: npm install -g @samhallskodex/cli
       - run: pcode validate --strict
       - run: pcode score
 ```
 
-> Tips: Använd [Cetriq/publiccode-tools](https://github.com/Cetriq/publiccode-tools) GitHub Action för enklare integration med PR-annotationer!
+> Tips: Använd [Cetriq/samhallskodex](https://github.com/Cetriq/samhallskodex) GitHub Action för enklare integration med PR-annotationer!
 
 ## Relaterade paket
 
-- [`@godwana/publiccode-core`](https://www.npmjs.com/package/@godwana/publiccode-core) - Kärnbibliotek för validering och scoring
-- [GitHub Action](https://github.com/Cetriq/publiccode-tools) - GitHub Action för automatisk validering
+- [`@samhallskodex/core`](https://www.npmjs.com/package/@samhallskodex/core) - Kärnbibliotek för validering och scoring
+- [GitHub Action](https://github.com/Cetriq/samhallskodex) - GitHub Action för automatisk validering
 
 ## Licens
 

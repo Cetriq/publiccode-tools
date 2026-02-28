@@ -1,19 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { getDb, COLLECTIONS } from '@/lib/firebase';
+import { requireAdmin, handleAuthError } from '@/lib/rbac';
 
 // GET /api/admin/debug-repos - Debug: show all repos with registeredBy fields
 export async function GET(): Promise<NextResponse> {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
+    // Require platform_admin role
+    const { session } = await requireAdmin();
 
     const db = getDb();
     const snapshot = await db.collection(COLLECTIONS.REPOSITORIES).get();
@@ -43,6 +36,11 @@ export async function GET(): Promise<NextResponse> {
       repos,
     });
   } catch (error) {
+    // Handle auth errors (401/403) with proper responses
+    const authResponse = handleAuthError(error);
+    if (authResponse.status !== 500) {
+      return authResponse;
+    }
     console.error('Debug repos error:', error);
     return NextResponse.json(
       { success: false, error: 'Debug failed' },

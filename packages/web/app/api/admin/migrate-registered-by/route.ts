@@ -1,19 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { getDb, COLLECTIONS } from '@/lib/firebase';
+import { requireAdmin, handleAuthError } from '@/lib/rbac';
 
 // POST /api/admin/migrate-registered-by - Set registeredBy to current user's login for all repos without it
 export async function POST(): Promise<NextResponse> {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
+    // Require platform_admin role
+    const { session } = await requireAdmin();
 
     // Get the current user's login (GitHub username)
     const userLogin = session.user.login || session.user.id || 'unknown';
@@ -69,6 +62,11 @@ export async function POST(): Promise<NextResponse> {
       details,
     });
   } catch (error) {
+    // Handle auth errors (401/403) with proper responses
+    const authResponse = handleAuthError(error);
+    if (authResponse.status !== 500) {
+      return authResponse;
+    }
     console.error('Migration error:', error);
     return NextResponse.json(
       { success: false, error: 'Migration failed' },

@@ -1,15 +1,15 @@
 {
-  "name": "@godwana/publiccode-core",
+  "name": "@samhallskodex/core",
   "version": "0.1.0",
-  "description": "Core library for publiccode.yml validation and DIS-Readiness scoring",
+  "description": "Core library for publiccode.yml validation and SamhällsKodex scoring",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Cetriq/publiccode-tools.git",
+    "url": "git+https://github.com/Cetriq/samhallskodex.git",
     "directory": "packages/core"
   },
-  "homepage": "https://github.com/Cetriq/publiccode-tools#readme",
+  "homepage": "https://github.com/Cetriq/samhallskodex#readme",
   "bugs": {
-    "url": "https://github.com/Cetriq/publiccode-tools/issues"
+    "url": "https://github.com/Cetriq/samhallskodex/issues"
   },
   "type": "module",
   "main": "./dist/index.js",
@@ -44,7 +44,7 @@
     "dis",
     "sweden"
   ],
-  "author": "DIS-Tools",
+  "author": "SamhällsKodex",
   "license": "Apache-2.0",
   "dependencies": {
     "ajv": "^8.18.0",

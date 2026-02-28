@@ -1,4 +1,4 @@
-# publiccode-tools
+# SamhällsKodex
 
 Verktygskedja för `publiccode.yml` - standarden för att beskriva öppen källkod i offentlig sektor.
 
@@ -6,9 +6,9 @@ Verktygskedja för `publiccode.yml` - standarden för att beskriva öppen källk
 
 [publiccode.yml](https://docs.italia.it/italia/developers-italia/publiccodeyml/en/master/) är en metadatastandard för mjukvarurepositorier i offentlig sektor. Filen placeras i rotmappen på ett Git-repo och gör mjukvaran maskinläsbar och sökbar.
 
-## DIS-Readiness Score
+## SamhällsKodex Score
 
-DIS-Tools bedömer hur väl förberedd en publiccode.yml är för DIS (Dynamiskt Inköpssystem för digitala tjänster). Poängen (0-100) baseras på:
+SamhällsKodex bedömer hur väl förberedd en publiccode.yml är för DIS (Dynamiskt Inköpssystem för digitala tjänster). Poängen (0-100) baseras på:
 
 | Kategori | Max | Beskrivning |
 |----------|-----|-------------|
@@ -22,10 +22,10 @@ DIS-Tools bedömer hur väl förberedd en publiccode.yml är för DIS (Dynamiskt
 
 | Paket | Beskrivning | npm |
 |-------|-------------|-----|
-| [@godwana/publiccode-core](./packages/core) | Kärnbibliotek för validering och scoring | [![npm](https://img.shields.io/npm/v/@godwana/publiccode-core)](https://www.npmjs.com/package/@godwana/publiccode-core) |
-| [@godwana/publiccode-cli](./packages/cli) | CLI-verktyg (`pcode`) | [![npm](https://img.shields.io/npm/v/@godwana/publiccode-cli)](https://www.npmjs.com/package/@godwana/publiccode-cli) |
-| [@godwana/publiccode-action](./packages/action) | GitHub Action | - |
-| @godwana/publiccode-web | Webbredaktören (privat) | - |
+| [@samhallskodex/core](./packages/core) | Kärnbibliotek för validering och scoring | [![npm](https://img.shields.io/npm/v/@samhallskodex/core)](https://www.npmjs.com/package/@samhallskodex/core) |
+| [@samhallskodex/cli](./packages/cli) | CLI-verktyg (`pcode`) | [![npm](https://img.shields.io/npm/v/@samhallskodex/cli)](https://www.npmjs.com/package/@samhallskodex/cli) |
+| [@samhallskodex/action](./packages/action) | GitHub Action | - |
+| @samhallskodex/web | Webbredaktören (privat) | - |
 
 ## Snabbstart
 
@@ -33,7 +33,7 @@ DIS-Tools bedömer hur väl förberedd en publiccode.yml är för DIS (Dynamiskt
 
 ```bash
 # Installera globalt
-npm install -g @godwana/publiccode-cli
+npm install -g @samhallskodex/cli
 
 # Skapa en ny publiccode.yml
 pcode init
@@ -41,11 +41,11 @@ pcode init
 # Validera
 pcode validate
 
-# Beräkna DIS-Readiness Score
+# Beräkna SamhällsKodex Score
 pcode score --detailed
 
 # Kolla ett GitHub-repo
-pcode check Cetriq/publiccode-tools
+pcode check Cetriq/samhallskodex
 ```
 
 ### GitHub Action
@@ -65,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: Cetriq/publiccode-tools@v1
+      - uses: Cetriq/samhallskodex@v1
         with:
           min-score: 60
 ```
@@ -73,7 +73,7 @@ jobs:
 ### Core-biblioteket
 
 ```typescript
-import { validate, scoreYaml } from '@godwana/publiccode-core';
+import { validate, scoreYaml } from '@samhallskodex/core';
 import fs from 'fs';
 
 const yaml = fs.readFileSync('publiccode.yml', 'utf-8');
@@ -95,8 +95,8 @@ console.log(score.suggestions); // [ { message, potentialPoints } ]
 
 ```bash
 # Klona
-git clone https://github.com/Cetriq/publiccode-tools.git
-cd publiccode-tools
+git clone https://github.com/Cetriq/samhallskodex.git
+cd samhallskodex
 
 # Installera dependencies
 pnpm install
@@ -108,7 +108,7 @@ pnpm build
 pnpm test
 
 # Starta webbutvecklingsserver
-pnpm --filter @godwana/publiccode-web dev
+pnpm --filter @samhallskodex/web dev
 ```
 
 ## DIS Fas 1-kategorier

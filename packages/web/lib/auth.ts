@@ -1,5 +1,9 @@
 import { NextAuthOptions, getServerSession } from 'next-auth';
 import GitHubProvider from 'next-auth/providers/github';
+import EmailProvider from 'next-auth/providers/email';
+import type { UserRole } from '@/types/rbac';
+import { isKommunEmail, getKommunFromEmail } from '@/data/kommun-domains';
+import { sendMagicLink } from '@/lib/email';
 
 // Extend the built-in session types
 declare module 'next-auth' {
@@ -11,6 +15,9 @@ declare module 'next-auth' {
       email?: string | null;
       image?: string | null;
       login?: string;
+      roles?: UserRole[];
+      kommun?: string; // For municipality users
+      authProvider?: 'github' | 'email';
     };
   }
 }
@@ -20,6 +27,9 @@ declare module 'next-auth/jwt' {
     accessToken?: string;
     id?: string;
     login?: string;
+    roles?: UserRole[];
+    kommun?: string;
+    authProvider?: 'github' | 'email';
   }
 }
 
@@ -35,9 +45,39 @@ export const authOptions: NextAuthOptions = {
         },
       },
     }),
+    EmailProvider({
+      server: {
+        host: process.env.EMAIL_SERVER_HOST,
+        port: Number(process.env.EMAIL_SERVER_PORT) || 465,
+        auth: {
+          user: process.env.EMAIL_SERVER_USER,
+          pass: process.env.EMAIL_SERVER_PASSWORD,
+        },
+      },
+      from: process.env.EMAIL_FROM || 'SamhällsKodex <noreply@samhallskodex.se>',
+      maxAge: 24 * 60 * 60, // Magic link valid for 24 hours
+      async sendVerificationRequest({ identifier: email, url }) {
+        // Only allow kommun emails
+        if (!isKommunEmail(email)) {
+          throw new Error('Endast kommunala e-postadresser (@kommun.se) är tillåtna');
+        }
+
+        const kommun = getKommunFromEmail(email);
+        await sendMagicLink({ email, url, kommun: kommun || undefined });
+      },
+    }),
   ],
   callbacks: {
-    async jwt({ token, account, profile }) {
+    async signIn({ user, account }) {
+      // For email provider, validate kommun domain
+      if (account?.provider === 'email') {
+        if (!user.email || !isKommunEmail(user.email)) {
+          return false;
+        }
+      }
+      return true;
+    },
+    async jwt({ token, account, profile, user }) {
       // Persist the OAuth access_token and user info to the token
       if (account && profile) {
         token.accessToken = account.access_token;
@@ -45,7 +85,16 @@ export const authOptions: NextAuthOptions = {
         const githubProfile = profile as { id?: number; login?: string };
         token.id = githubProfile.id?.toString();
         token.login = githubProfile.login;
+        token.authProvider = 'github';
       }
+
+      // For email provider
+      if (account?.provider === 'email' && user?.email) {
+        token.id = user.id;
+        token.authProvider = 'email';
+        token.kommun = getKommunFromEmail(user.email) || undefined;
+      }
+
       return token;
     },
     async session({ session, token }) {
@@ -54,12 +103,16 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id ?? '';
         session.user.login = token.login;
+        session.user.roles = token.roles || ['user'];
+        session.user.kommun = token.kommun;
+        session.user.authProvider = token.authProvider;
       }
       return session;
     },
   },
   pages: {
     signIn: '/register',
+    verifyRequest: '/auth/verify-request', // Page shown after magic link is sent
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

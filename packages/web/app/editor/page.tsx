@@ -4,9 +4,9 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { stringify } from 'yaml';
 // Importera endast CATEGORIES (inte validator som använder fs)
-import { CATEGORIES } from '@godwana/publiccode-core/categories';
+import { CATEGORIES } from '@samhallskodex/core/categories';
 // Importera scorer för poängberäkning (samma som används vid registrering)
-import { score as coreScore } from '@godwana/publiccode-core/scorer';
+import { score as coreScore } from '@samhallskodex/core/scorer';
 
 // Score calculation - använder samma logik som core-paketet
 interface ScoreBreakdown {
@@ -167,7 +167,7 @@ function generateSuggestions(data: PubliccodeData): Suggestion[] {
   }
 
   const priorityCategories = CATEGORIES.filter(c => c.disFase1).map(c => c.id);
-  const hasPriorityCategory = data.categories.some(c => priorityCategories.includes(c));
+  const hasPriorityCategory = data.categories.some(c => priorityCategories.includes(c as typeof priorityCategories[number]));
 
   if (!hasPriorityCategory && data.categories.length > 0) {
     suggestions.push({
@@ -460,7 +460,7 @@ const categoryOptions = CATEGORIES
   });
 
 // Valid category IDs for filtering and validation
-const validCategoryIds = new Set(categoryOptions.map(c => c.value));
+const validCategoryIds = new Set<string>(categoryOptions.map(c => c.value));
 
 // Helper function to validate and map categories
 function validateAndMapCategories(categories: string[]): string[] {
@@ -1786,15 +1786,15 @@ function Step4({
         <div className="flex items-start gap-4">
           <div className="flex-1">
             <h3 className="font-semibold text-blue-100">
-              Digital Infrastruktur för Samhällsservice - Fas 1
+              Prioriterat samhällsområde
             </h3>
             <p className="mt-1 text-sm text-blue-300">
-              Markera om detta projekt är del av DIS Fas 1-initiativet.
-              Detta ger extra synlighet i kataloger.
+              Markera om detta projekt tillhör ett prioriterat samhällsområde.
+              Detta ger extra synlighet i katalogen.
             </p>
             {!isPriorityCategory && (
               <p className="mt-2 text-xs text-amber-400">
-                Tips: Välj en prioriterad kategori i steg 1 för att kvalificera för DIS Fas 1
+                Tips: Välj en prioriterad kategori i steg 1 för att kvalificera
               </p>
             )}
           </div>

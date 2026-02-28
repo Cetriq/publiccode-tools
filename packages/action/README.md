@@ -1,11 +1,11 @@
-# @dis-tools/action
+# @samhallskodex/action
 
-GitHub Action för att validera och poängsätta `publiccode.yml`-filer enligt DIS-standarden (Digital Infrastruktur för Samhällsservice).
+GitHub Action för att validera och poängsätta `publiccode.yml`-filer enligt SamhällsKodex-standarden för svensk offentlig sektor.
 
 ## Funktioner
 
 - **Validering** mot publiccode.yml-schemat
-- **DIS-Readiness Score** (0-100) med detaljerad uppdelning
+- **SamhällsKodex Score** (0-100) med detaljerad uppdelning
 - **PR-annotationer** för fel och varningar direkt i koden
 - **Job Summary** med tabeller och förbättringsförslag
 - **Konfigurerbar** med min-score, fail-on-warnings, språk
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: Cetriq/publiccode-tools@v1
+      - uses: Cetriq/samhallskodex@v1
 ```
 
 ## Inputs
@@ -39,7 +39,7 @@ jobs:
 |-------|-------------|---------|
 | `path` | Sökväg till publiccode.yml | `./publiccode.yml` |
 | `fail-on-warnings` | Misslyckas om varningar hittas | `false` |
-| `min-score` | Minsta godkända DIS-Readiness Score (0-100) | `0` |
+| `min-score` | Minsta godkända SamhällsKodex Score (0-100) | `0` |
 | `annotate` | Skapa PR-annotationer | `true` |
 | `lang` | Språk för meddelanden (sv/en) | `sv` |
 
@@ -48,7 +48,7 @@ jobs:
 | Output | Beskrivning |
 |--------|-------------|
 | `valid` | `true` om filen är giltig |
-| `score` | DIS-Readiness Score (0-100) |
+| `score` | SamhällsKodex Score (0-100) |
 | `errors` | Antal valideringsfel |
 | `warnings` | Antal varningar |
 
@@ -68,7 +68,7 @@ jobs:
     min-score: 60
 ```
 
-Misslyckas om DIS-Readiness Score är under 60.
+Misslyckas om SamhällsKodex Score är under 60.
 
 ### Strikt validering
 
@@ -178,7 +178,7 @@ Fel och varningar visas direkt i PR-diffen:
 ⚠️ Varning: Lägg till underhållsinformation
 ```
 
-## DIS-Readiness Score
+## SamhällsKodex Score
 
 Poängen baseras på fem kategorier:
 
@@ -194,15 +194,15 @@ Poängen baseras på fem kategorier:
 
 | Score | Nivå | Rekommendation |
 |-------|------|----------------|
-| 80-100 | 🟢 Utmärkt | Redo för DIS-katalogen |
+| 80-100 | 🟢 Utmärkt | Redo för SamhällsKodex-katalogen |
 | 60-79 | 🟡 Bra | Några förbättringar rekommenderas |
 | 40-59 | 🟠 Acceptabel | Behöver mer arbete |
 | 0-39 | 🔴 Otillräcklig | Saknar viktiga fält |
 
 ## Relaterade verktyg
 
-- [`@godwana/publiccode-cli`](https://www.npmjs.com/package/@godwana/publiccode-cli) - CLI för lokal validering
-- [`@godwana/publiccode-core`](https://www.npmjs.com/package/@godwana/publiccode-core) - Kärnbibliotek
+- [`@samhallskodex/cli`](https://www.npmjs.com/package/@samhallskodex/cli) - CLI för lokal validering
+- [`@samhallskodex/core`](https://www.npmjs.com/package/@samhallskodex/core) - Kärnbibliotek
 
 ## Licens
 

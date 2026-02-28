@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { fetchPubliccode, parseGitHubUrl } from '@/lib/github';
 import { getDb, hashUrl, COLLECTIONS } from '@/lib/firebase';
 import { FieldValue } from 'firebase-admin/firestore';
-import { parse, validate, scoreYaml } from '@godwana/publiccode-core';
+import { parse, validate, scoreYaml } from '@samhallskodex/core';
 
 const MIN_SCORE = 60;
 

@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getFirebaseAdmin, hashToken, COLLECTIONS } from '@/lib/firebase';
-import { FieldValue } from 'firebase-admin/firestore';
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { randomBytes } from 'crypto';
 import type {
   CreateOrganizationRequest,
   CreateOrganizationResponse,
+  Organization,
 } from '@/types/organization';
+import { isOrgMember } from '@/types/organization';
 
 // POST /api/organizations - Create a new organization
 export async function POST(
@@ -40,9 +42,9 @@ export async function POST(
     // Check if organization already exists
     const existingOrg = await db.collection(COLLECTIONS.ORGANIZATIONS).doc(orgId).get();
     if (existingOrg.exists) {
-      const orgData = existingOrg.data();
-      // Check if current user is an admin
-      if (orgData?.adminUsers?.includes(session.user.id)) {
+      const orgData = existingOrg.data() as Organization;
+      // Check if current user is a member (uses helper that checks both members[] and legacy adminUsers[])
+      if (isOrgMember(orgData, session.user.id)) {
         return NextResponse.json(
           {
             success: false,
@@ -65,13 +67,24 @@ export async function POST(
     const apiKey = randomBytes(32).toString('hex');
     const apiKeyHash = hashToken(apiKey);
 
-    // Create the organization document
+    // Create the organization document with new RBAC fields
     const orgDoc = {
       id: orgId,
       name: orgName,
       slug: orgName.toLowerCase(),
+      type: 'developer' as const, // Default type
+      verified: false, // Not verified until admin approves
       avatarUrl: orgAvatar || '',
       apiKeyHash,
+      // New members array with role
+      members: [
+        {
+          userId: session.user.id,
+          role: 'owner' as const,
+          addedAt: FieldValue.serverTimestamp(),
+        },
+      ],
+      // Keep legacy adminUsers for backwards compatibility
       adminUsers: [session.user.id],
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
@@ -134,8 +147,11 @@ export async function GET(): Promise<NextResponse> {
         id: doc.id,
         name: data.name,
         slug: data.slug,
+        type: data.type || 'developer',
+        verified: data.verified || false,
         avatarUrl: data.avatarUrl,
         repoCount: data.repoCount || 0,
+        capabilities: data.capabilities || [],
         createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
       };
     });

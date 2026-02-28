@@ -1,12 +1,12 @@
 /**
- * @dis-tools/action
+ * @samhallskodex/action
  * GitHub Action for publiccode.yml validation and scoring
  */
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { readFileSync, existsSync } from 'fs';
 import { load as parseYaml } from 'js-yaml';
-import { validate, scoreYaml, CATEGORIES, } from '@godwana/publiccode-core';
+import { validate, scoreYaml, CATEGORIES, } from '@samhallskodex/core';
 async function run() {
     try {
         // Get inputs

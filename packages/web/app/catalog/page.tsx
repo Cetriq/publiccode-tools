@@ -3,8 +3,8 @@ import { CatalogClient } from './CatalogClient';
 import type { CatalogRepository } from '@/types/registry';
 
 export const metadata: Metadata = {
-  title: 'Katalog - DIS-Tools',
-  description: 'Utforska öppen källkod i svenska offentliga sektorn. Hitta projekt med DIS-kompatibla publiccode.yml-filer.',
+  title: 'Katalog - SamhällsKodex',
+  description: 'Utforska öppen källkod i svenska offentliga sektorn. Hitta projekt med publiccode.yml.',
 };
 
 // Revalidate every 5 minutes
@@ -47,7 +47,7 @@ export default async function CatalogPage() {
             </h1>
             <p className="mt-4 text-lg text-slate-300 max-w-2xl mx-auto">
               Utforska öppen källkod i svenska offentliga sektorn.
-              Alla projekt har minst 60 poängs DIS-Readiness Score.
+              Alla projekt har minst 60 poängs SamhällsKodex Score.
             </p>
           </div>
 

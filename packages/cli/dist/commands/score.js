@@ -4,7 +4,7 @@
 import { Command } from 'commander';
 import { readFileSync, existsSync } from 'fs';
 import chalk from 'chalk';
-import { scoreYaml, getBadgeUrl } from '@godwana/publiccode-core';
+import { scoreYaml, getBadgeUrl } from '@samhallskodex/core';
 export const scoreCommand = new Command('score')
     .description('Beräkna DIS-Readiness Score')
     .argument('[path]', 'Sökväg till publiccode.yml', './publiccode.yml')

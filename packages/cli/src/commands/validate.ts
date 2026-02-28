@@ -5,7 +5,7 @@
 import { Command } from 'commander';
 import { readFileSync, existsSync } from 'fs';
 import chalk from 'chalk';
-import { validate, type Language } from '@godwana/publiccode-core';
+import { validate, type Language } from '@samhallskodex/core';
 
 export const validateCommand = new Command('validate')
   .description('Validera en publiccode.yml-fil')

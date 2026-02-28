@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 
-// All valid publiccode.yml categories - synced with @godwana/publiccode-core
+// All valid publiccode.yml categories - synced with @samhallskodex/core
 const VALID_CATEGORIES = [
   'accounting', 'agile-project-management', 'applicant-tracking', 'application-development',
   'appointment-scheduling', 'backup', 'billing-and-invoicing', 'blog', 'budgeting',
@@ -70,7 +70,7 @@ const CATEGORY_ALIASES: Record<string, string> = {
   'projects': 'project-management',
 };
 
-// DIS Fas 1 priority categories - synced with @godwana/publiccode-core
+// DIS Fas 1 priority categories - synced with @samhallskodex/core
 const DIS_FASE1_CATEGORIES = [
   'case-management',
   'civic-engagement',

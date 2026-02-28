@@ -51,7 +51,7 @@ export async function getDefaultBranch(
 ): Promise<string> {
   const headers: Record<string, string> = {
     'Accept': 'application/vnd.github.v3+json',
-    'User-Agent': 'DIS-Tools',
+    'User-Agent': 'SamhallsKodex',
   };
 
   if (accessToken) {
@@ -83,7 +83,7 @@ export async function checkRepoAccess(
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'DIS-Tools',
+      'User-Agent': 'SamhallsKodex',
     },
   });
 
@@ -128,7 +128,7 @@ export async function fetchPubliccode(
   const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/publiccode.yml`;
 
   const headers: Record<string, string> = {
-    'User-Agent': 'DIS-Tools',
+    'User-Agent': 'SamhallsKodex',
   };
 
   if (accessToken) {

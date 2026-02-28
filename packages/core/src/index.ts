@@ -1,4 +1,4 @@
-// @godwana/publiccode-core
+// @samhallskodex/core
 // Main entry point
 
 // Types

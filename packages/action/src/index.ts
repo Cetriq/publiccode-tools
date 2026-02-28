@@ -1,5 +1,5 @@
 /**
- * @dis-tools/action
+ * @samhallskodex/action
  * GitHub Action for publiccode.yml validation and scoring
  */
 
@@ -14,7 +14,7 @@ import {
   type ValidationResult,
   type ScoreResult,
   type Language,
-} from '@godwana/publiccode-core';
+} from '@samhallskodex/core';
 
 interface RegistrationPayload {
   url: string;

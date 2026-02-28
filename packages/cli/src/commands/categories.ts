@@ -8,7 +8,7 @@ import {
   getCategories,
   searchCategories,
   getDISFase1Categories,
-} from '@godwana/publiccode-core';
+} from '@samhallskodex/core';
 
 export const categoriesCommand = new Command('categories')
   .description('Lista och sök kategorier')

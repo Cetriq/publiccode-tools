@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['@godwana/publiccode-core'],
+  transpilePackages: ['@samhallskodex/core'],
 };
 
 module.exports = nextConfig;

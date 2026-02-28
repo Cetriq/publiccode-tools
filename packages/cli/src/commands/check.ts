@@ -4,7 +4,7 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { validate, scoreYaml, type Language } from '@godwana/publiccode-core';
+import { validate, scoreYaml, type Language } from '@samhallskodex/core';
 
 /**
  * Parse GitHub URL to extract owner and repo

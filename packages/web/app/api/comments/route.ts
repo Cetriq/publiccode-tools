@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getDb, COLLECTIONS } from '@/lib/firebase';
 import { FieldValue } from 'firebase-admin/firestore';
+import { getUser } from '@/lib/rbac';
+import { isPlatformAdmin } from '@/types/rbac';
 
 export interface Comment {
   id: string;
@@ -167,7 +169,17 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
     const commentData = commentDoc.data();
     const userId = session.user.id || session.user.email;
 
-    if (commentData?.userId !== userId) {
+    // Check if user owns the comment or is platform admin
+    const isOwner = commentData?.userId === userId;
+    let isAdmin = false;
+
+    if (!isOwner) {
+      // Check if user is platform admin (can moderate any comment)
+      const user = await getUser(session.user.id);
+      isAdmin = user ? isPlatformAdmin(user.roles) : false;
+    }
+
+    if (!isOwner && !isAdmin) {
       return NextResponse.json(
         { error: 'Not authorized to delete this comment' },
         { status: 403 }

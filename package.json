@@ -1,16 +1,16 @@
 {
-  "name": "publiccode-tools",
+  "name": "samhallskodex",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Verktygskedja för publiccode.yml och DIS",
+  "description": "SamhällsKodex - Verktygskedja för publiccode.yml och svensk offentlig sektor",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Cetriq/publiccode-tools.git"
+    "url": "git+https://github.com/Cetriq/samhallskodex.git"
   },
-  "homepage": "https://github.com/Cetriq/publiccode-tools#readme",
+  "homepage": "https://github.com/Cetriq/samhallskodex#readme",
   "bugs": {
-    "url": "https://github.com/Cetriq/publiccode-tools/issues"
+    "url": "https://github.com/Cetriq/samhallskodex/issues"
   },
   "scripts": {
     "build": "turbo run build",
@@ -24,11 +24,12 @@
   },
   "keywords": [
     "publiccode",
+    "samhallskodex",
     "dis",
     "opensource",
     "sweden"
   ],
-  "author": "DIS-Tools",
+  "author": "SamhällsKodex",
   "license": "Apache-2.0",
   "packageManager": "pnpm@10.30.3",
   "engines": {

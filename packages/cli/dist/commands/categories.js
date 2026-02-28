@@ -3,7 +3,7 @@
  */
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { getCategories, searchCategories, getDISFase1Categories, } from '@godwana/publiccode-core';
+import { getCategories, searchCategories, getDISFase1Categories, } from '@samhallskodex/core';
 export const categoriesCommand = new Command('categories')
     .description('Lista och sök kategorier')
     .option('-s, --search <query>', 'Sök i kategorier')
