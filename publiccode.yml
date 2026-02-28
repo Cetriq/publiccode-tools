@@ -1,75 +1,47 @@
-publiccodeYmlVersion: '0.3'
-name: DIS-Tools
+publiccodeYmlVersion: "0.3"
+name: publiccode-tools
 url: https://github.com/Cetriq/publiccode-tools
-releaseDate: '2026-02-27'
-softwareVersion: '0.1.0'
+releaseDate: 2026-02-27
+softwareVersion: 0.1.0
 platforms:
   - web
 categories:
-  - IT_DEVELOPMENT
-  - DATA_ANALYTICS
-  - WORKFLOW_MANAGEMENT
+  - it-development
+  - workflow-automation
+  - data-analytics
 developmentStatus: development
 softwareType: standalone/web
 description:
   sv:
-    localisedName: DIS-Tools
-    shortDescription: Verktyg för att skapa, validera och analysera publiccode.yml-filer för svenska OSS-projekt
-    longDescription: |
-      DIS-Tools är en samling verktyg för att hjälpa svenska myndigheter och kommuner
-      att beskriva sina öppen källkod-projekt enligt publiccode.yml-standarden.
+    shortDescription: Verktygskedja för publiccode.yml och DIS-Readiness
+    longDescription: |2-
+       DIS-Tools är en samling verktyg för att hjälpa svenska myndigheter och kommuner att beskriva sina öppen källkod-projekt enligt publiccode.yml-standarden.
 
-      Verktygskedjan inkluderar:
-      - En visuell webbredigerare med steg-för-steg-guide
-      - Ett CLI-verktyg för validering och scoring
-      - En GitHub Action för automatisk kontroll
-      - Ett core-bibliotek för programmatisk användning
+            Verktygskedjan inkluderar:
+            - En visuell webbredigerare med steg-för-steg-guide
+            - Ett CLI-verktyg för validering och scoring
+            - En GitHub Action för automatisk kontroll
+            - Ett core-bibliotek för programmatisk användning
 
-      DIS-Readiness Score hjälper er att mäta och förbättra kvaliteten på era
-      projektbeskrivningar, med särskilt fokus på svenska offentliga sektorns behov.
+      DIS-Readiness Score hjälper er att mäta och förbättra kvaliteten på era projektbeskrivningar, med särskilt fokus på svenska offentliga sektorns behov.
     features:
       - Visuell redigerare för publiccode.yml
       - DIS-Readiness Score (0-100 poäng)
       - Validering mot publiccode.yml-standarden
-      - Stöd för svenska tillägg (sv-extension)
-      - 52 kategorier med svenska beskrivningar
       - CLI-verktyg för automation
       - GitHub Action för CI/CD-integration
-  en:
-    shortDescription: Tools for creating, validating and analyzing publiccode.yml files for Swedish OSS projects
-    longDescription: |
-      DIS-Tools is a collection of tools to help Swedish government agencies and municipalities
-      describe their open source projects according to the publiccode.yml standard.
-
-      The toolchain includes:
-      - A visual web editor with step-by-step guide
-      - A CLI tool for validation and scoring
-      - A GitHub Action for automated checks
-      - A core library for programmatic use
-
-      The DIS-Readiness Score helps you measure and improve the quality of your
-      project descriptions, with special focus on Swedish public sector needs.
-    features:
-      - Visual editor for publiccode.yml
-      - DIS-Readiness Score (0-100 points)
-      - Validation against publiccode.yml standard
-      - Support for Swedish extensions (sv-extension)
-      - 52 categories with Swedish descriptions
-      - CLI tool for automation
-      - GitHub Action for CI/CD integration
+    localisedName: DIS-Tools
 legal:
-  license: MIT
-  repoOwner: DIS-Tools
+  license: Apache-2.0
 maintenance:
-  type: community
+  type: contract
   contacts:
-    - name: DIS-Tools Team
-      email: hello@dis-tools.se
+    - name: Clas Törnquist
+      email: clas.tornquist@hotmail.com
 localisation:
-  localisationReady: true
+  localisationReady: false
   availableLanguages:
     - sv
-    - en
 sv:
-  countryExtensionVersion: '1.0'
+  countryExtensionVersion: "1.0"
   disFas1: true
