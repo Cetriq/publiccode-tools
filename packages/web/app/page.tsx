@@ -1,371 +1,81 @@
-import Link from 'next/link';
-import CopyButton from '@/components/CopyButton';
-
 export default function Home() {
   return (
-    <div className="flex flex-col">
-      {/* Hero - Manifest style */}
-      <section className="relative overflow-hidden bg-slate-950">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10" />
-        <div className="relative mx-auto max-w-7xl px-4 py-32 sm:px-6 lg:px-8 lg:py-44">
-          <div className="max-w-4xl">
-            <p className="text-sm font-semibold uppercase tracking-widest text-amber-500">
-              En doktrin för svensk offentlig sektor
-            </p>
-            <h1 className="mt-6 text-5xl font-bold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
-              Varje kodrad ska kunna återanvändas av nästa kommun.
-            </h1>
-            <p className="mt-8 max-w-2xl text-xl leading-relaxed text-slate-400">
-              SamhällsKodex är principen att all programvara som byggs för offentlig sektor
-              ska beskrivas, delas och återanvändas. Inte som en möjlighet. Som en självklarhet.
-            </p>
-            <div className="mt-12 flex flex-col gap-4 sm:flex-row">
-              <Link
-                href="/catalog"
-                className="inline-flex items-center justify-center rounded-none border-2 border-white bg-white px-8 py-4 text-lg font-bold text-slate-900 transition-all hover:bg-transparent hover:text-white"
-              >
-                Se katalogen
-              </Link>
-              <Link
-                href="#principerna"
-                className="inline-flex items-center justify-center rounded-none border-2 border-slate-700 px-8 py-4 text-lg font-bold text-white transition-all hover:border-white"
-              >
-                Läs principerna
-              </Link>
-            </div>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4">
+      <div className="mx-auto max-w-2xl text-center">
+        {/* Logo */}
+        <div className="mb-8 flex justify-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30">
+            <svg
+              className="h-8 w-8 text-white"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
+              <path d="M16 18l2-2-2-2" />
+              <path d="M8 6L6 8l2 2" />
+              <path d="M14.5 4l-5 16" />
+            </svg>
           </div>
         </div>
 
-        {/* Stark linje */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500" />
-      </section>
+        {/* Title */}
+        <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+          SamhällsKodex
+        </h1>
 
-      {/* Manifestet - tre principer */}
-      <section id="principerna" className="bg-white py-24 lg:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl">
-            <p className="text-sm font-semibold uppercase tracking-widest text-slate-500">
-              Tre principer
-            </p>
-            <h2 className="mt-4 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-              SamhällsKodex
-            </h2>
-          </div>
+        <p className="mt-4 text-lg text-slate-400">
+          Verktyg för publiccode.yml i svensk offentlig sektor
+        </p>
 
-          <div className="mt-20 grid gap-0 border-t border-slate-200 lg:grid-cols-3">
-            <PrincipleCard
-              number="I"
-              title="Beskriv"
-              description="All programvara som utvecklas med offentliga medel ska ha en standardiserad beskrivning. Vad den gör. Vem som ansvarar. Hur den kan användas."
-            />
-            <PrincipleCard
-              number="II"
-              title="Dela"
-              description="Beskrivningen ska vara offentlig och maskinläsbar. Andra ska kunna hitta, utvärdera och kontakta er utan hinder."
-            />
-            <PrincipleCard
-              number="III"
-              title="Återanvänd"
-              description="Innan ny utveckling påbörjas ska befintliga lösningar undersökas. Duplicering av ansträngning är slöseri med skattemedel."
-            />
-          </div>
+        {/* Status badge */}
+        <div className="mt-8 inline-flex items-center gap-2 rounded-full bg-amber-500/10 px-4 py-2 text-amber-400">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500"></span>
+          </span>
+          <span className="text-sm font-medium">Arbete pågår</span>
         </div>
-      </section>
 
-      {/* Problemet - emotionell */}
-      <section className="bg-slate-950 py-24 lg:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
-              290 kommuner.<br />
-              Samma problem.<br />
-              <span className="text-slate-500">290 olika lösningar.</span>
-            </h2>
-            <div className="mt-12 space-y-6 text-lg leading-relaxed text-slate-400">
-              <p>
-                Varje år spenderar svenska kommuner och myndigheter miljarder kronor på
-                IT-utveckling. Ärendehantering. Dokumenthantering. Medborgardialoger.
-                Samma typer av system, om och om igen.
-              </p>
-              <p>
-                Inte för att det saknas bra lösningar. Utan för att de inte går att hitta.
-                Det finns ingen gemensam plats. Inget standardiserat sätt att beskriva vad
-                som redan finns.
-              </p>
-              <p className="text-white font-semibold">
-                SamhällsKodex ändrar det.
-              </p>
-            </div>
-          </div>
+        {/* Message */}
+        <p className="mt-8 text-slate-500">
+          Vi bygger något nytt. Lansering i mars 2026.
+        </p>
+
+        {/* Links */}
+        <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <a
+            href="https://github.com/Cetriq/publiccode-tools"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-6 py-3 text-sm font-medium text-white transition hover:bg-white/20"
+          >
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+              <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+            </svg>
+            Källkod på GitHub
+          </a>
+          <a
+            href="https://www.npmjs.com/package/@samhallskodex/cli"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-6 py-3 text-sm font-medium text-white transition hover:bg-white/20"
+          >
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M0 7.334v8h6.666v1.332H12v-1.332h12v-8H0zm6.666 6.664H5.334v-4H3.999v4H1.335V8.667h5.331v5.331zm4 0v1.336H8.001V8.667h5.334v5.332h-2.669v-.001zm12.001 0h-1.33v-4h-1.336v4h-1.335v-4h-1.33v4h-2.671V8.667h8.002v5.331zM10.665 10H12v2.667h-1.335V10z" />
+            </svg>
+            CLI på npm
+          </a>
         </div>
-      </section>
 
-      {/* Standarden */}
-      <section className="bg-slate-100 py-24 lg:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-16 lg:grid-cols-2 lg:gap-24">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-widest text-slate-500">
-                Standarden
-              </p>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-                En fil. All information.
-              </h2>
-              <p className="mt-6 text-lg leading-relaxed text-slate-600">
-                <code className="rounded bg-slate-200 px-2 py-1 font-mono text-sm">publiccode.yml</code> är
-                en öppen standard för att beskriva programvara. En liten textfil i varje projekts
-                kodarkiv som berättar vad projektet är, vem som står bakom det, och hur det kan användas.
-              </p>
-              <p className="mt-4 text-lg leading-relaxed text-slate-600">
-                Standarden kommer från Italien och används redan av tusentals europeiska
-                offentliga projekt. SamhällsKodex anpassar den för svenska förhållanden
-                med svenska kategorier, svenska felmeddelanden och fokus på svensk lagstiftning.
-              </p>
-              <Link
-                href="/editor"
-                className="mt-8 inline-flex items-center text-lg font-semibold text-slate-900 hover:text-slate-600"
-              >
-                Skapa er publiccode.yml
-                <svg className="ml-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-            </div>
-            <div className="rounded-none bg-slate-900 p-6 lg:p-8">
-              <div className="font-mono text-sm leading-relaxed text-slate-300">
-                <div className="text-slate-500"># publiccode.yml</div>
-                <div className="mt-4">
-                  <span className="text-amber-400">publiccodeYmlVersion</span>: <span className="text-green-400">"0.4"</span>
-                </div>
-                <div>
-                  <span className="text-amber-400">name</span>: <span className="text-green-400">"Medborgarportalen"</span>
-                </div>
-                <div>
-                  <span className="text-amber-400">url</span>: <span className="text-green-400">"https://github.com/..."</span>
-                </div>
-                <div className="mt-4">
-                  <span className="text-amber-400">description</span>:
-                </div>
-                <div className="pl-4">
-                  <span className="text-amber-400">sv</span>:
-                </div>
-                <div className="pl-8">
-                  <span className="text-amber-400">shortDescription</span>: <span className="text-green-400">"Portal för medborgardialog"</span>
-                </div>
-                <div className="mt-4">
-                  <span className="text-amber-400">categories</span>:
-                </div>
-                <div className="pl-4">
-                  <span className="text-green-400">- civic-engagement</span>
-                </div>
-                <div className="pl-4">
-                  <span className="text-green-400">- public-participation</span>
-                </div>
-                <div className="mt-4">
-                  <span className="text-amber-400">legal</span>:
-                </div>
-                <div className="pl-4">
-                  <span className="text-amber-400">license</span>: <span className="text-green-400">"EUPL-1.2"</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Prioriterade områden */}
-      <section className="bg-white py-24 lg:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="text-sm font-semibold uppercase tracking-widest text-slate-500">
-              Fokusområden
-            </p>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-              Nio områden med störst potential
-            </h2>
-            <p className="mt-6 text-lg text-slate-600">
-              DIS har identifierat områden där delning av programvara kan ge störst samhällsnytta.
-              Projekt inom dessa kategorier prioriteras i katalogen.
-            </p>
-          </div>
-
-          <div className="mt-16 grid gap-px bg-slate-200 sm:grid-cols-2 lg:grid-cols-3">
-            {priorityCategories.map((cat) => (
-              <div key={cat.name} className="bg-white p-8">
-                <div className="text-3xl">{cat.emoji}</div>
-                <div className="mt-4 text-lg font-semibold text-slate-900">{cat.name}</div>
-                <div className="mt-2 text-slate-600">{cat.description}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Verktyg - kort sektion */}
-      <section className="border-t border-slate-200 bg-white py-24 lg:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-              Verktyg för att följa doktrinen
-            </h2>
-            <p className="mt-6 text-lg text-slate-600">
-              Vi tillhandahåller verktyg som gör det enkelt att skapa, validera och publicera
-              projektbeskrivningar enligt standarden.
-            </p>
-          </div>
-
-          <div className="mt-16 grid gap-8 lg:grid-cols-3">
-            <ToolCard
-              title="Webb-editor"
-              description="Skapa publiccode.yml visuellt utan att skriva kod. En guide som tar dig igenom alla fält."
-              cta="Öppna editorn"
-              href="/editor"
-            />
-            <ToolCard
-              title="Kommandoradsverktyg"
-              description="Validera och poängsätt projektbeskrivningar direkt i terminalen. Perfekt för utvecklare."
-              cta="npm install @samhallskodex/cli"
-              href="https://www.npmjs.com/package/@samhallskodex/cli"
-              mono
-            />
-            <ToolCard
-              title="GitHub Action"
-              description="Automatisk validering vid varje commit. Fel visas direkt i pull requests."
-              cta="Se dokumentation"
-              href="https://github.com/Cetriq/samhallskodex"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* CLI demo */}
-      <section className="bg-slate-950 py-24 lg:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl">
-            <div className="overflow-hidden border border-slate-800">
-              <div className="flex items-center gap-2 border-b border-slate-800 bg-slate-900 px-4 py-3">
-                <div className="h-3 w-3 rounded-full bg-red-500" />
-                <div className="h-3 w-3 rounded-full bg-yellow-500" />
-                <div className="h-3 w-3 rounded-full bg-green-500" />
-                <span className="ml-4 font-mono text-sm text-slate-500">terminal</span>
-              </div>
-              <div className="bg-slate-950 p-6">
-                <div className="space-y-4 font-mono text-sm">
-                  <div className="group flex items-center">
-                    <span className="text-slate-600">$</span>
-                    <span className="ml-2 text-slate-300">npm install -g @samhallskodex/cli</span>
-                    <CopyButton text="npm install -g @samhallskodex/cli" className="ml-2 opacity-0 group-hover:opacity-100" />
-                  </div>
-                  <div className="text-slate-600"># Validera ert projekt</div>
-                  <div className="group flex items-center">
-                    <span className="text-slate-600">$</span>
-                    <span className="ml-2 text-slate-300">pcode score</span>
-                    <CopyButton text="pcode score" className="ml-2 opacity-0 group-hover:opacity-100" />
-                  </div>
-                  <div className="mt-4 border-l-2 border-amber-500 bg-slate-900 p-4">
-                    <div className="text-amber-500">SamhällsKodex Score: 72/100</div>
-                    <div className="mt-2 text-slate-500">████████████████░░░░</div>
-                    <div className="mt-4 text-slate-400">Förbättringar:</div>
-                    <div className="text-slate-500">  + Lägg till screenshots (+10p)</div>
-                    <div className="text-slate-500">  + Lägg till maintenance.contacts (+8p)</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Avslutande CTA */}
-      <section className="bg-slate-900 py-24 lg:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-              Börja idag.
-            </h2>
-            <p className="mt-6 text-xl text-slate-400">
-              Det tar fem minuter att beskriva ert projekt. Varje beskrivning
-              som läggs till gör det enklare för nästa kommun att hitta rätt.
-            </p>
-            <div className="mt-12 flex flex-col gap-4 sm:flex-row sm:justify-center">
-              <Link
-                href="/add-repo"
-                className="inline-flex items-center justify-center border-2 border-white bg-white px-8 py-4 text-lg font-bold text-slate-900 transition-all hover:bg-transparent hover:text-white"
-              >
-                Registrera projekt
-              </Link>
-              <Link
-                href="/catalog"
-                className="inline-flex items-center justify-center border-2 border-slate-700 px-8 py-4 text-lg font-bold text-white transition-all hover:border-white"
-              >
-                Bläddra i katalogen
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+        {/* Contact */}
+        <p className="mt-16 text-sm text-slate-600">
+          Frågor? Kontakta oss på{' '}
+          <a href="mailto:dis-tools@cetriq.se" className="text-slate-400 hover:text-white">
+            dis-tools@cetriq.se
+          </a>
+        </p>
+      </div>
     </div>
   );
 }
-
-// Components
-
-function PrincipleCard({
-  number,
-  title,
-  description,
-}: {
-  number: string;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="border-b border-slate-200 p-8 lg:border-b-0 lg:border-r lg:p-12 last:border-r-0">
-      <div className="font-mono text-4xl font-bold text-slate-300">{number}</div>
-      <h3 className="mt-6 text-2xl font-bold text-slate-900">{title}</h3>
-      <p className="mt-4 leading-relaxed text-slate-600">{description}</p>
-    </div>
-  );
-}
-
-function ToolCard({
-  title,
-  description,
-  cta,
-  href,
-  mono = false,
-}: {
-  title: string;
-  description: string;
-  cta: string;
-  href: string;
-  mono?: boolean;
-}) {
-  return (
-    <div className="border border-slate-200 p-8">
-      <h3 className="text-xl font-bold text-slate-900">{title}</h3>
-      <p className="mt-4 text-slate-600">{description}</p>
-      <Link
-        href={href}
-        className={`mt-6 inline-flex items-center font-semibold text-slate-900 hover:text-slate-600 ${mono ? 'font-mono text-sm' : ''}`}
-      >
-        {cta}
-        <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-        </svg>
-      </Link>
-    </div>
-  );
-}
-
-const priorityCategories = [
-  { name: 'Ärendehantering', description: 'Hantera ärenden och förfrågningar systematiskt', emoji: '📋' },
-  { name: 'Medborgarengagemang', description: 'Dialog mellan kommun och medborgare', emoji: '🗣️' },
-  { name: 'Dataanalys', description: 'Analysera och visualisera offentlig data', emoji: '📊' },
-  { name: 'Dokumenthantering', description: 'Strukturerad hantering av dokument', emoji: '📁' },
-  { name: 'Identitetshantering', description: 'Inloggning och behörighetskontroll', emoji: '🔐' },
-  { name: 'Kommunal förvaltning', description: 'System för kommunernas kärnverksamhet', emoji: '🏛️' },
-  { name: 'Medborgardeltagande', description: 'Demokratiska processer och samråd', emoji: '🤝' },
-  { name: 'Felanmälan', description: 'Rapportera och hantera incidenter', emoji: '🔧' },
-  { name: 'Arbetsflöden', description: 'Automatisering av administrativa processer', emoji: '⚡' },
-];
