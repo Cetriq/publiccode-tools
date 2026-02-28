@@ -6,13 +6,10 @@ softwareVersion: 0.1.0
 platforms:
   - web
 categories:
-  - workflow-management
-  - application-development
-  - digital-asset-management
-  - it-asset-management
-  - it-development
   - software-development
+  - it-development
   - compliance-management
+  - workflow-management
 developmentStatus: development
 softwareType: standalone/web
 description:
