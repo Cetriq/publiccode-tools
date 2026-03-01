@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { fetchPubliccode, parseGitHubUrl } from '@/lib/github';
 import { getDb, hashUrl, COLLECTIONS } from '@/lib/firebase';
 import { FieldValue } from 'firebase-admin/firestore';
 import { parse, validate, scoreYaml } from '@samhallskodex/core';
+import { requireVerified, handleAuthError, AuthError } from '@/lib/rbac';
 
 // Force dynamic rendering - prevents build-time Firebase initialization
 export const dynamic = 'force-dynamic';
@@ -34,10 +33,26 @@ interface RegisterRepoResponse {
 // POST /api/repos/register - Register a repository by URL
 export async function POST(request: NextRequest): Promise<NextResponse<RegisterRepoResponse>> {
   try {
-    // Check authentication
-    const session = await getServerSession(authOptions);
+    // Check authentication and verification
+    let session;
+    try {
+      const authResult = await requireVerified();
+      session = authResult.session;
+    } catch (error) {
+      if (error instanceof AuthError) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: error.message,
+            errorCode: error.statusCode === 401 ? 'unauthenticated' : 'not_verified'
+          },
+          { status: error.statusCode }
+        );
+      }
+      throw error;
+    }
 
-    if (!session || !session.accessToken) {
+    if (!session.accessToken) {
       return NextResponse.json(
         {
           success: false,

@@ -26,6 +26,7 @@ export async function GET(): Promise<NextResponse> {
         email: data.email,
         avatarUrl: data.avatarUrl,
         roles: data.roles || ['user'],
+        verified: data.verified || false,
         createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
         lastLogin: data.lastLogin?.toDate?.()?.toISOString() || null,
       };
@@ -41,6 +42,56 @@ export async function GET(): Promise<NextResponse> {
       return authResponse;
     }
     console.error('Admin users GET error:', error);
+    return NextResponse.json(
+      { success: false, message: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+// POST /api/admin/users - Verify/unverify a user
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  try {
+    await requireAdmin();
+
+    const body = await request.json();
+    const { userId, verified } = body;
+
+    if (!userId || typeof verified !== 'boolean') {
+      return NextResponse.json(
+        { success: false, message: 'Missing userId or verified status' },
+        { status: 400 }
+      );
+    }
+
+    const db = getDb();
+    const userRef = db.collection(COLLECTIONS.USERS).doc(userId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return NextResponse.json(
+        { success: false, message: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    await userRef.update({
+      verified,
+      verifiedAt: verified ? FieldValue.serverTimestamp() : null,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: verified ? 'Användare verifierad' : 'Verifiering borttagen',
+      verified,
+    });
+  } catch (error) {
+    const authResponse = handleAuthError(error);
+    if (authResponse.status !== 500) {
+      return authResponse;
+    }
+    console.error('Admin users POST error:', error);
     return NextResponse.json(
       { success: false, message: 'Internal server error' },
       { status: 500 }

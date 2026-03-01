@@ -5,7 +5,7 @@ interface RecentUser {
   login: string;
   name?: string;
   avatarUrl?: string;
-  verified?: boolean;
+  verified: boolean; // true if user.verified OR has platform_admin role
 }
 
 async function getRecentUsers(): Promise<RecentUser[]> {
@@ -21,12 +21,14 @@ async function getRecentUsers(): Promise<RecentUser[]> {
 
     return snapshot.docs.map((doc) => {
       const data = doc.data();
+      const roles: string[] = data.roles || [];
+      const isPlatformAdmin = roles.includes('platform_admin');
       return {
         id: doc.id,
         login: data.login || 'unknown',
         name: data.name,
         avatarUrl: data.avatarUrl,
-        verified: data.verified || false,
+        verified: data.verified === true || isPlatformAdmin,
       };
     });
   } catch (error) {

@@ -95,6 +95,22 @@ export async function requireAdmin(): Promise<{ session: Session; user: User }> 
   return { session, user };
 }
 
+// Check if user is verified (either has verified flag OR is platform admin)
+export function isVerifiedUser(user: User): boolean {
+  return user.verified === true || isPlatformAdmin(user.roles);
+}
+
+// Require verified user (verified OR admin)
+export async function requireVerified(): Promise<{ session: Session; user: User }> {
+  const { session, user } = await requireAuth();
+
+  if (!isVerifiedUser(user)) {
+    throw new AuthError('Ditt konto måste verifieras av en administratör innan du kan registrera projekt.', 403);
+  }
+
+  return { session, user };
+}
+
 // Handle auth errors and return appropriate response
 export function handleAuthError(error: unknown): NextResponse {
   if (error instanceof AuthError) {
