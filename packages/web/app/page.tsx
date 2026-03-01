@@ -96,7 +96,7 @@ export default function Home() {
                 SamhällsKodex ändrar det.
               </p>
               <p className="text-slate-400">
-                En standard som redan används ute i EU.
+                En standard som redan används i flera länder inom Europeiska unionen.
               </p>
             </div>
           </div>
