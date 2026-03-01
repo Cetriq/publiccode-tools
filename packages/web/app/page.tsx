@@ -66,7 +66,7 @@ export default function Home() {
             <PrincipleCard
               number="III"
               title="Återanvänd"
-              description="Innan ny utveckling påbörjas ska befintliga lösningar undersökas. Duplicering av ansträngning är slöseri med skattemedel."
+              description="Innan ny utveckling påbörjas ska befintliga lösningar undersökas. Låt oss dela och spara skattemedel."
             />
           </div>
         </div>
