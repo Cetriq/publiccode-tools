@@ -10,6 +10,9 @@ import type { ServiceOffering, Certification, ProjectSupport } from '@/types/org
 export const dynamic = 'force-dynamic';
 
 interface ProfileUpdateRequest {
+  // Organization type
+  type?: 'developer' | 'service_provider' | 'municipality' | 'public_sector' | 'other';
+
   // Basic info
   description?: string;
   website?: string;
@@ -118,6 +121,14 @@ export async function PATCH(
     const updateData: Record<string, unknown> = {
       updatedAt: FieldValue.serverTimestamp(),
     };
+
+    // Organization type
+    if (body.type !== undefined) {
+      const validTypes = ['developer', 'service_provider', 'municipality', 'public_sector', 'other'];
+      if (validTypes.includes(body.type)) {
+        updateData.type = body.type;
+      }
+    }
 
     // Basic info fields
     if (body.description !== undefined) {
