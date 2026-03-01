@@ -40,9 +40,13 @@ function formatPrivateKey(key: string | undefined): string | undefined {
   if (!key) return undefined;
   // Handle both escaped newlines (\n as literal characters) and actual newlines
   // Also handle JSON-escaped keys that might have extra backslashes
+  // Trim each line to remove any leading/trailing whitespace
   return key
     .replace(/\\\\n/g, '\n')  // Handle double-escaped \\n
-    .replace(/\\n/g, '\n');   // Handle single-escaped \n
+    .replace(/\\n/g, '\n')    // Handle single-escaped \n
+    .split('\n')
+    .map(line => line.trim())
+    .join('\n');
 }
 
 // Firebase Admin credentials for NextAuth adapter - lazy initialization
