@@ -34,10 +34,10 @@ async function getRepositories(): Promise<CatalogRepository[]> {
         score: data.score,
         categories: data.categories || [],
         disFase1: data.disFase1 || false,
-        organization: data.organization,
-        language: data.language,
-        license: data.license,
-        lastUpdated: data.lastUpdated?.toDate?.()?.toISOString() || null,
+        owner: data.owner || '',
+        license: data.license || '',
+        developmentStatus: data.developmentStatus || 'stable',
+        lastUpdated: data.lastUpdated?.toDate?.()?.toISOString() || new Date().toISOString(),
       };
     });
   } catch (error) {
