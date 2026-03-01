@@ -187,7 +187,7 @@ export default function Home() {
               Nio områden med störst potential
             </h2>
             <p className="mt-6 text-lg text-slate-400">
-              DIS har identifierat områden där delning av programvara kan ge störst samhällsnytta.
+              Regeringen har identifierat områden där delning av programvara kan ge störst samhällsnytta.
               Projekt inom dessa kategorier prioriteras i katalogen.
             </p>
           </div>
