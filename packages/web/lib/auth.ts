@@ -38,25 +38,9 @@ declare module 'next-auth/jwt' {
 // Helper to properly format private key from environment variable
 function formatPrivateKey(key: string | undefined): string | undefined {
   if (!key) return undefined;
-
-  // First, handle escaped newlines
-  let formatted = key
-    .replace(/\\\\n/g, '\n')  // Handle double-escaped \\n
-    .replace(/\\n/g, '\n');   // Handle single-escaped \n
-
-  // Trim leading/trailing whitespace from the whole key
-  formatted = formatted.trim();
-
-  // If the key doesn't contain actual newlines but is one long string,
-  // it might be base64 encoded without proper PEM formatting
-  // In that case, we need to check if it has proper BEGIN/END markers
-  if (formatted.includes('-----BEGIN') && formatted.includes('-----END')) {
-    // Split by newlines and trim each line, then rejoin
-    const lines = formatted.split('\n').map(line => line.trim()).filter(line => line);
-    return lines.join('\n');
-  }
-
-  return formatted;
+  // Handle escaped newlines (\n as literal characters)
+  // Don't trim - preserve the key exactly as provided
+  return key.replace(/\\n/g, '\n');
 }
 
 // Firebase Admin credentials for NextAuth adapter - lazy initialization
