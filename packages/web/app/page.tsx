@@ -27,7 +27,7 @@ export default function Home() {
                 Se katalogen
               </Link>
               <Link
-                href="#principerna"
+                href="#principer"
                 className="inline-flex items-center justify-center rounded-none border-2 border-slate-700 px-8 py-4 text-lg font-bold text-white transition-all hover:border-white"
               >
                 Läs principerna
@@ -41,7 +41,7 @@ export default function Home() {
       </section>
 
       {/* Manifestet - tre principer */}
-      <section id="principerna" className="bg-slate-900 py-24 lg:py-32">
+      <section id="principer" className="bg-slate-900 py-24 lg:py-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl">
             <p className="text-sm font-semibold uppercase tracking-widest text-slate-500">
@@ -104,7 +104,7 @@ export default function Home() {
       </section>
 
       {/* Standarden */}
-      <section className="bg-slate-800 py-24 lg:py-32">
+      <section id="standarden" className="bg-slate-800 py-24 lg:py-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-16 lg:grid-cols-2 lg:gap-24">
             <div>
@@ -177,7 +177,7 @@ export default function Home() {
       </section>
 
       {/* Prioriterade områden */}
-      <section className="bg-slate-900 py-24 lg:py-32">
+      <section id="kategorier" className="bg-slate-900 py-24 lg:py-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-sm font-semibold uppercase tracking-widest text-slate-500">
