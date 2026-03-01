@@ -129,6 +129,8 @@ export async function fetchPubliccode(
 
   const headers: Record<string, string> = {
     'User-Agent': 'SamhallsKodex',
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache',
   };
 
   if (accessToken) {
@@ -136,7 +138,9 @@ export async function fetchPubliccode(
   }
 
   try {
-    const response = await fetch(rawUrl, { headers });
+    // Add cache-busting query param to bypass GitHub's CDN cache
+    const cacheBuster = `?t=${Date.now()}`;
+    const response = await fetch(rawUrl + cacheBuster, { headers, cache: 'no-store' });
 
     if (response.status === 404) {
       return {
