@@ -6,7 +6,6 @@ import { cert } from 'firebase-admin/app';
 import type { UserRole } from '@/types/rbac';
 import { isKommunEmail, getKommunFromEmail } from '@/data/kommun-domains';
 import { sendMagicLink } from '@/lib/email';
-import { getDb, COLLECTIONS } from '@/lib/firebase';
 
 // Extend the built-in session types
 declare module 'next-auth' {
@@ -118,6 +117,8 @@ export const authOptions: NextAuthOptions = {
       // Fetch roles from database on sign in or when updating session
       if (token.id && (trigger === 'signIn' || trigger === 'update' || !token.roles)) {
         try {
+          // Dynamic import to avoid initialization errors
+          const { getDb, COLLECTIONS } = await import('@/lib/firebase');
           const db = getDb();
           const userDoc = await db.collection(COLLECTIONS.USERS).doc(token.id).get();
           if (userDoc.exists) {
