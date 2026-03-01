@@ -42,7 +42,8 @@ function getFirebaseAdminConfig() {
   const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
 
   if (!projectId || !clientEmail || !privateKey) {
-    throw new Error('Missing Firebase Admin credentials');
+    console.warn('Missing Firebase Admin credentials - adapter will be disabled');
+    return null;
   }
 
   return {
@@ -57,9 +58,15 @@ function getFirebaseAdminConfig() {
 // Create adapter lazily to avoid build-time errors
 function getAdapter() {
   try {
-    return FirestoreAdapter(getFirebaseAdminConfig());
-  } catch {
+    const config = getFirebaseAdminConfig();
+    if (!config) {
+      // No adapter when credentials are missing - works fine with JWT strategy
+      return undefined;
+    }
+    return FirestoreAdapter(config);
+  } catch (error) {
     // Return undefined if Firebase is not configured (build time)
+    console.error('Failed to create Firebase adapter:', error);
     return undefined;
   }
 }
