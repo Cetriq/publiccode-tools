@@ -130,22 +130,30 @@ export async function PATCH(
       }
     }
 
-    // Basic info fields
+    // Basic info fields (handle empty strings gracefully)
     if (body.description !== undefined) {
-      updateData.description = body.description.slice(0, 1000);
+      updateData.description = typeof body.description === 'string'
+        ? body.description.slice(0, 1000)
+        : '';
     }
     if (body.website !== undefined) {
-      updateData.website = body.website.slice(0, 200);
+      updateData.website = typeof body.website === 'string'
+        ? body.website.slice(0, 200)
+        : '';
     }
     if (body.contactEmail !== undefined) {
-      updateData.contactEmail = body.contactEmail.slice(0, 100);
+      updateData.contactEmail = typeof body.contactEmail === 'string'
+        ? body.contactEmail.slice(0, 100)
+        : '';
     }
     if (body.location !== undefined) {
-      updateData.location = body.location.slice(0, 100);
+      updateData.location = typeof body.location === 'string'
+        ? body.location.slice(0, 100)
+        : '';
     }
-    if (body.foundedYear !== undefined) {
+    if (body.foundedYear !== undefined && body.foundedYear !== null) {
       const year = parseInt(String(body.foundedYear));
-      if (year >= 1800 && year <= new Date().getFullYear()) {
+      if (!isNaN(year) && year >= 1800 && year <= new Date().getFullYear()) {
         updateData.foundedYear = year;
       }
     }
@@ -153,42 +161,53 @@ export async function PATCH(
       const validCounts = ['1-10', '11-50', '51-200', '201-500', '500+'];
       if (validCounts.includes(body.employeeCount)) {
         updateData.employeeCount = body.employeeCount;
+      } else {
+        // Clear if empty string or invalid
+        updateData.employeeCount = '';
       }
     }
 
     // Service provider fields (validate structure)
     if (body.serviceOfferings !== undefined) {
-      const validServiceTypes = ['support', 'hosting', 'development', 'training', 'consulting', 'integration', 'migration'];
-      const validPricingModels = ['hourly', 'monthly', 'yearly', 'project', 'custom'];
-      const validPriceIndicators = ['budget', 'mid-range', 'premium'];
+      if (Array.isArray(body.serviceOfferings)) {
+        const validServiceTypes = ['support', 'hosting', 'development', 'training', 'consulting', 'integration', 'migration'];
+        const validPricingModels = ['hourly', 'monthly', 'yearly', 'project', 'custom'];
+        const validPriceIndicators = ['budget', 'mid-range', 'premium'];
 
-      const validatedOfferings = body.serviceOfferings
-        .filter(offering => validServiceTypes.includes(offering.type))
-        .slice(0, 10) // Max 10 offerings
-        .map(offering => ({
-          type: offering.type,
-          description: offering.description?.slice(0, 500) || '',
-          pricingModel: validPricingModels.includes(offering.pricingModel || '') ? offering.pricingModel : undefined,
-          priceIndicator: validPriceIndicators.includes(offering.priceIndicator || '') ? offering.priceIndicator : undefined,
-          minPrice: typeof offering.minPrice === 'number' ? Math.max(0, offering.minPrice) : undefined,
-          maxPrice: typeof offering.maxPrice === 'number' ? Math.max(0, offering.maxPrice) : undefined,
-        }));
+        const validatedOfferings = body.serviceOfferings
+          .filter(offering => offering && typeof offering === 'object' && validServiceTypes.includes(offering.type))
+          .slice(0, 10) // Max 10 offerings
+          .map(offering => ({
+            type: offering.type,
+            description: typeof offering.description === 'string' ? offering.description.slice(0, 500) : '',
+            pricingModel: validPricingModels.includes(offering.pricingModel || '') ? offering.pricingModel : undefined,
+            priceIndicator: validPriceIndicators.includes(offering.priceIndicator || '') ? offering.priceIndicator : undefined,
+            minPrice: typeof offering.minPrice === 'number' ? Math.max(0, offering.minPrice) : undefined,
+            maxPrice: typeof offering.maxPrice === 'number' ? Math.max(0, offering.maxPrice) : undefined,
+          }));
 
-      updateData.serviceOfferings = validatedOfferings;
+        updateData.serviceOfferings = validatedOfferings;
+      } else {
+        updateData.serviceOfferings = [];
+      }
     }
 
     if (body.certifications !== undefined) {
-      const validatedCertifications = body.certifications
-        .filter(cert => cert.name && cert.name.length > 0)
-        .slice(0, 20) // Max 20 certifications
-        .map(cert => ({
-          name: cert.name.slice(0, 100),
-          issuer: cert.issuer?.slice(0, 100) || '',
-          validUntil: cert.validUntil || '',
-          verificationUrl: cert.verificationUrl?.slice(0, 500) || '',
-        }));
+      if (Array.isArray(body.certifications)) {
+        const validatedCertifications = body.certifications
+          .filter(cert => cert && typeof cert === 'object' && cert.name && typeof cert.name === 'string' && cert.name.length > 0)
+          .slice(0, 20) // Max 20 certifications
+          .map(cert => ({
+            name: cert.name.slice(0, 100),
+            issuer: typeof cert.issuer === 'string' ? cert.issuer.slice(0, 100) : '',
+            validUntil: typeof cert.validUntil === 'string' ? cert.validUntil : '',
+            verificationUrl: typeof cert.verificationUrl === 'string' ? cert.verificationUrl.slice(0, 500) : '',
+          }));
 
-      updateData.certifications = validatedCertifications;
+        updateData.certifications = validatedCertifications;
+      } else {
+        updateData.certifications = [];
+      }
     }
 
     await db.collection(COLLECTIONS.ORGANIZATIONS).doc(orgId).update(updateData);
