@@ -1,5 +1,9 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import CopyButton from '@/components/CopyButton';
+import RecentUsers from '@/components/RecentUsers';
+
+export const dynamic = 'force-dynamic';
 
 export default function Home() {
   return (
@@ -7,31 +11,41 @@ export default function Home() {
       {/* Hero - Manifest style */}
       <section className="relative overflow-hidden bg-slate-950">
         <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10" />
-        <div className="relative mx-auto max-w-7xl px-4 py-32 sm:px-6 lg:px-8 lg:py-44">
-          <div className="max-w-4xl">
-            <p className="text-sm font-semibold uppercase tracking-widest text-amber-500">
-              En doktrin för svensk offentlig sektor
-            </p>
-            <h1 className="mt-6 text-5xl font-bold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
-              Varje kodrad ska kunna återanvändas av nästa kommun.
-            </h1>
-            <p className="mt-8 max-w-2xl text-xl leading-relaxed text-slate-400">
-              SamhällsKodex är principen att all programvara som byggs för offentlig sektor
-              ska beskrivas, delas och återanvändas. Inte som en möjlighet. Som en självklarhet.
-            </p>
-            <div className="mt-12 flex flex-col gap-4 sm:flex-row">
-              <Link
-                href="/catalog"
-                className="inline-flex items-center justify-center rounded-none border-2 border-white bg-white px-8 py-4 text-lg font-bold text-slate-900 transition-all hover:bg-transparent hover:text-white"
-              >
-                Se katalogen
-              </Link>
-              <Link
-                href="#principer"
-                className="inline-flex items-center justify-center rounded-none border-2 border-slate-700 px-8 py-4 text-lg font-bold text-white transition-all hover:border-white"
-              >
-                Läs principerna
-              </Link>
+        <div className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
+          <div className="grid gap-12 lg:grid-cols-3 lg:gap-16">
+            {/* Left side - Main content */}
+            <div className="lg:col-span-2">
+              <p className="text-sm font-semibold uppercase tracking-widest text-amber-500">
+                En doktrin för svensk offentlig sektor
+              </p>
+              <h1 className="mt-6 text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+                Varje kodrad ska kunna återanvändas av nästa kommun.
+              </h1>
+              <p className="mt-8 max-w-2xl text-xl leading-relaxed text-slate-400">
+                SamhällsKodex är principen att all programvara som byggs för offentlig sektor
+                ska beskrivas, delas och återanvändas. Inte som en möjlighet. Som en självklarhet.
+              </p>
+              <div className="mt-12 flex flex-col gap-4 sm:flex-row">
+                <Link
+                  href="/catalog"
+                  className="inline-flex items-center justify-center rounded-none border-2 border-white bg-white px-8 py-4 text-lg font-bold text-slate-900 transition-all hover:bg-transparent hover:text-white"
+                >
+                  Se katalogen
+                </Link>
+                <Link
+                  href="#principer"
+                  className="inline-flex items-center justify-center rounded-none border-2 border-slate-700 px-8 py-4 text-lg font-bold text-white transition-all hover:border-white"
+                >
+                  Läs principerna
+                </Link>
+              </div>
+            </div>
+
+            {/* Right side - Recent users */}
+            <div className="hidden lg:block">
+              <Suspense fallback={<RecentUsersSkeleton />}>
+                <RecentUsers />
+              </Suspense>
             </div>
           </div>
         </div>
@@ -372,3 +386,25 @@ const priorityCategories = [
   { name: 'Felanmälan', description: 'Rapportera och hantera incidenter', emoji: '🔧' },
   { name: 'Arbetsflöden', description: 'Automatisering av administrativa processer', emoji: '⚡' },
 ];
+
+function RecentUsersSkeleton() {
+  return (
+    <div className="rounded-2xl border border-slate-700/50 bg-slate-900/50 p-6 backdrop-blur">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="h-4 w-28 animate-pulse rounded bg-slate-700" />
+        <div className="h-3 w-16 animate-pulse rounded bg-slate-700" />
+      </div>
+      <div className="space-y-3">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="flex items-center gap-3 rounded-lg bg-slate-800/50 p-3">
+            <div className="h-10 w-10 animate-pulse rounded-full bg-slate-700" />
+            <div className="flex-1">
+              <div className="h-4 w-24 animate-pulse rounded bg-slate-700" />
+              <div className="mt-1 h-3 w-16 animate-pulse rounded bg-slate-700" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

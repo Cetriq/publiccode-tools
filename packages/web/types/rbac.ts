@@ -17,6 +17,7 @@ export interface User {
   name?: string;
   avatarUrl?: string;
   roles: UserRole[];       // Global platform roles
+  verified?: boolean;      // Admin-verified account
   createdAt: Timestamp;
   lastLogin: Timestamp;
 }
