@@ -6,11 +6,21 @@ import { createHash } from 'crypto';
 let app: App | undefined;
 let db: Firestore | undefined;
 
+// Helper to properly format private key from environment variable
+function formatPrivateKey(key: string | undefined): string | undefined {
+  if (!key) return undefined;
+  // Handle both escaped newlines (\n as literal characters) and actual newlines
+  // Also handle JSON-escaped keys that might have extra backslashes
+  return key
+    .replace(/\\\\n/g, '\n')  // Handle double-escaped \\n
+    .replace(/\\n/g, '\n');   // Handle single-escaped \n
+}
+
 function getFirebaseAdmin(): { app: App; db: Firestore } {
   if (!app) {
     const projectId = process.env.FIREBASE_PROJECT_ID;
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+    const privateKey = formatPrivateKey(process.env.FIREBASE_PRIVATE_KEY);
 
     if (!projectId || !clientEmail || !privateKey) {
       throw new Error(
