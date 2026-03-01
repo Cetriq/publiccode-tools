@@ -194,9 +194,9 @@ export default function DashboardPage() {
                     <div className="shrink-0 text-right">
                       <div className="flex items-center gap-1">
                         <span className={`text-lg font-bold ${
-                          repo.score >= 80 ? 'text-green-400' :
+                          repo.score >= 80 ? 'text-emerald-400' :
                           repo.score >= 60 ? 'text-yellow-400' :
-                          'text-red-400'
+                          'text-orange-400'
                         }`}>
                           {repo.score}
                         </span>

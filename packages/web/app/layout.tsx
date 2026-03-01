@@ -29,7 +29,7 @@ export default function RootLayout({
 
 function Footer() {
   return (
-    <footer className="border-t border-slate-200 bg-white">
+    <footer className="border-t border-slate-700/50 bg-slate-900">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-12">
           {/* Brand & Mission */}
@@ -48,11 +48,11 @@ function Footer() {
                   <path d="M14.5 4l-5 16" />
                 </svg>
               </div>
-              <span className="text-xl font-bold tracking-tight text-slate-900">
+              <span className="text-xl font-bold tracking-tight text-white">
                 SamhällsKodex
               </span>
             </div>
-            <p className="mt-4 max-w-sm text-slate-600 leading-relaxed">
+            <p className="mt-4 max-w-sm text-slate-400 leading-relaxed">
               En standard för att beskriva öppen programvara i offentlig sektor.
               Varje kodrad ska kunna återanvändas av nästa kommun.
             </p>
@@ -63,22 +63,22 @@ function Footer() {
 
           {/* Doktrinen */}
           <div className="lg:col-span-2">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-900">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-white">
               Doktrinen
             </h3>
             <ul className="mt-4 space-y-3">
               <li>
-                <a href="/#principer" className="text-slate-600 transition-colors hover:text-blue-600">
+                <a href="/#principer" className="text-slate-400 transition-colors hover:text-blue-400">
                   Tre principer
                 </a>
               </li>
               <li>
-                <a href="/#standarden" className="text-slate-600 transition-colors hover:text-blue-600">
+                <a href="/#standarden" className="text-slate-400 transition-colors hover:text-blue-400">
                   Standarden
                 </a>
               </li>
               <li>
-                <a href="/#kategorier" className="text-slate-600 transition-colors hover:text-blue-600">
+                <a href="/#kategorier" className="text-slate-400 transition-colors hover:text-blue-400">
                   Prioriterade områden
                 </a>
               </li>
@@ -87,17 +87,17 @@ function Footer() {
 
           {/* Verktyg */}
           <div className="lg:col-span-2">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-900">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-white">
               Verktyg
             </h3>
             <ul className="mt-4 space-y-3">
               <li>
-                <a href="/catalog" className="text-slate-600 transition-colors hover:text-blue-600">
+                <a href="/catalog" className="text-slate-400 transition-colors hover:text-blue-400">
                   Katalog
                 </a>
               </li>
               <li>
-                <a href="/editor" className="text-slate-600 transition-colors hover:text-blue-600">
+                <a href="/editor" className="text-slate-400 transition-colors hover:text-blue-400">
                   Skapa publiccode.yml
                 </a>
               </li>
@@ -106,7 +106,7 @@ function Footer() {
                   href="https://www.npmjs.com/package/@samhallskodex/cli"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-600 transition-colors hover:text-blue-600"
+                  className="text-slate-400 transition-colors hover:text-blue-400"
                 >
                   CLI (pcode)
                 </a>
@@ -116,7 +116,7 @@ function Footer() {
                   href="https://github.com/Cetriq/samhallskodex"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-600 transition-colors hover:text-blue-600"
+                  className="text-slate-400 transition-colors hover:text-blue-400"
                 >
                   GitHub Action
                 </a>
@@ -126,7 +126,7 @@ function Footer() {
 
           {/* Resurser */}
           <div className="lg:col-span-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-900">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-white">
               Resurser
             </h3>
             <ul className="mt-4 space-y-3">
@@ -135,7 +135,7 @@ function Footer() {
                   href="https://yml.publiccode.tools/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-600 transition-colors hover:text-blue-600"
+                  className="text-slate-400 transition-colors hover:text-blue-400"
                 >
                   publiccode.yml-specifikation
                 </a>
@@ -145,7 +145,7 @@ function Footer() {
                   href="https://github.com/Cetriq/samhallskodex"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-600 transition-colors hover:text-blue-600"
+                  className="text-slate-400 transition-colors hover:text-blue-400"
                 >
                   Källkod på GitHub
                 </a>
@@ -155,7 +155,7 @@ function Footer() {
                   href="https://www.npmjs.com/org/samhallskodex"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-600 transition-colors hover:text-blue-600"
+                  className="text-slate-400 transition-colors hover:text-blue-400"
                 >
                   npm-paket
                 </a>
@@ -165,7 +165,7 @@ function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 sm:flex-row">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-700/50 pt-8 sm:flex-row">
           <p className="text-sm text-slate-500">
             Byggt för svensk offentlig sektor
           </p>
@@ -174,7 +174,7 @@ function Footer() {
               href="https://github.com/Cetriq/samhallskodex"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-slate-400 transition-colors hover:text-slate-600"
+              className="text-slate-500 transition-colors hover:text-slate-300"
               aria-label="GitHub"
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -185,7 +185,7 @@ function Footer() {
               href="https://www.npmjs.com/org/samhallskodex"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-slate-400 transition-colors hover:text-slate-600"
+              className="text-slate-500 transition-colors hover:text-slate-300"
               aria-label="npm"
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
