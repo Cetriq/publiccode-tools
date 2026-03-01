@@ -7,25 +7,39 @@ export const metadata: Metadata = {
   description: 'Utforska öppen källkod i svenska offentliga sektorn. Hitta projekt med publiccode.yml.',
 };
 
+// Force dynamic rendering to avoid build-time fetch issues
+export const dynamic = 'force-dynamic';
+
 // Revalidate every 5 minutes
 export const revalidate = 300;
 
 async function getRepositories(): Promise<CatalogRepository[]> {
-  // In production, fetch from API
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-
   try {
-    const response = await fetch(`${baseUrl}/api/registry`, {
-      next: { revalidate: 300 },
+    // Import Firebase dynamically to avoid build-time initialization
+    const { getDb, COLLECTIONS } = await import('@/lib/firebase');
+    const db = getDb();
+
+    const snapshot = await db
+      .collection(COLLECTIONS.REPOSITORIES)
+      .orderBy('score', 'desc')
+      .get();
+
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        url: data.url,
+        name: data.name,
+        description: data.description || '',
+        score: data.score,
+        categories: data.categories || [],
+        disFase1: data.disFase1 || false,
+        organization: data.organization,
+        language: data.language,
+        license: data.license,
+        lastUpdated: data.lastUpdated?.toDate?.()?.toISOString() || null,
+      };
     });
-
-    if (!response.ok) {
-      console.error('Failed to fetch repositories:', response.statusText);
-      return [];
-    }
-
-    const data = await response.json();
-    return data.repositories || [];
   } catch (error) {
     console.error('Error fetching repositories:', error);
     // Return empty array - catalog will show "no projects" message

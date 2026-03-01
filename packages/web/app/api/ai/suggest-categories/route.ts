@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 // All valid publiccode.yml categories - synced with @samhallskodex/core
 const VALID_CATEGORIES = [
   'accounting', 'agile-project-management', 'applicant-tracking', 'application-development',

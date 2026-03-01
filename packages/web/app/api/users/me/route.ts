@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { requireAuth, handleAuthError } from '@/lib/rbac';
 import { isPlatformAdmin, getPermissions } from '@/types/rbac';
 
+// Force dynamic rendering - prevents build-time errors
+export const dynamic = 'force-dynamic';
+
 // GET /api/users/me - Get current user's profile and permissions
 export async function GET(): Promise<NextResponse> {
   try {

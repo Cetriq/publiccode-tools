@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parse as parseYaml } from 'yaml';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 interface GitHubRepo {
   name: string;
   full_name: string;
