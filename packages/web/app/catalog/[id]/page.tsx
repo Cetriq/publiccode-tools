@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getDb, COLLECTIONS } from '@/lib/firebase';
 import { ProjectClient } from './ProjectClient';
+import ProjectProviders from '@/components/ProjectProviders';
+import ProjectUsers from '@/components/ProjectUsers';
 
 interface Contact {
   name: string;
@@ -516,6 +518,16 @@ export default async function ProjectPage({ params }: Props) {
               </div>
             </div>
           )}
+
+          {/* Used by (municipalities, etc.) */}
+          <div className="mb-6">
+            <ProjectUsers projectId={project.id} />
+          </div>
+
+          {/* Service Providers */}
+          <div className="mb-6">
+            <ProjectProviders projectId={project.id} />
+          </div>
 
           {/* Comments section */}
           <ProjectClient projectId={project.id} />

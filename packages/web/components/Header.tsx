@@ -47,6 +47,12 @@ export default function Header() {
               Skapa
             </a>
             <a
+              href="/leverantorer"
+              className="px-4 py-2 text-sm font-medium text-slate-300 rounded-lg transition-colors hover:text-white hover:bg-white/5"
+            >
+              Leverantörer
+            </a>
+            <a
               href="/add-repo"
               className="px-4 py-2 text-sm font-medium text-slate-300 rounded-lg transition-colors hover:text-white hover:bg-white/5"
             >
@@ -109,6 +115,13 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Skapa
+              </a>
+              <a
+                href="/leverantorer"
+                className="px-4 py-2 text-sm font-medium text-slate-300 rounded-lg transition-colors hover:text-white hover:bg-white/5"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Leverantörer
               </a>
               <a
                 href="/add-repo"
