@@ -160,6 +160,11 @@ function Footer() {
                   npm-paket
                 </a>
               </li>
+              <li>
+                <a href="/om" className="text-slate-400 transition-colors hover:text-blue-400">
+                  Om SamhällsKodex
+                </a>
+              </li>
             </ul>
           </div>
         </div>
