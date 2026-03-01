@@ -3,6 +3,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getDb, COLLECTIONS } from '@/lib/firebase';
 
+// Force dynamic rendering - prevents build-time Firebase initialization
+export const dynamic = 'force-dynamic';
+
 export interface MyRepo {
   id: string;
   name: string;

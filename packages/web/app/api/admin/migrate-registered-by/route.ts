@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { getDb, COLLECTIONS } from '@/lib/firebase';
 import { requireAdmin, handleAuthError } from '@/lib/rbac';
 
+// Force dynamic rendering - prevents build-time Firebase initialization
+export const dynamic = 'force-dynamic';
+
 // POST /api/admin/migrate-registered-by - Set registeredBy to current user's login for all repos without it
 export async function POST(): Promise<NextResponse> {
   try {

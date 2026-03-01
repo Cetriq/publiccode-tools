@@ -3,6 +3,9 @@ import { getDb, COLLECTIONS } from '@/lib/firebase';
 import { requireAdmin, handleAuthError } from '@/lib/rbac';
 import { FieldValue } from 'firebase-admin/firestore';
 
+// Force dynamic rendering - prevents build-time Firebase initialization
+export const dynamic = 'force-dynamic';
+
 // GET /api/admin/organizations - List all organizations (admin only)
 export async function GET(): Promise<NextResponse> {
   try {

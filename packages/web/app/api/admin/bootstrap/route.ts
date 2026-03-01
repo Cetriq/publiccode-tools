@@ -4,6 +4,9 @@ import { authOptions } from '@/lib/auth';
 import { getFirebaseAdmin, COLLECTIONS } from '@/lib/firebase';
 import { FieldValue } from 'firebase-admin/firestore';
 
+// Force dynamic rendering - prevents build-time Firebase initialization
+export const dynamic = 'force-dynamic';
+
 /**
  * POST /api/admin/bootstrap
  *

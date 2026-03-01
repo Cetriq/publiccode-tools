@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { getDb, COLLECTIONS } from '@/lib/firebase';
 import { requireAdmin, handleAuthError } from '@/lib/rbac';
 
+// Force dynamic rendering - prevents build-time Firebase initialization
+export const dynamic = 'force-dynamic';
+
 // GET /api/admin/stats - Get platform statistics (admin only)
 export async function GET(): Promise<NextResponse> {
   try {

@@ -11,6 +11,9 @@ import type {
 } from '@/types/organization';
 import { isOrgMember } from '@/types/organization';
 
+// Force dynamic rendering - prevents build-time Firebase initialization
+export const dynamic = 'force-dynamic';
+
 // POST /api/organizations - Create a new organization
 export async function POST(
   request: NextRequest

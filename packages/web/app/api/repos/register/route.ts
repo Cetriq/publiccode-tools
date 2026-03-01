@@ -6,6 +6,9 @@ import { getDb, hashUrl, COLLECTIONS } from '@/lib/firebase';
 import { FieldValue } from 'firebase-admin/firestore';
 import { parse, validate, scoreYaml } from '@samhallskodex/core';
 
+// Force dynamic rendering - prevents build-time Firebase initialization
+export const dynamic = 'force-dynamic';
+
 const MIN_SCORE = 60;
 
 interface RegisterRepoRequest {

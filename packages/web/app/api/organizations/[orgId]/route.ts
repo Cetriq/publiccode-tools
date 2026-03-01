@@ -8,6 +8,9 @@ import type { OrgType } from '@/types/rbac';
 import { FieldValue } from 'firebase-admin/firestore';
 import { notifyNewServiceProvider } from '@/lib/email';
 
+// Force dynamic rendering - prevents build-time Firebase initialization
+export const dynamic = 'force-dynamic';
+
 interface RouteParams {
   params: Promise<{ orgId: string }>;
 }

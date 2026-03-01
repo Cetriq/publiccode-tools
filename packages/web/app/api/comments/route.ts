@@ -6,6 +6,9 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { getUser } from '@/lib/rbac';
 import { isPlatformAdmin } from '@/types/rbac';
 
+// Force dynamic rendering - prevents build-time Firebase initialization
+export const dynamic = 'force-dynamic';
+
 export interface Comment {
   id: string;
   projectId: string;

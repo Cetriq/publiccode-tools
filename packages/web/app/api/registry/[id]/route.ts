@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb, COLLECTIONS } from '@/lib/firebase';
 
+// Force dynamic rendering - prevents build-time Firebase initialization
+export const dynamic = 'force-dynamic';
+
 interface ProjectDetail {
   id: string;
   url: string;
