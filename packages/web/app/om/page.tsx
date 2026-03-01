@@ -87,6 +87,46 @@ export default function AboutPage() {
           </div>
         </section>
 
+        {/* For businesses */}
+        <section className="mt-16 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-8">
+          <div className="flex items-start gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500">
+              <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white">För småföretag och konsulter</h3>
+              <p className="mt-2 text-slate-300">
+                SamhällsKodex är inte bara för offentlig sektor. Vi vill skapa en plattform där
+                små och medelstora företag kan visa upp sina lösningar för offentlig sektor och
+                erbjuda underhållsavtal.
+              </p>
+              <div className="mt-4 space-y-3 text-slate-400">
+                <p>
+                  <strong className="text-slate-300">Visa upp era produkter:</strong> Registrera
+                  era open source-projekt i katalogen och nå kommuner och myndigheter som letar
+                  efter lösningar.
+                </p>
+                <p>
+                  <strong className="text-slate-300">Erbjud support och underhåll:</strong> Kommuner
+                  behöver ofta hjälp med installation, anpassning och löpande underhåll. Här finns
+                  möjligheten att skapa långsiktiga kundrelationer.
+                </p>
+                <p>
+                  <strong className="text-slate-300">Bidra till samhällsnyttan:</strong> Genom att
+                  dela kod som öppen källkod och erbjuda professionell support hjälper ni till att
+                  bygga Sveriges digitala infrastruktur.
+                </p>
+              </div>
+              <p className="mt-4 text-sm text-amber-400/80">
+                Vi utforskar fortfarande hur detta ska fungera i praktiken. Har du idéer?
+                Kontakta oss via formuläret nedan!
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Roadmap */}
         <section className="mt-16">
           <h2 className="text-2xl font-bold text-white">Kommande funktioner</h2>
