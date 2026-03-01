@@ -95,6 +95,9 @@ export default function Home() {
               <p className="text-white font-semibold">
                 SamhällsKodex ändrar det.
               </p>
+              <p className="text-slate-400">
+                En standard som redan används ute i EU.
+              </p>
             </div>
           </div>
         </div>
