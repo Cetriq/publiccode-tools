@@ -48,7 +48,7 @@ export async function POST(
         return NextResponse.json(
           {
             success: false,
-            message: 'Organisationen ar redan registrerad. Ga till Dashboard for att hantera den.',
+            message: 'Organisationen är redan registrerad. Gå till Dashboard för att hantera den.',
           },
           { status: 409 }
         );
@@ -56,7 +56,7 @@ export async function POST(
         return NextResponse.json(
           {
             success: false,
-            message: 'Organisationen ar redan registrerad av en annan anvandare.',
+            message: 'Organisationen är redan registrerad av en annan användare.',
           },
           { status: 409 }
         );

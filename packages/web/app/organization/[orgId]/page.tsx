@@ -22,11 +22,11 @@ interface Organization {
 }
 
 const ORG_TYPES: { value: OrgType; label: string; description: string }[] = [
-  { value: 'developer', label: 'Utvecklare', description: 'Utvecklar och underhaller open source-projekt' },
-  { value: 'service_provider', label: 'Tjansteleverantor', description: 'Erbjuder support, hosting eller utvecklingstjanster' },
-  { value: 'municipality', label: 'Kommun', description: 'Svensk kommun som anvander eller utvecklar oppna losningar' },
+  { value: 'developer', label: 'Utvecklare', description: 'Utvecklar och underhåller open source-projekt' },
+  { value: 'service_provider', label: 'Tjänsteleverantör', description: 'Erbjuder support, hosting eller utvecklingstjänster' },
+  { value: 'municipality', label: 'Kommun', description: 'Svensk kommun som använder eller utvecklar öppna lösningar' },
   { value: 'public_sector', label: 'Offentlig sektor', description: 'Myndighet eller annan offentlig organisation' },
-  { value: 'other', label: 'Ovrig', description: 'Annan typ av organisation' },
+  { value: 'other', label: 'Övrig', description: 'Annan typ av organisation' },
 ];
 
 const CAPABILITY_SUGGESTIONS = [
@@ -245,9 +245,9 @@ export default function OrganizationPage() {
         {/* Capabilities (only for service providers) */}
         {selectedType === 'service_provider' && (
           <div className="mb-8 rounded-2xl bg-white/10 p-6 backdrop-blur">
-            <h2 className="mb-4 text-lg font-semibold text-white">Tjanster ni erbjuder</h2>
+            <h2 className="mb-4 text-lg font-semibold text-white">Tjänster ni erbjuder</h2>
             <p className="mb-4 text-sm text-slate-400">
-              Lagg till de tjanster ni erbjuder for oppna losningar (max 10 st).
+              Lägg till de tjänster ni erbjuder för öppna lösningar (max 10 st).
             </p>
 
             {/* Current capabilities */}
@@ -271,7 +271,7 @@ export default function OrganizationPage() {
                 </span>
               ))}
               {capabilities.length === 0 && (
-                <span className="text-sm text-slate-500">Inga tjanster tillagda annu</span>
+                <span className="text-sm text-slate-500">Inga tjänster tillagda ännu</span>
               )}
             </div>
 
@@ -289,14 +289,14 @@ export default function OrganizationPage() {
                         addCapability(newCapability);
                       }
                     }}
-                    placeholder="Lagg till tjanst..."
+                    placeholder="Lägg till tjänst..."
                     className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none"
                   />
                   <button
                     onClick={() => addCapability(newCapability)}
                     className="rounded-lg bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-600"
                   >
-                    Lagg till
+                    Lägg till
                   </button>
                 </div>
 
@@ -331,7 +331,7 @@ export default function OrganizationPage() {
               disabled={saving}
               className="rounded-xl bg-blue-500 px-6 py-3 font-semibold text-white transition hover:bg-blue-600 disabled:opacity-50"
             >
-              {saving ? 'Sparar...' : 'Spara andringar'}
+              {saving ? 'Sparar...' : 'Spara ändringar'}
             </button>
           </div>
         )}
@@ -340,7 +340,7 @@ export default function OrganizationPage() {
           <div className="rounded-lg bg-yellow-500/10 border border-yellow-500/20 p-4 text-center">
             <p className="text-yellow-300">
               Du har inte behörighet att redigera denna organisation.
-              Kontakta en agare for att fa tillgang.
+              Kontakta en ägare för att få tillgång.
             </p>
           </div>
         )}

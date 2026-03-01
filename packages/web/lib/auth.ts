@@ -1,9 +1,12 @@
 import { NextAuthOptions, getServerSession } from 'next-auth';
 import GitHubProvider from 'next-auth/providers/github';
 import EmailProvider from 'next-auth/providers/email';
+import { FirestoreAdapter } from '@auth/firebase-adapter';
+import { cert } from 'firebase-admin/app';
 import type { UserRole } from '@/types/rbac';
 import { isKommunEmail, getKommunFromEmail } from '@/data/kommun-domains';
 import { sendMagicLink } from '@/lib/email';
+import { getDb, COLLECTIONS } from '@/lib/firebase';
 
 // Extend the built-in session types
 declare module 'next-auth' {
@@ -33,7 +36,17 @@ declare module 'next-auth/jwt' {
   }
 }
 
+// Firebase Admin credentials for NextAuth adapter
+const firebaseAdminConfig = {
+  credential: cert({
+    projectId: process.env.FIREBASE_PROJECT_ID!,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL!,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  }),
+};
+
 export const authOptions: NextAuthOptions = {
+  adapter: FirestoreAdapter(firebaseAdminConfig),
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_ID ?? '',
@@ -54,7 +67,7 @@ export const authOptions: NextAuthOptions = {
           pass: process.env.EMAIL_SERVER_PASSWORD,
         },
       },
-      from: process.env.EMAIL_FROM || 'SamhällsKodex <noreply@samhallskodex.se>',
+      from: process.env.EMAIL_FROM || 'SamhällsKodex <kontakt@samhallskodex.se>',
       maxAge: 24 * 60 * 60, // Magic link valid for 24 hours
       async sendVerificationRequest({ identifier: email, url }) {
         // Only allow kommun emails
@@ -77,9 +90,9 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-    async jwt({ token, account, profile, user }) {
+    async jwt({ token, account, profile, user, trigger }) {
       // Persist the OAuth access_token and user info to the token
-      if (account && profile) {
+      if (account?.provider === 'github' && profile) {
         token.accessToken = account.access_token;
         // GitHub profile has 'id' and 'login' fields
         const githubProfile = profile as { id?: number; login?: string };
@@ -89,26 +102,67 @@ export const authOptions: NextAuthOptions = {
       }
 
       // For email provider
-      if (account?.provider === 'email' && user?.email) {
+      if (account?.provider === 'email' && user) {
         token.id = user.id;
         token.authProvider = 'email';
-        token.kommun = getKommunFromEmail(user.email) || undefined;
+        if (user.email) {
+          token.kommun = getKommunFromEmail(user.email) || undefined;
+        }
+      }
+
+      // Ensure token.id is always set (fallback to user.id if available)
+      if (!token.id && user?.id) {
+        token.id = user.id;
+      }
+
+      // Fetch roles from database on sign in or when updating session
+      if (token.id && (trigger === 'signIn' || trigger === 'update' || !token.roles)) {
+        try {
+          const db = getDb();
+          const userDoc = await db.collection(COLLECTIONS.USERS).doc(token.id).get();
+          if (userDoc.exists) {
+            const userData = userDoc.data();
+            token.roles = userData?.roles || ['user'];
+          } else {
+            token.roles = ['user'];
+          }
+        } catch (error) {
+          console.error('Error fetching user roles:', error);
+          token.roles = token.roles || ['user'];
+        }
       }
 
       return token;
     },
-    async session({ session, token }) {
-      // Send properties to the client
-      session.accessToken = token.accessToken;
-      if (session.user) {
+    async session({ session, token, user }) {
+      // With database adapter, we get user instead of token for database sessions
+      // With JWT strategy, we get token
+      // Always ensure session.user exists before accessing properties
+      if (!session.user) {
+        session.user = {
+          id: '',
+          roles: ['user'],
+        };
+      }
+
+      if (token) {
+        session.accessToken = token.accessToken;
         session.user.id = token.id ?? '';
         session.user.login = token.login;
         session.user.roles = token.roles || ['user'];
         session.user.kommun = token.kommun;
         session.user.authProvider = token.authProvider;
+      } else if (user) {
+        // Database session - user object from adapter
+        session.user.id = user.id;
+        session.user.roles = ['user'];
       }
+      // If neither token nor user, session.user keeps defaults from above
       return session;
     },
+  },
+  session: {
+    strategy: 'jwt', // Use JWT to preserve access tokens
   },
   pages: {
     signIn: '/register',

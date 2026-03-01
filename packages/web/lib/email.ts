@@ -31,7 +31,7 @@ export async function sendEmail({
     return null;
   }
 
-  const fromEmail = process.env.EMAIL_FROM || 'SamhällsKodex <noreply@samhallskodex.se>';
+  const fromEmail = process.env.EMAIL_FROM || 'SamhällsKodex <kontakt@samhallskodex.se>';
 
   try {
     const result = await client.emails.send({
@@ -51,7 +51,7 @@ export async function sendEmail({
  * Skicka notifikation till admin
  */
 export async function sendAdminNotification(subject: string, html: string) {
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@samhallskodex.se';
+  const adminEmail = process.env.ADMIN_EMAIL || 'kontakt@samhallskodex.se';
   return sendEmail({
     to: adminEmail,
     subject: `[SamhällsKodex Admin] ${subject}`,

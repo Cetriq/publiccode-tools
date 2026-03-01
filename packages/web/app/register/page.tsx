@@ -24,13 +24,34 @@ export default function RegisterPage() {
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // Update step based on session status
+  // Check if user already has an organization and redirect to dashboard
   useEffect(() => {
-    if (status === 'authenticated' && step === 'login') {
-      setStep('select-org');
-      fetchOrganizations();
+    async function checkExistingOrg() {
+      if (status === 'authenticated') {
+        try {
+          const response = await fetch('/api/organizations');
+          if (response.ok) {
+            const data = await response.json();
+            if (data.organizations && data.organizations.length > 0) {
+              // User already has an org, redirect to dashboard
+              router.push('/dashboard');
+              return;
+            }
+          }
+        } catch {
+          // Continue with registration flow if check fails
+        }
+
+        // No existing org, continue with registration
+        if (step === 'login') {
+          setStep('select-org');
+          fetchOrganizations();
+        }
+      }
     }
-  }, [status, step]);
+
+    checkExistingOrg();
+  }, [status, step, router]);
 
   async function fetchOrganizations() {
     if (!session?.accessToken) return;
