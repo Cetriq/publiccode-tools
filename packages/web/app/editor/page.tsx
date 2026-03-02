@@ -992,9 +992,115 @@ function Step1({
 }) {
   const [githubUrl, setGithubUrl] = useState('');
   const [isImporting, setIsImporting] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const [importSuccess, setImportSuccess] = useState(false);
   const [foundPubliccodeYml, setFoundPubliccodeYml] = useState(false);
+  const [aiAnalyzed, setAiAnalyzed] = useState(false);
+
+  // AI-analys - fyller i ALLA falt automatiskt
+  const handleAiAnalysis = async () => {
+    if (!githubUrl.trim()) return;
+
+    setIsAnalyzing(true);
+    setImportError(null);
+    setImportSuccess(false);
+    setAiAnalyzed(false);
+
+    try {
+      const response = await fetch('/api/ai/analyze-repo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: githubUrl }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setImportError(result.error || 'Ett fel uppstod vid AI-analys');
+        return;
+      }
+
+      if (result.success && result.suggestion) {
+        const s = result.suggestion;
+
+        // Basic info
+        if (s.name) updateData('name', s.name);
+        if (s.url) updateData('url', s.url);
+        if (s.landingURL) updateData('landingURL', s.landingURL);
+        if (s.softwareVersion) updateData('softwareVersion', s.softwareVersion);
+        if (s.releaseDate) updateData('releaseDate', s.releaseDate);
+        if (s.platforms?.length) updateData('platforms', s.platforms);
+        if (s.categories?.length) {
+          const validatedCategories = validateAndMapCategories(s.categories);
+          updateData('categories', validatedCategories);
+        }
+        if (s.developmentStatus) updateData('developmentStatus', s.developmentStatus);
+        if (s.softwareType) updateData('softwareType', s.softwareType);
+
+        // Description - Swedish
+        if (s.description?.sv) {
+          if (s.description.sv.shortDescription) {
+            updateData('description.sv.shortDescription', s.description.sv.shortDescription);
+          }
+          if (s.description.sv.longDescription) {
+            updateData('description.sv.longDescription', s.description.sv.longDescription);
+          }
+          if (s.description.sv.features?.length) {
+            updateData('description.sv.features', s.description.sv.features);
+          }
+          if (s.description.sv.documentation) {
+            updateData('description.sv.documentation', s.description.sv.documentation);
+          }
+        }
+
+        // Description - English (store as backup)
+        if (s.description?.en && !s.description?.sv) {
+          if (s.description.en.shortDescription) {
+            updateData('description.sv.shortDescription', s.description.en.shortDescription);
+          }
+          if (s.description.en.longDescription) {
+            updateData('description.sv.longDescription', s.description.en.longDescription);
+          }
+          if (s.description.en.features?.length) {
+            updateData('description.sv.features', s.description.en.features);
+          }
+        }
+
+        // Legal
+        if (s.legal) {
+          if (s.legal.license) updateData('legal.license', s.legal.license);
+          if (s.legal.repoOwner) updateData('legal.repoOwner', s.legal.repoOwner);
+          if (s.legal.mainCopyrightOwner) updateData('legal.mainCopyrightOwner', s.legal.mainCopyrightOwner);
+        }
+
+        // Maintenance
+        if (s.maintenance) {
+          if (s.maintenance.type) updateData('maintenance.type', s.maintenance.type);
+          if (s.maintenance.contacts?.length) {
+            updateData('maintenance.contacts', s.maintenance.contacts);
+          }
+        }
+
+        // Localisation
+        if (s.localisation) {
+          if (typeof s.localisation.localisationReady === 'boolean') {
+            updateData('localisation.localisationReady', s.localisation.localisationReady);
+          }
+          if (s.localisation.availableLanguages?.length) {
+            updateData('localisation.availableLanguages', s.localisation.availableLanguages);
+          }
+        }
+
+        setAiAnalyzed(true);
+        setImportSuccess(true);
+      }
+    } catch {
+      setImportError('Kunde inte ansluta till AI-tjansten');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const handleImport = async () => {
     if (!githubUrl.trim()) return;
@@ -1152,11 +1258,11 @@ function Step1({
             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleImport())}
             placeholder="https://github.com/owner/repo eller owner/repo"
             className="input flex-1"
-            disabled={isImporting}
+            disabled={isImporting || isAnalyzing}
           />
           <button
             onClick={handleImport}
-            disabled={isImporting || !githubUrl.trim()}
+            disabled={isImporting || isAnalyzing || !githubUrl.trim()}
             className="inline-flex items-center gap-2 rounded-xl bg-slate-700 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-slate-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isImporting ? (
@@ -1165,7 +1271,7 @@ function Step1({
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
-                Hämtar...
+                Hamtar...
               </>
             ) : (
               <>
@@ -1176,7 +1282,33 @@ function Step1({
               </>
             )}
           </button>
+          <button
+            onClick={handleAiAnalysis}
+            disabled={isImporting || isAnalyzing || !githubUrl.trim()}
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-3 text-sm font-semibold text-white transition-all hover:from-purple-500 hover:to-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+            title="Kräver GitHub-inloggning och ägarskap av repot"
+          >
+            {isAnalyzing ? (
+              <>
+                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Analyserar...
+              </>
+            ) : (
+              <>
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 2a2 2 0 012 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 017 7h1a1 1 0 110 2h-1.07a7 7 0 01-5.22 5.73 2 2 0 11-3.42 0A7 7 0 016.07 16H5a1 1 0 110-2h1a7 7 0 017-7h1V5.73A2 2 0 0112 2z" />
+                </svg>
+                AI-analys
+              </>
+            )}
+          </button>
         </div>
+        <p className="mt-2 text-xs text-slate-500">
+          <strong>Importera:</strong> Hamtar grunddata fran GitHub. <strong>AI-analys:</strong> Fyller i ALLA falt automatiskt med AI (kraver inloggning och agarskap).
+        </p>
         {importError && (
           <p className="mt-2 flex items-center gap-1 text-xs text-red-400">
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1186,13 +1318,15 @@ function Step1({
           </p>
         )}
         {importSuccess && (
-          <p className={`mt-2 flex items-center gap-1 text-xs ${foundPubliccodeYml ? 'text-emerald-400' : 'text-green-400'}`}>
+          <p className={`mt-2 flex items-center gap-1 text-xs ${aiAnalyzed ? 'text-purple-400' : foundPubliccodeYml ? 'text-emerald-400' : 'text-green-400'}`}>
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
-            {foundPubliccodeYml
-              ? 'Hittade publiccode.yml! Alla fält har fyllts i från befintlig fil.'
-              : 'Data importerad från GitHub! Kontrollera och fyll i resten.'}
+            {aiAnalyzed
+              ? 'AI har fyllt i alla falt! Granska och justera vid behov.'
+              : foundPubliccodeYml
+              ? 'Hittade publiccode.yml! Alla falt har fyllts i fran befintlig fil.'
+              : 'Data importerad fran GitHub! Kontrollera och fyll i resten.'}
           </p>
         )}
       </div>
