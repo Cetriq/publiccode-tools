@@ -247,11 +247,20 @@ async function fetchLicenseFile(owner: string, repo: string): Promise<string | n
 
 export async function POST(request: NextRequest) {
   try {
-    // Require authentication
+    // Require authentication with GitHub (need accessToken for API calls)
     const session = await getServerSession(authOptions);
-    if (!session?.user?.login || !session?.accessToken) {
+    if (!session?.user?.id || !session?.accessToken) {
       return NextResponse.json(
-        { error: 'Du maste vara inloggad med GitHub for att analysera repos.' },
+        { error: 'Du maste vara inloggad med GitHub for att analysera repos. Logga ut och in igen om problemet kvarstar.' },
+        { status: 401 }
+      );
+    }
+
+    // Get GitHub username - required for ownership verification
+    const userLogin = session.user.login;
+    if (!userLogin) {
+      return NextResponse.json(
+        { error: 'Kunde inte hamta ditt GitHub-anvandarnamn. Logga ut och in igen.' },
         { status: 401 }
       );
     }
@@ -287,7 +296,7 @@ export async function POST(request: NextRequest) {
       session.accessToken,
       parsed.owner,
       parsed.repo,
-      session.user.login
+      userLogin
     );
 
     if (!accessCheck.hasAccess) {
