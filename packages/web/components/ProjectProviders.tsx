@@ -196,202 +196,198 @@ export default function ProjectProviders({ projectId }: ProjectProvidersProps) {
     setShowModal(true);
   };
 
-  // Modal component
-  const ProviderModal = () => {
-    if (!showModal) return null;
+  // Modal JSX - rendered inline to prevent re-creation on state changes
+  const modalContent = showModal && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+      <div className="relative w-full max-w-lg rounded-2xl bg-slate-800 border border-slate-700 p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+        <button
+          onClick={() => setShowModal(false)}
+          className="absolute right-4 top-4 text-slate-400 hover:text-white"
+        >
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
 
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowModal(false)} />
-        <div className="relative w-full max-w-lg rounded-2xl bg-slate-800 border border-slate-700 p-6 shadow-xl max-h-[90vh] overflow-y-auto">
-          <button
-            onClick={() => setShowModal(false)}
-            className="absolute right-4 top-4 text-slate-400 hover:text-white"
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+        {registerResult ? (
+          <div className={`rounded-lg p-4 ${registerResult.success ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'}`}>
+            {registerResult.message}
+          </div>
+        ) : modalStep === 'select-org' ? (
+          <>
+            <h3 className="text-lg font-semibold text-white mb-4">Välj organisation</h3>
 
-          {registerResult ? (
-            <div className={`rounded-lg p-4 ${registerResult.success ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'}`}>
-              {registerResult.message}
-            </div>
-          ) : modalStep === 'select-org' ? (
-            <>
-              <h3 className="text-lg font-semibold text-white mb-4">Välj organisation</h3>
-
-              {loadingOrgs ? (
-                <div className="animate-pulse space-y-3">
-                  <div className="h-12 bg-white/10 rounded-lg"></div>
-                  <div className="h-12 bg-white/10 rounded-lg"></div>
-                </div>
-              ) : userOrgs.length === 0 ? (
-                <div className="text-slate-300">
-                  <p className="mb-4">
-                    Du har inga leverantörsorganisationer att registrera, eller alla dina organisationer erbjuder redan tjänster för detta projekt.
-                  </p>
-                  <p className="text-sm text-slate-400 mb-4">
-                    För att bli leverantör behöver du en organisation av typen "Tjänsteleverantör" eller "Utvecklare".
-                  </p>
-                  <Link
-                    href="/register"
-                    className="inline-flex items-center gap-2 text-amber-400 hover:text-amber-300"
+            {loadingOrgs ? (
+              <div className="animate-pulse space-y-3">
+                <div className="h-12 bg-white/10 rounded-lg"></div>
+                <div className="h-12 bg-white/10 rounded-lg"></div>
+              </div>
+            ) : userOrgs.length === 0 ? (
+              <div className="text-slate-300">
+                <p className="mb-4">
+                  Du har inga leverantörsorganisationer att registrera, eller alla dina organisationer erbjuder redan tjänster för detta projekt.
+                </p>
+                <p className="text-sm text-slate-400 mb-4">
+                  För att bli leverantör behöver du en organisation av typen "Tjänsteleverantör" eller "Utvecklare".
+                </p>
+                <Link
+                  href="/register"
+                  className="inline-flex items-center gap-2 text-amber-400 hover:text-amber-300"
+                >
+                  Registrera en organisation
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-slate-400 mb-4">
+                  Välj vilken organisation som ska registreras som leverantör för detta projekt:
+                </p>
+                {userOrgs.map((org) => (
+                  <button
+                    key={org.id}
+                    onClick={() => handleSelectOrg(org)}
+                    className="w-full flex items-center gap-3 rounded-lg bg-white/5 p-3 hover:bg-white/10 transition-colors text-left"
                   >
-                    Registrera en organisation
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Link>
-                </div>
+                    {org.avatarUrl ? (
+                      <img src={org.avatarUrl} alt={org.name} className="h-10 w-10 rounded" />
+                    ) : (
+                      <div className="flex h-10 w-10 items-center justify-center rounded bg-slate-700 text-lg font-medium text-white">
+                        {org.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <span className="font-medium text-white">{org.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => setModalStep('select-org')}
+              className="flex items-center gap-1 text-sm text-slate-400 hover:text-white mb-4"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Tillbaka
+            </button>
+
+            <div className="flex items-center gap-3 mb-6">
+              {selectedOrg?.avatarUrl ? (
+                <img src={selectedOrg.avatarUrl} alt={selectedOrg.name} className="h-10 w-10 rounded" />
               ) : (
-                <div className="space-y-3">
-                  <p className="text-sm text-slate-400 mb-4">
-                    Välj vilken organisation som ska registreras som leverantör för detta projekt:
-                  </p>
-                  {userOrgs.map((org) => (
-                    <button
-                      key={org.id}
-                      onClick={() => handleSelectOrg(org)}
-                      className="w-full flex items-center gap-3 rounded-lg bg-white/5 p-3 hover:bg-white/10 transition-colors text-left"
-                    >
-                      {org.avatarUrl ? (
-                        <img src={org.avatarUrl} alt={org.name} className="h-10 w-10 rounded" />
-                      ) : (
-                        <div className="flex h-10 w-10 items-center justify-center rounded bg-slate-700 text-lg font-medium text-white">
-                          {org.name.charAt(0).toUpperCase()}
-                        </div>
-                      )}
-                      <span className="font-medium text-white">{org.name}</span>
-                    </button>
-                  ))}
+                <div className="flex h-10 w-10 items-center justify-center rounded bg-slate-700 text-lg font-medium text-white">
+                  {selectedOrg?.name.charAt(0).toUpperCase()}
                 </div>
               )}
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => setModalStep('select-org')}
-                className="flex items-center gap-1 text-sm text-slate-400 hover:text-white mb-4"
-              >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                Tillbaka
-              </button>
+              <h3 className="text-lg font-semibold text-white">{selectedOrg?.name}</h3>
+            </div>
 
-              <div className="flex items-center gap-3 mb-6">
-                {selectedOrg?.avatarUrl ? (
-                  <img src={selectedOrg.avatarUrl} alt={selectedOrg.name} className="h-10 w-10 rounded" />
-                ) : (
-                  <div className="flex h-10 w-10 items-center justify-center rounded bg-slate-700 text-lg font-medium text-white">
-                    {selectedOrg?.name.charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <h3 className="text-lg font-semibold text-white">{selectedOrg?.name}</h3>
+            {/* Services */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Vilka tjänster erbjuder ni? *
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {SERVICE_OPTIONS.map(({ value, label }) => (
+                  <button
+                    key={value}
+                    onClick={() => toggleService(value)}
+                    className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+                      selectedServices.includes(value)
+                        ? 'bg-amber-500/30 text-amber-300 border border-amber-500/50'
+                        : 'bg-white/5 text-slate-400 border border-transparent hover:bg-white/10'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
+              {selectedServices.length === 0 && (
+                <p className="mt-2 text-xs text-red-400">Välj minst en tjänst</p>
+              )}
+            </div>
 
-              {/* Services */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Vilka tjänster erbjuder ni? *
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {SERVICE_OPTIONS.map(({ value, label }) => (
-                    <button
-                      key={value}
-                      onClick={() => toggleService(value)}
-                      className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
-                        selectedServices.includes(value)
-                          ? 'bg-amber-500/30 text-amber-300 border border-amber-500/50'
-                          : 'bg-white/5 text-slate-400 border border-transparent hover:bg-white/10'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-                {selectedServices.length === 0 && (
-                  <p className="mt-2 text-xs text-red-400">Välj minst en tjänst</p>
-                )}
+            {/* Experience Level */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Erfarenhetsnivå
+              </label>
+              <div className="flex gap-2">
+                {EXPERIENCE_OPTIONS.map(({ value, label }) => (
+                  <button
+                    key={value}
+                    onClick={() => setExperienceLevel(value as typeof experienceLevel)}
+                    className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                      experienceLevel === value
+                        ? 'bg-amber-500/30 text-amber-300 border border-amber-500/50'
+                        : 'bg-white/5 text-slate-400 border border-transparent hover:bg-white/10'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
+            </div>
 
-              {/* Experience Level */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Erfarenhetsnivå
-                </label>
-                <div className="flex gap-2">
-                  {EXPERIENCE_OPTIONS.map(({ value, label }) => (
-                    <button
-                      key={value}
-                      onClick={() => setExperienceLevel(value as typeof experienceLevel)}
-                      className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                        experienceLevel === value
-                          ? 'bg-amber-500/30 text-amber-300 border border-amber-500/50'
-                          : 'bg-white/5 text-slate-400 border border-transparent hover:bg-white/10'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            {/* Deployments */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Antal installationer (valfritt)
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={deployments}
+                onChange={(e) => setDeployments(parseInt(e.target.value) || 0)}
+                className="w-full rounded-lg bg-white/5 border border-slate-600 px-3 py-2 text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none"
+                placeholder="0"
+              />
+            </div>
 
-              {/* Deployments */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Antal installationer (valfritt)
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={deployments}
-                  onChange={(e) => setDeployments(parseInt(e.target.value) || 0)}
-                  className="w-full rounded-lg bg-white/5 border border-slate-600 px-3 py-2 text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none"
-                  placeholder="0"
-                />
-              </div>
+            {/* Description */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Beskriv ert stöd (valfritt)
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                maxLength={500}
+                rows={3}
+                className="w-full rounded-lg bg-white/5 border border-slate-600 px-3 py-2 text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none resize-none"
+                placeholder="T.ex. 'Vi har implementerat detta system för 5 kommuner och erbjuder 24/7 support.'"
+              />
+            </div>
 
-              {/* Description */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Beskriv ert stöd (valfritt)
-                </label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  maxLength={500}
-                  rows={3}
-                  className="w-full rounded-lg bg-white/5 border border-slate-600 px-3 py-2 text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none resize-none"
-                  placeholder="T.ex. 'Vi har implementerat detta system för 5 kommuner och erbjuder 24/7 support.'"
-                />
-              </div>
-
-              {/* Submit */}
-              <button
-                onClick={handleRegister}
-                disabled={registering || selectedServices.length === 0}
-                className="w-full rounded-lg bg-amber-500 px-4 py-3 font-semibold text-white hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {registering ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
-                    Registrerar...
-                  </span>
-                ) : (
-                  'Registrera som leverantör'
-                )}
-              </button>
-            </>
-          )}
-        </div>
+            {/* Submit */}
+            <button
+              onClick={handleRegister}
+              disabled={registering || selectedServices.length === 0}
+              className="w-full rounded-lg bg-amber-500 px-4 py-3 font-semibold text-white hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {registering ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Registrerar...
+                </span>
+              ) : (
+                'Registrera som leverantör'
+              )}
+            </button>
+          </>
+        )}
       </div>
-    );
-  };
+    </div>
+  );
 
   if (loading) {
     return (
@@ -412,7 +408,7 @@ export default function ProjectProviders({ projectId }: ProjectProvidersProps) {
   if (providers.length === 0) {
     return (
       <>
-        <ProviderModal />
+        {modalContent}
         <div className="rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 p-6">
           <h2 className="text-xl font-semibold text-white mb-3">Behöver du hjälp?</h2>
           <p className="text-slate-300 mb-4">
@@ -435,7 +431,7 @@ export default function ProjectProviders({ projectId }: ProjectProvidersProps) {
 
   return (
     <>
-      <ProviderModal />
+      {modalContent}
       <div className="rounded-2xl bg-white/5 p-6 backdrop-blur">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-white">Tjänsteleverantörer</h2>
