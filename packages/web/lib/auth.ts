@@ -87,8 +87,8 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GITHUB_SECRET ?? '',
       authorization: {
         params: {
-          // Request access to read user's organizations
-          scope: 'read:user read:org',
+          // Request access to read user's organizations and push to repos
+          scope: 'read:user read:org repo',
         },
       },
     }),
