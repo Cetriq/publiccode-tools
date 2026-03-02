@@ -218,8 +218,9 @@ export async function PATCH(
     });
   } catch (error) {
     console.error('Failed to update organization profile:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { success: false, message: 'Kunde inte uppdatera profil' },
+      { success: false, message: 'Kunde inte uppdatera profil', error: errorMessage },
       { status: 500 }
     );
   }
