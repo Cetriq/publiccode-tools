@@ -203,14 +203,26 @@ export async function PATCH(
         const validatedOfferings = body.serviceOfferings
           .filter(offering => offering && typeof offering === 'object' && validServiceTypes.includes(offering.type))
           .slice(0, 10) // Max 10 offerings
-          .map(offering => ({
-            type: offering.type,
-            description: typeof offering.description === 'string' ? offering.description.slice(0, 500) : '',
-            pricingModel: validPricingModels.includes(offering.pricingModel || '') ? offering.pricingModel : undefined,
-            priceIndicator: validPriceIndicators.includes(offering.priceIndicator || '') ? offering.priceIndicator : undefined,
-            minPrice: typeof offering.minPrice === 'number' ? Math.max(0, offering.minPrice) : undefined,
-            maxPrice: typeof offering.maxPrice === 'number' ? Math.max(0, offering.maxPrice) : undefined,
-          }));
+          .map(offering => {
+            // Build object without undefined values (Firestore doesn't allow undefined)
+            const result: Record<string, unknown> = {
+              type: offering.type,
+              description: typeof offering.description === 'string' ? offering.description.slice(0, 500) : '',
+            };
+            if (validPricingModels.includes(offering.pricingModel || '')) {
+              result.pricingModel = offering.pricingModel;
+            }
+            if (validPriceIndicators.includes(offering.priceIndicator || '')) {
+              result.priceIndicator = offering.priceIndicator;
+            }
+            if (typeof offering.minPrice === 'number') {
+              result.minPrice = Math.max(0, offering.minPrice);
+            }
+            if (typeof offering.maxPrice === 'number') {
+              result.maxPrice = Math.max(0, offering.maxPrice);
+            }
+            return result;
+          });
 
         updateData.serviceOfferings = validatedOfferings;
       } else {
