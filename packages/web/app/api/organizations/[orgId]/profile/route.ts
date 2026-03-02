@@ -116,11 +116,28 @@ export async function PATCH(
     const orgData = orgDoc.data() as Organization;
 
     debugStep = 'canManageOrg';
-    if (!canManageOrg(orgData, session.user.id)) {
+    // Check if organization has no admins at all (data migration case)
+    const hasNoAdmins = (!orgData.members || orgData.members.length === 0) &&
+                        (!orgData.adminUsers || orgData.adminUsers.length === 0);
+
+    if (!hasNoAdmins && !canManageOrg(orgData, session.user.id)) {
       return NextResponse.json(
         { success: false, message: 'Du har inte behörighet att redigera denna organisation' },
         { status: 403 }
       );
+    }
+
+    // If no admins exist, auto-add current user as owner (one-time migration)
+    if (hasNoAdmins) {
+      debugStep = 'autoAddAdmin';
+      await db.collection(COLLECTIONS.ORGANIZATIONS).doc(orgId).update({
+        adminUsers: [session.user.id],
+        members: [{
+          userId: session.user.id,
+          role: 'owner',
+          addedAt: FieldValue.serverTimestamp(),
+        }],
+      });
     }
 
     debugStep = 'parseBody';
