@@ -215,7 +215,9 @@ export default function ProviderProfilePage() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.message || 'Kunde inte spara profilen');
+        // Show detailed error info for debugging
+        const errorDetails = data.error ? ` (${data.debugStep}: ${data.error})` : '';
+        throw new Error((data.message || 'Kunde inte spara profilen') + errorDetails);
       }
 
       setSuccess(true);
