@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { stringify } from 'yaml';
@@ -508,7 +508,20 @@ const maintenanceTypeOptions = [
   { value: 'none', label: 'Inget', description: 'Underhålls inte aktivt' },
 ];
 
-export default function EditorPage() {
+// Wrapper component to handle Suspense for useSearchParams
+export default function EditorPageWrapper() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="text-white">Laddar editor...</div>
+      </div>
+    }>
+      <EditorPage />
+    </Suspense>
+  );
+}
+
+function EditorPage() {
   const searchParams = useSearchParams();
   const [currentStep, setCurrentStep] = useState(1);
   const [data, setData] = useState<PubliccodeData>(initialData);
