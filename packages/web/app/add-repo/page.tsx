@@ -79,10 +79,10 @@ export default function AddRepoPage() {
                 </svg>
               </div>
               <h1 className="mt-6 text-3xl font-bold text-white">
-                Lägg till ditt projekt
+                Registrera projekt med publiccode.yml
               </h1>
               <p className="mt-4 text-lg text-slate-300">
-                Logga in med GitHub för att registrera ditt projekt i DIS-katalogen.
+                Logga in med GitHub för att registrera ditt projekt i katalogen.
               </p>
               <button
                 onClick={() => signIn('github')}
@@ -104,11 +104,10 @@ export default function AddRepoPage() {
           {status === 'authenticated' && !result?.success && (
             <div>
               <h1 className="text-2xl font-bold text-white">
-                Lägg till ditt projekt
+                Registrera projekt
               </h1>
               <p className="mt-2 text-slate-300">
-                Klistra in URL:en till ditt GitHub-repo. Vi hämtar och validerar
-                din publiccode.yml automatiskt.
+                Ange URL:en till ditt GitHub-repo som redan har en <code className="rounded bg-white/10 px-1.5 py-0.5 text-sm">publiccode.yml</code> i roten.
               </p>
 
               <form onSubmit={handleSubmit} className="mt-8">
@@ -138,7 +137,7 @@ export default function AddRepoPage() {
                       Kontrollerar...
                     </span>
                   ) : (
-                    'Lägg till projekt'
+                    'Registrera projekt'
                   )}
                 </button>
               </form>
@@ -182,13 +181,10 @@ export default function AddRepoPage() {
                   {/* Help text */}
                   {result.errorCode === 'not_found' && (
                     <div className="mt-4 rounded-lg bg-blue-500/20 p-4 text-blue-200">
-                      <h3 className="font-semibold">Så här gör du:</h3>
-                      <ol className="mt-2 list-decimal list-inside space-y-1 text-sm">
-                        <li>Använd vår <Link href="/editor" className="underline">editor</Link> eller CLI för att skapa en publiccode.yml</li>
-                        <li>Lägg filen i roten av ditt repo</li>
-                        <li>Pusha till GitHub</li>
-                        <li>Kom tillbaka hit och försök igen!</li>
-                      </ol>
+                      <h3 className="font-semibold">Saknar du publiccode.yml?</h3>
+                      <p className="mt-2 text-sm">
+                        Använd vår <Link href="/editor" className="underline font-medium">editor</Link> för att skapa en automatiskt med AI-analys av ditt repo.
+                      </p>
                     </div>
                   )}
                 </div>
@@ -196,28 +192,17 @@ export default function AddRepoPage() {
 
               {/* Help section */}
               <div className="mt-8 pt-8 border-t border-white/10">
-                <h3 className="text-sm font-medium text-slate-400">Har du ingen publiccode.yml?</h3>
-                <div className="mt-3 flex flex-wrap gap-3">
+                <h3 className="text-sm font-medium text-slate-400">Har du ingen publiccode.yml ännu?</h3>
+                <div className="mt-3">
                   <Link
                     href="/editor"
-                    className="inline-flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2 text-sm text-white hover:bg-white/10 transition"
+                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 px-5 py-3 font-semibold text-white hover:from-purple-600 hover:to-blue-600 transition"
                   >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
-                    Webb-editor
+                    Skapa med AI-editor
                   </Link>
-                  <a
-                    href="https://www.npmjs.com/package/@samhallskodex/cli"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2 text-sm text-white hover:bg-white/10 transition"
-                  >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    CLI-verktyg
-                  </a>
                 </div>
               </div>
             </div>
