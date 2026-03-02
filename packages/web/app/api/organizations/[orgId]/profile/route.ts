@@ -83,7 +83,9 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ orgId: string }> }
 ): Promise<NextResponse> {
+  let debugStep = 'init';
   try {
+    debugStep = 'getSession';
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
@@ -93,9 +95,13 @@ export async function PATCH(
       );
     }
 
+    debugStep = 'getParams';
     const { orgId } = await params;
+
+    debugStep = 'getFirebase';
     const { db } = getFirebaseAdmin();
 
+    debugStep = 'getOrgDoc';
     // Check if organization exists and user has permission
     const orgDoc = await db.collection(COLLECTIONS.ORGANIZATIONS).doc(orgId).get();
 
@@ -106,8 +112,10 @@ export async function PATCH(
       );
     }
 
+    debugStep = 'getOrgData';
     const orgData = orgDoc.data() as Organization;
 
+    debugStep = 'canManageOrg';
     if (!canManageOrg(orgData, session.user.id)) {
       return NextResponse.json(
         { success: false, message: 'Du har inte behörighet att redigera denna organisation' },
@@ -115,6 +123,7 @@ export async function PATCH(
       );
     }
 
+    debugStep = 'parseBody';
     const body: ProfileUpdateRequest = await request.json();
 
     // Build update object with only allowed fields
@@ -220,7 +229,7 @@ export async function PATCH(
     console.error('Failed to update organization profile:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { success: false, message: 'Kunde inte uppdatera profil', error: errorMessage },
+      { success: false, message: 'Kunde inte uppdatera profil', error: errorMessage, debugStep },
       { status: 500 }
     );
   }
