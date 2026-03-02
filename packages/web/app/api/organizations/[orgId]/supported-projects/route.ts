@@ -137,20 +137,30 @@ export async function POST(
       );
     }
 
-    // Create the project support entry
+    // Create the project support entry - avoid undefined values for Firestore
     const newSupport: ProjectSupport = {
       projectId: body.projectId,
-      projectName: projectData?.name || 'Okänt projekt',
-      projectUrl: projectData?.url || '',
+      projectName: projectData?.name || projectData?.publiccode?.name || 'Okänt projekt',
+      projectUrl: projectData?.repoUrl || projectData?.url || projectData?.publiccode?.url || '',
       services: filteredServices as ProjectSupport['services'],
       experienceLevel: body.experienceLevel,
-      deployments: typeof body.deployments === 'number' ? Math.max(0, body.deployments) : undefined,
-      description: body.description?.slice(0, 500) || undefined,
     };
 
-    // Add to array
+    // Add optional fields only if they have values
+    if (typeof body.deployments === 'number' && body.deployments > 0) {
+      newSupport.deployments = body.deployments;
+    }
+    if (body.description?.trim()) {
+      newSupport.description = body.description.slice(0, 500);
+    }
+
+    // Get current supportedProjects and add new one
+    const currentProjects = orgData.supportedProjects || [];
+    const updatedProjects = [...currentProjects, newSupport];
+
+    // Update with the full array instead of arrayUnion (which can have issues with objects)
     await db.collection(COLLECTIONS.ORGANIZATIONS).doc(orgId).update({
-      supportedProjects: FieldValue.arrayUnion(newSupport),
+      supportedProjects: updatedProjects,
       updatedAt: FieldValue.serverTimestamp(),
     });
 
