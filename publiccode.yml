@@ -1,44 +1,47 @@
 publiccodeYmlVersion: "0.3"
 name: publiccode-tools
 url: https://github.com/Cetriq/publiccode-tools
-releaseDate: 2026-02-28
+releaseDate: 2026-03-03
 softwareVersion: 0.1.0
 platforms:
   - web
+  - linux
+  - windows
+  - mac
 categories:
-  - it-development
+  - application-development
   - compliance-management
-  - government-websites
-  - workflow-management
+  - data-analytics
+  - design-system
 developmentStatus: development
-softwareType: standalone/web
+softwareType: library
 description:
   sv:
-    shortDescription: Verktygskedja för publiccode.yml och DIS-Readiness
-    longDescription: |
-      Publiccode Tools är en svensk verktygslåda för att skapa, validera och publicera publiccode.yml-filer enligt den internationella standarden.
-        Systemet hjälper offentliga organisationer och myndigheter att enkelt dokumentera sina öppna källkodsprojekt på ett strukturerat sätt. Med inbyggd
-        DIS-Readiness-poängsättning får du direkt feedback på hur väl din dokumentation uppfyller svenska krav för digital informationssamverkan. Verktyget
-         stödjer alla 117 standardkategorier, erbjuder realtidsvalidering mot JSON-schema, och genererar YAML-filer som kan läggas direkt i ditt kodarkiv.
-        Katalogfunktionen ger överblick över registrerade projekt och underlättar återanvändning av öppen programvara inom offentlig sektor.
+    shortDescription: Verktygskedja för publiccode.yml-standarden och SamhällsKodex-bedömning av öppen källkod i offentlig sektor
+    longDescription: Komplett verktygskedja för att skapa, validera och bedöma publiccode.yml-filer enligt SamhällsKodex-standarden. Innehåller CLI-verktyg, kärnbibliotek, GitHub Action och webbredaktör för att hjälpa offentliga organisationer att dokumentera och bedöma sin programvara för DIS-kompatibilitet.
     features:
-      - En visuell webbredigerare med steg-för-steg-guide
-      - Ett CLI-verktyg för validering och scoring
-      - En GitHub Action för automatisk kontroll
-      - Ett core-bibliotek för programmatisk användning
+      - CLI-verktyg för att skapa och validera publiccode.yml
+      - SamhällsKodex Score (0-100) baserat på DIS-kriterier
+      - GitHub Action för automatisk validering
+      - Webbredaktör för enkel redigering
+      - Stöd för svenska lokaliseringar
+      - Validering mot publiccode.yml-standarden
 legal:
   license: Apache-2.0
-  repoOwner: CETRIQ
+  repoOwner: Cetriq
 maintenance:
-  type: contract
+  type: internal
   contacts:
-    - name: Clas Törnquist
-      email: clas.tornquist@hotmail.com
-      phone: "+46764951061"
+    - name: Cetriq
+      affiliation: Cetriq
+      email: Clas Tötquist
+      phone: clas.tornquist@hotmail.com
 localisation:
-  localisationReady: false
+  localisationReady: true
   availableLanguages:
     - sv
+    - en
 sv:
   countryExtensionVersion: "1.0"
-  disFas1: true
+  disFas1: false
+landingURL: https://publiccode-tools-web.vercel.app
