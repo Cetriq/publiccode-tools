@@ -499,21 +499,28 @@ Svara ENDAST med JSON-objektet, inget annat:`
           : 'community',
         contacts: Array.isArray(suggestion.maintenance?.contacts)
           ? suggestion.maintenance.contacts
-              .filter((c: { name?: string; email?: string }) => c.name && typeof c.name === 'string')
+              // Filter out contacts without a real name (not empty string)
+              .filter((c: { name?: string; email?: string }) =>
+                c.name && typeof c.name === 'string' && c.name.trim().length > 0
+              )
               .map((c: { name: string; email?: string; phone?: string; affiliation?: string }) => {
                 const contact: { name: string; email?: string; phone?: string; affiliation?: string } = {
-                  name: c.name,
+                  name: c.name.trim(),
                 };
-                // Only include email if it looks like a valid email
-                if (c.email && typeof c.email === 'string' && c.email.includes('@') && !c.email.includes(' ')) {
-                  contact.email = c.email;
+                // Only include email if it looks like a valid email (has @, has domain, no spaces)
+                if (c.email && typeof c.email === 'string' &&
+                    c.email.trim().length > 0 &&
+                    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email.trim())) {
+                  contact.email = c.email.trim();
                 }
                 // Only include phone if it looks like a phone number
-                if (c.phone && typeof c.phone === 'string' && /^[+\d\s()-]+$/.test(c.phone)) {
-                  contact.phone = c.phone;
+                if (c.phone && typeof c.phone === 'string' &&
+                    c.phone.trim().length > 0 &&
+                    /^[+\d\s()-]+$/.test(c.phone.trim())) {
+                  contact.phone = c.phone.trim();
                 }
-                if (c.affiliation && typeof c.affiliation === 'string') {
-                  contact.affiliation = c.affiliation;
+                if (c.affiliation && typeof c.affiliation === 'string' && c.affiliation.trim().length > 0) {
+                  contact.affiliation = c.affiliation.trim();
                 }
                 return contact;
               })
