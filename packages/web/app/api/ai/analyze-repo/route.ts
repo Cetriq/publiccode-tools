@@ -408,9 +408,10 @@ Generera ett JSON-objekt med foljande struktur. Fyll i SA MANGA falt som mojligt
     "type": "internal|community|contract|none",
     "contacts": [
       {
-        "name": "Kontaktperson eller organisation",
-        "email": "om finns",
-        "affiliation": "organisation"
+        "name": "Personens fullstandiga namn (t.ex. 'Anna Andersson')",
+        "email": "giltig email-adress (t.ex. 'anna@example.com') - INTE namn eller telefon!",
+        "affiliation": "organisationsnamn",
+        "phone": "telefonnummer i format +46701234567 (valfritt, uteslut om okant)"
       }
     ]
   },
@@ -429,10 +430,16 @@ VIKTIGT:
 - Kort beskrivning: max 150 tecken, fokusera pa VAD projektet gor
 - Lang beskrivning: 150-500 tecken, mer detaljer
 - Features: minst 3 konkreta funktioner/egenskaper
-- Gissa INTE pa kontaktuppgifter - anvand bara det som finns
+- Gissa INTE pa kontaktuppgifter - anvand bara det som finns i README
 - For license: anvand SPDX-identifier (MIT, Apache-2.0, GPL-3.0-only, etc)
 - Basera developmentStatus pa aktivitet och releases
 - Valj categories som bast beskriver projektets syfte
+- KRITISKT for maintenance.contacts:
+  * "name" = personens namn (t.ex. "Anna Andersson"), INTE email
+  * "email" = giltig email-adress (t.ex. "anna@example.com"), INTE namn eller telefon
+  * "phone" = telefonnummer (valfritt, uteslut om det inte finns)
+  * Om du inte hittar kontaktinfo, lamna contacts som tom array []
+- Inkludera INTE "sv:" extension pa toppniva - den ar inte del av standard publiccode.yml
 
 Svara ENDAST med JSON-objektet, inget annat:`
         }
@@ -492,6 +499,24 @@ Svara ENDAST med JSON-objektet, inget annat:`
           : 'community',
         contacts: Array.isArray(suggestion.maintenance?.contacts)
           ? suggestion.maintenance.contacts
+              .filter((c: { name?: string; email?: string }) => c.name && typeof c.name === 'string')
+              .map((c: { name: string; email?: string; phone?: string; affiliation?: string }) => {
+                const contact: { name: string; email?: string; phone?: string; affiliation?: string } = {
+                  name: c.name,
+                };
+                // Only include email if it looks like a valid email
+                if (c.email && typeof c.email === 'string' && c.email.includes('@') && !c.email.includes(' ')) {
+                  contact.email = c.email;
+                }
+                // Only include phone if it looks like a phone number
+                if (c.phone && typeof c.phone === 'string' && /^[+\d\s()-]+$/.test(c.phone)) {
+                  contact.phone = c.phone;
+                }
+                if (c.affiliation && typeof c.affiliation === 'string') {
+                  contact.affiliation = c.affiliation;
+                }
+                return contact;
+              })
           : [],
       },
       localisation: {
