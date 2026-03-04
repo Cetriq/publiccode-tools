@@ -391,10 +391,6 @@ const initialData: PubliccodeData = {
     localisationReady: false,
     availableLanguages: ['sv'],
   },
-  sv: {
-    countryExtensionVersion: '1.0',
-    disFas1: false,
-  },
 };
 
 const steps = [
@@ -605,8 +601,46 @@ function EditorPage() {
     });
   };
 
+  // Validate if user can proceed to next step
+  const canProceedToNextStep = (): { canProceed: boolean; missingFields: string[] } => {
+    const missingFields: string[] = [];
+
+    switch (currentStep) {
+      case 1: // Grundinfo - name and url required
+        if (!data.name?.trim()) missingFields.push('Namn');
+        if (!data.url?.trim()) missingFields.push('URL');
+        break;
+      case 2: // Kategori - at least one category required
+        if (!data.categories || data.categories.length === 0) missingFields.push('Minst en kategori');
+        if (!data.developmentStatus?.trim()) missingFields.push('Utvecklingsstatus');
+        break;
+      case 3: // Beskrivning - shortDescription required
+        if (!data.description?.sv?.shortDescription?.trim()) missingFields.push('Kort beskrivning (svenska)');
+        break;
+      case 4: // Licens - license required
+        if (!data.legal?.license?.trim()) missingFields.push('Licens');
+        break;
+      case 5: // Underhåll - contact name and email required
+        const contacts = data.maintenance?.contacts || [];
+        const hasValidContact = contacts.some(c =>
+          c.name?.trim() && c.email?.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email.trim())
+        );
+        if (!hasValidContact) {
+          if (!contacts[0]?.name?.trim()) missingFields.push('Kontaktpersonens namn');
+          if (!contacts[0]?.email?.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contacts[0]?.email?.trim() || '')) {
+            missingFields.push('Giltig e-postadress');
+          }
+        }
+        break;
+    }
+
+    return { canProceed: missingFields.length === 0, missingFields };
+  };
+
+  const validation = canProceedToNextStep();
+
   const nextStep = () => {
-    if (currentStep < steps.length) {
+    if (currentStep < steps.length && validation.canProceed) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -894,15 +928,27 @@ function EditorPage() {
               </span>
 
               {currentStep < steps.length ? (
-                <button
-                  onClick={nextStep}
-                  className="group inline-flex items-center gap-2 rounded-full bg-blue-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-all hover:bg-blue-400 hover:shadow-xl hover:shadow-blue-500/30"
-                >
-                  Nästa steg
-                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </button>
+                <div className="flex flex-col items-end gap-2">
+                  <button
+                    onClick={nextStep}
+                    disabled={!validation.canProceed}
+                    className={`group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold shadow-lg transition-all ${
+                      validation.canProceed
+                        ? 'bg-blue-500 text-white shadow-blue-500/25 hover:bg-blue-400 hover:shadow-xl hover:shadow-blue-500/30'
+                        : 'bg-slate-600 text-slate-400 cursor-not-allowed shadow-none'
+                    }`}
+                  >
+                    Nästa steg
+                    <svg className={`h-4 w-4 transition-transform ${validation.canProceed ? 'group-hover:translate-x-1' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </button>
+                  {!validation.canProceed && validation.missingFields.length > 0 && (
+                    <p className="text-xs text-red-400">
+                      Saknas: {validation.missingFields.join(', ')}
+                    </p>
+                  )}
+                </div>
               ) : (
                 <button
                   onClick={downloadYaml}
