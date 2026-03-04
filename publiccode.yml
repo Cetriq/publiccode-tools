@@ -1,41 +1,39 @@
 publiccodeYmlVersion: "0.3"
 name: publiccode-tools
 url: https://github.com/Cetriq/publiccode-tools
-releaseDate: 2026-03-03
-softwareVersion: 0.1.0
+releaseDate: 2026-03-04
 platforms:
   - web
   - linux
-  - windows
   - mac
+  - windows
 categories:
-  - application-development
-  - compliance-management
+  - collaboration
   - data-analytics
-  - design-system
+  - content-management
+  - compliance-management
 developmentStatus: development
 softwareType: library
 description:
   sv:
     shortDescription: Verktygskedja för publiccode.yml-standarden och SamhällsKodex-bedömning av öppen källkod i offentlig sektor
-    longDescription: Komplett verktygskedja för att skapa, validera och bedöma publiccode.yml-filer enligt SamhällsKodex-standarden. Innehåller CLI-verktyg, kärnbibliotek, GitHub Action och webbredaktör för att hjälpa offentliga organisationer att dokumentera och bedöma sin programvara för DIS-kompatibilitet.
+    longDescription: SamhällsKodex är en komplett verktygskedja för publiccode.yml-standarden som används för att beskriva öppen källkod i offentlig sektor. Innehåller CLI-verktyg, JavaScript-bibliotek, GitHub Action och webbgränssnitt för att validera, bedöma och skapa publiccode.yml-filer.
     features:
       - CLI-verktyg för att skapa och validera publiccode.yml
-      - SamhällsKodex Score (0-100) baserat på DIS-kriterier
+      - SamhällsKodex Score-bedömning (0-100 poäng) för DIS-readiness
+      - JavaScript/TypeScript-bibliotek för integrering
       - GitHub Action för automatisk validering
       - Webbredaktör för enkel redigering
       - Stöd för svenska lokaliseringar
-      - Validering mot publiccode.yml-standarden
+      - DIS Fas 1-kategorier för offentlig sektor
 legal:
   license: Apache-2.0
   repoOwner: Cetriq
 maintenance:
   type: internal
   contacts:
-    - name: Cetriq
-      affiliation: Cetriq
-      email: Clas Tötquist
-      phone: clas.tornquist@hotmail.com
+    - name: ""
+      email: ""
 localisation:
   localisationReady: true
   availableLanguages:
