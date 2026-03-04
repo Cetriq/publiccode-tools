@@ -306,10 +306,10 @@ export default function Home() {
             </p>
             <div className="mt-12 flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Link
-                href="/add-repo"
+                href="/kom-igang"
                 className="inline-flex items-center justify-center border-2 border-white bg-white px-8 py-4 text-lg font-bold text-slate-900 transition-all hover:bg-transparent hover:text-white"
               >
-                Registrera projekt
+                Kom igång
               </Link>
               <Link
                 href="/catalog"

@@ -53,10 +53,10 @@ export default function Header() {
               Leverantörer
             </a>
             <a
-              href="/add-repo"
+              href="/kom-igang"
               className="px-4 py-2 text-sm font-medium text-slate-300 rounded-lg transition-colors hover:text-white hover:bg-white/5"
             >
-              Registrera
+              Kom igång
             </a>
             <a
               href="https://github.com/Cetriq/samhallskodex"
@@ -124,11 +124,11 @@ export default function Header() {
                 Leverantörer
               </a>
               <a
-                href="/add-repo"
+                href="/kom-igang"
                 className="px-4 py-2 text-sm font-medium text-slate-300 rounded-lg transition-colors hover:text-white hover:bg-white/5"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Registrera
+                Kom igång
               </a>
               <a
                 href="https://github.com/Cetriq/samhallskodex"

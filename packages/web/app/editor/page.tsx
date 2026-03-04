@@ -906,6 +906,7 @@ function EditorPage() {
                 onPushToGitHub={pushToGitHub}
                 isPushing={isPushing}
                 pushResult={pushResult}
+                isRegisterFlow={searchParams.get('flow') === 'register'}
               />
             )}
 
@@ -2258,6 +2259,7 @@ function Step6({
   onPushToGitHub,
   isPushing,
   pushResult,
+  isRegisterFlow,
 }: {
   yaml: string;
   onDownload: () => void;
@@ -2266,8 +2268,50 @@ function Step6({
   onPushToGitHub: () => void;
   isPushing: boolean;
   pushResult: { success: boolean; message: string; fileUrl?: string } | null;
+  isRegisterFlow?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [registerResult, setRegisterResult] = useState<{ success: boolean; message: string; project?: { name: string; score: number } } | null>(null);
+
+  const registerProject = async () => {
+    if (!repoUrl) return;
+
+    setIsRegistering(true);
+    setRegisterResult(null);
+
+    try {
+      const response = await fetch('/api/repos/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ repoUrl }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setRegisterResult({
+          success: true,
+          message: data.message || 'Projektet är nu registrerat i katalogen!',
+          project: data.project,
+        });
+      } else {
+        setRegisterResult({
+          success: false,
+          message: data.message || 'Kunde inte registrera projektet',
+        });
+      }
+    } catch {
+      setRegisterResult({
+        success: false,
+        message: 'Kunde inte ansluta till servern',
+      });
+    } finally {
+      setIsRegistering(false);
+    }
+  };
 
   const handleCopy = () => {
     onCopy();
@@ -2362,6 +2406,87 @@ function Step6({
               >
                 Visa på GitHub
               </a>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Register in catalog - show after successful push or when in register flow */}
+      {isRegisterFlow && pushResult?.success && !registerResult?.success && (
+        <div className="rounded-2xl border-2 border-dashed border-blue-500/50 bg-blue-500/10 p-6">
+          <div className="flex items-start gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500/20">
+              <svg className="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-white">Registrera i katalogen</h3>
+              <p className="mt-1 text-sm text-slate-300">
+                Nu när din publiccode.yml är på GitHub, registrera projektet i SamhällsKodex så att andra kan hitta det.
+              </p>
+              <button
+                onClick={registerProject}
+                disabled={isRegistering}
+                className="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-500 px-6 py-3 font-semibold text-white shadow-lg shadow-blue-500/25 transition-all hover:bg-blue-400 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isRegistering ? (
+                  <>
+                    <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Registrerar...
+                  </>
+                ) : (
+                  <>
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Registrera nu
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Registration result */}
+      {registerResult && (
+        <div className={`rounded-xl p-4 ${
+          registerResult.success
+            ? 'bg-green-500/20 border border-green-500/30'
+            : 'bg-red-500/20 border border-red-500/30'
+        }`}>
+          <div className="flex items-center gap-3">
+            {registerResult.success ? (
+              <>
+                <svg className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <div className="flex-1">
+                  <span className="text-green-200">{registerResult.message}</span>
+                  {registerResult.project && (
+                    <span className="ml-2 text-sm text-green-300">
+                      ({registerResult.project.score} poäng)
+                    </span>
+                  )}
+                </div>
+                <a
+                  href="/catalog"
+                  className="rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-400"
+                >
+                  Visa i katalogen
+                </a>
+              </>
+            ) : (
+              <>
+                <svg className="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-red-200">{registerResult.message}</span>
+              </>
             )}
           </div>
         </div>
