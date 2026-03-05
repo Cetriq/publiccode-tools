@@ -15,6 +15,16 @@ export default function Home() {
           <div className="grid gap-12 lg:grid-cols-3 lg:gap-16">
             {/* Left side - Main content */}
             <div className="lg:col-span-2">
+              {/* Beta badge */}
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500"></span>
+                </span>
+                <span className="text-sm font-medium text-amber-400">Beta</span>
+                <span className="text-sm text-slate-400">— Vi bygger fortfarande</span>
+              </div>
+
               <p className="text-sm font-semibold uppercase tracking-widest text-amber-500">
                 En doktrin för svensk offentlig sektor
               </p>
