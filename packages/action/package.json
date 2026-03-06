@@ -4,12 +4,12 @@
   "description": "GitHub Action for publiccode.yml validation",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Cetriq/samhallskodex.git",
+    "url": "git+https://github.com/Cetriq/publiccode-tools.git",
     "directory": "packages/action"
   },
-  "homepage": "https://github.com/Cetriq/samhallskodex#readme",
+  "homepage": "https://github.com/Cetriq/publiccode-tools#readme",
   "bugs": {
-    "url": "https://github.com/Cetriq/samhallskodex/issues"
+    "url": "https://github.com/Cetriq/publiccode-tools/issues"
   },
   "type": "module",
   "main": "./dist/index.js",

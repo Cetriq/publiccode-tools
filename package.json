@@ -6,11 +6,11 @@
   "description": "SamhällsKodex - Verktygskedja för publiccode.yml och svensk offentlig sektor",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Cetriq/samhallskodex.git"
+    "url": "git+https://github.com/Cetriq/publiccode-tools.git"
   },
-  "homepage": "https://github.com/Cetriq/samhallskodex#readme",
+  "homepage": "https://github.com/Cetriq/publiccode-tools#readme",
   "bugs": {
-    "url": "https://github.com/Cetriq/samhallskodex/issues"
+    "url": "https://github.com/Cetriq/publiccode-tools/issues"
   },
   "scripts": {
     "build": "turbo run build",

@@ -4,12 +4,12 @@
   "description": "Core library for publiccode.yml validation and SamhällsKodex scoring",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Cetriq/samhallskodex.git",
+    "url": "git+https://github.com/Cetriq/publiccode-tools.git",
     "directory": "packages/core"
   },
-  "homepage": "https://github.com/Cetriq/samhallskodex#readme",
+  "homepage": "https://github.com/Cetriq/publiccode-tools#readme",
   "bugs": {
-    "url": "https://github.com/Cetriq/samhallskodex/issues"
+    "url": "https://github.com/Cetriq/publiccode-tools/issues"
   },
   "type": "module",
   "main": "./dist/index.js",

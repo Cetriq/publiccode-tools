@@ -187,12 +187,12 @@ jobs:
       - run: pcode score
 ```
 
-> Tips: Använd [Cetriq/samhallskodex](https://github.com/Cetriq/samhallskodex) GitHub Action för enklare integration med PR-annotationer!
+> Tips: Använd [Cetriq/publiccode-tools](https://github.com/Cetriq/publiccode-tools) GitHub Action för enklare integration med PR-annotationer!
 
 ## Relaterade paket
 
 - [`@samhallskodex/core`](https://www.npmjs.com/package/@samhallskodex/core) - Kärnbibliotek för validering och scoring
-- [GitHub Action](https://github.com/Cetriq/samhallskodex) - GitHub Action för automatisk validering
+- [GitHub Action](https://github.com/Cetriq/publiccode-tools) - GitHub Action för automatisk validering
 
 ## Licens
 

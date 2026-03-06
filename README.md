@@ -45,7 +45,7 @@ pcode validate
 pcode score --detailed
 
 # Kolla ett GitHub-repo
-pcode check Cetriq/samhallskodex
+pcode check Cetriq/publiccode-tools
 ```
 
 ### GitHub Action
@@ -65,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: Cetriq/samhallskodex@v1
+      - uses: Cetriq/publiccode-tools@v1
         with:
           min-score: 60
 ```
@@ -95,8 +95,8 @@ console.log(score.suggestions); // [ { message, potentialPoints } ]
 
 ```bash
 # Klona
-git clone https://github.com/Cetriq/samhallskodex.git
-cd samhallskodex
+git clone https://github.com/Cetriq/publiccode-tools.git
+cd publiccode-tools
 
 # Installera dependencies
 pnpm install

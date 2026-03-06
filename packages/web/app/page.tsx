@@ -259,7 +259,7 @@ export default function Home() {
               title="GitHub Action"
               description="Automatisk validering vid varje commit. Fel visas direkt i pull requests."
               cta="Se dokumentation"
-              href="https://github.com/Cetriq/samhallskodex"
+              href="https://github.com/Cetriq/publiccode-tools"
             />
           </div>
         </div>

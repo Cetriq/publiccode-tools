@@ -59,7 +59,7 @@ export default function Header() {
               Kom igång
             </a>
             <a
-              href="https://github.com/Cetriq/samhallskodex"
+              href="https://github.com/Cetriq/publiccode-tools"
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2 text-sm font-medium text-slate-300 rounded-lg transition-colors hover:text-white hover:bg-white/5"
@@ -131,7 +131,7 @@ export default function Header() {
                 Kom igång
               </a>
               <a
-                href="https://github.com/Cetriq/samhallskodex"
+                href="https://github.com/Cetriq/publiccode-tools"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-4 py-2 text-sm font-medium text-slate-300 rounded-lg transition-colors hover:text-white hover:bg-white/5"

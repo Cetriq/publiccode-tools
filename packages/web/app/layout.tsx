@@ -113,7 +113,7 @@ function Footer() {
               </li>
               <li>
                 <a
-                  href="https://github.com/Cetriq/samhallskodex"
+                  href="https://github.com/Cetriq/publiccode-tools"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-slate-400 transition-colors hover:text-blue-400"
@@ -142,7 +142,7 @@ function Footer() {
               </li>
               <li>
                 <a
-                  href="https://github.com/Cetriq/samhallskodex"
+                  href="https://github.com/Cetriq/publiccode-tools"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-slate-400 transition-colors hover:text-blue-400"
@@ -176,7 +176,7 @@ function Footer() {
           </p>
           <div className="flex items-center gap-4">
             <a
-              href="https://github.com/Cetriq/samhallskodex"
+              href="https://github.com/Cetriq/publiccode-tools"
               target="_blank"
               rel="noopener noreferrer"
               className="text-slate-500 transition-colors hover:text-slate-300"
