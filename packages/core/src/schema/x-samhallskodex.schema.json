@@ -27,18 +27,16 @@
           "properties": {
             "platform": {
               "type": "string",
-              "enum": ["web", "desktop", "mobile", "cli", "api-only", "embedded"],
+              "enum": ["web", "desktop", "mobile", "cli", "api", "embedded", "none", "other"],
               "description": "Primary UI platform"
             },
             "framework": {
               "type": "string",
-              "enum": ["react", "vue", "angular", "svelte", "nextjs", "nuxt", "remix", "solid", "qwik", "htmx", "blazor", "wpf", "winforms", "swiftui", "flutter", "react-native", "electron", "tauri", "none", "other"],
-              "description": "UI framework"
+              "description": "UI framework (e.g., React, Vue, Angular, Next.js, Flutter)"
             },
             "buildTool": {
               "type": "string",
-              "enum": ["vite", "webpack", "esbuild", "rollup", "parcel", "turbopack", "rspack", "none", "other"],
-              "description": "Build tool"
+              "description": "Build tool (e.g., Vite, Webpack, esbuild)"
             },
             "designSystem": {
               "type": "string",
@@ -87,13 +85,11 @@
             },
             "runtime": {
               "type": "string",
-              "enum": ["node", "deno", "bun", "dotnet", "jvm", "python", "go", "rust", "php", "ruby", "other"],
-              "description": "Backend runtime environment"
+              "description": "Backend runtime environment (e.g., Node.js, Python, .NET, Java)"
             },
             "language": {
               "type": "string",
-              "enum": ["typescript", "javascript", "csharp", "fsharp", "java", "kotlin", "scala", "python", "go", "rust", "php", "ruby", "other"],
-              "description": "Primary backend programming language"
+              "description": "Primary backend programming language (e.g., TypeScript, Python, C#, Java)"
             },
             "database": {
               "type": "object",
@@ -344,7 +340,7 @@
         },
         "vendorDependency": {
           "type": "string",
-          "enum": ["low", "medium", "high"],
+          "enum": ["none", "low", "medium", "high"],
           "description": "Level of dependency on specific vendors"
         },
         "lockInRisk": {
