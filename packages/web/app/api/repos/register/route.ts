@@ -209,6 +209,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<RegisterR
     // Extract dependencies
     const dependsOn = publiccodeData.dependsOn || {};
 
+    // Extract x-samhallskodex profile
+    const xSamhallskodex = publiccodeData['x-samhallskodex'] || null;
+
     const documentData = {
       url: normalizedUrl,
       name: publiccodeData.name || parsedUrl.repo,
@@ -274,6 +277,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<RegisterR
         proprietary: (dependsOn.proprietary || []).slice(0, 10),
         hardware: (dependsOn.hardware || []).slice(0, 10),
       },
+
+      // x-samhallskodex profile (stored as 'x-samhallskodex' to match YAML key)
+      ...(xSamhallskodex ? { 'x-samhallskodex': xSamhallskodex } : {}),
 
       // System fields
       urlHash,
