@@ -13,7 +13,9 @@ import type {
   ValidationWarning,
 } from '../types/validation.js';
 import { getErrorMessage, type Language } from './errors.js';
+import { validateProfile } from './profile-validator.js';
 import schema from '../schema/publiccode.schema.json' with { type: 'json' };
+import xSamhallskodexSchema from '../schema/x-samhallskodex.schema.json' with { type: 'json' };
 
 interface AjvError {
   instancePath: string;
@@ -31,6 +33,9 @@ const ajv = new Ajv({
 });
 
 addFormats(ajv);
+
+// Add x-samhallskodex schema for reference resolution
+ajv.addSchema(xSamhallskodexSchema);
 
 // Compile schema
 const validateSchema = ajv.compile(schema);
@@ -86,10 +91,17 @@ export function validate(
     warnings.push(...getWarnings(publiccode, lang));
   }
 
+  // Validate profile if present
+  const publiccode = data as PublicCode;
+  const profileValidation = publiccode['x-samhallskodex']
+    ? validateProfile(publiccode['x-samhallskodex'], { lang })
+    : undefined;
+
   return {
     valid: errors.length === 0,
     errors,
     warnings,
+    profileValidation,
   };
 }
 

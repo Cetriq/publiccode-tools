@@ -12,11 +12,28 @@ import {
   getCategories,
   getDISFase1Categories,
   scoreYaml,
+  scoreProfile,
   type PublicCode,
   type Category,
   type Platform,
   type DevelopmentStatus,
   type SoftwareType,
+  type XSamhallskodexProfile,
+  type UIPlatform,
+  type BackendArchitecture,
+  type APIStyle,
+  type IdentityMethod,
+  type OpennessLevel,
+  type DataLocality,
+  type AIUseCase,
+  UI_PLATFORMS,
+  BACKEND_ARCHITECTURES,
+  API_STYLES,
+  IDENTITY_METHODS,
+  OPENNESS_LEVELS,
+  DATA_LOCALITIES,
+  AI_USE_CASES,
+  PROFILE_LABELS_SV,
 } from '@samhallskodex/core';
 
 export const initCommand = new Command('init')
@@ -24,6 +41,7 @@ export const initCommand = new Command('init')
   .option('-o, --output <path>', 'Output-fil', './publiccode.yml')
   .option('-f, --force', 'Skriv över befintlig fil')
   .option('-l, --lang <lang>', 'Språk (sv/en)', 'sv')
+  .option('-p, --with-profile', 'Inkludera x-samhallskodex profil')
   .action(async (options) => {
     const lang = (options.lang || 'sv') as 'sv' | 'en';
     const outputPath = options.output || './publiccode.yml';
@@ -278,6 +296,162 @@ export const initCommand = new Command('init')
       ]);
     }
 
+    // Step 6: Profile (optional, if --with-profile)
+    let profileData: XSamhallskodexProfile | undefined;
+    if (options.withProfile) {
+      console.log(
+        chalk.cyan(
+          lang === 'sv'
+            ? '\n📊 x-samhallskodex Profil\n'
+            : '\n📊 x-samhallskodex Profile\n'
+        )
+      );
+
+      // Architecture - UI
+      const uiInfo = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'platform',
+          message: lang === 'sv' ? 'UI-plattform:' : 'UI Platform:',
+          choices: UI_PLATFORMS.map((p) => ({
+            name: PROFILE_LABELS_SV[p] || p,
+            value: p,
+          })),
+        },
+        {
+          type: 'input',
+          name: 'framework',
+          message: lang === 'sv' ? 'UI-ramverk (t.ex. React, Vue):' : 'UI Framework (e.g. React, Vue):',
+        },
+      ]);
+
+      // Architecture - Backend
+      const backendInfo = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'architecture',
+          message: lang === 'sv' ? 'Backend-arkitektur:' : 'Backend Architecture:',
+          choices: BACKEND_ARCHITECTURES.map((a) => ({
+            name: PROFILE_LABELS_SV[a] || a,
+            value: a,
+          })),
+        },
+        {
+          type: 'input',
+          name: 'runtime',
+          message: lang === 'sv' ? 'Backend-runtime (t.ex. Node.js, .NET):' : 'Backend Runtime (e.g. Node.js, .NET):',
+        },
+      ]);
+
+      // Integration
+      const integrationInfo = await inquirer.prompt([
+        {
+          type: 'checkbox',
+          name: 'apiStyles',
+          message: lang === 'sv' ? 'API-stilar:' : 'API Styles:',
+          choices: API_STYLES.map((s) => ({
+            name: PROFILE_LABELS_SV[s] || s,
+            value: s,
+          })),
+          validate: (input: string[]) =>
+            input.length > 0 ||
+            (lang === 'sv' ? 'Välj minst en API-stil' : 'Select at least one API style'),
+        },
+        {
+          type: 'checkbox',
+          name: 'identity',
+          message: lang === 'sv' ? 'Identitetsmetoder:' : 'Identity Methods:',
+          choices: IDENTITY_METHODS.map((m) => ({
+            name: PROFILE_LABELS_SV[m] || m,
+            value: m,
+          })),
+        },
+      ]);
+
+      // AI
+      const aiInfo = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'enabled',
+          message: lang === 'sv' ? 'Använder AI-funktionalitet?' : 'Uses AI functionality?',
+          default: false,
+        },
+      ]);
+
+      let aiDetails: { useCases?: AIUseCase[]; humanInLoop?: boolean } = {};
+      if (aiInfo.enabled) {
+        aiDetails = await inquirer.prompt([
+          {
+            type: 'checkbox',
+            name: 'useCases',
+            message: lang === 'sv' ? 'AI-användningsfall:' : 'AI Use Cases:',
+            choices: AI_USE_CASES.map((uc) => ({
+              name: PROFILE_LABELS_SV[uc] || uc,
+              value: uc,
+            })),
+          },
+          {
+            type: 'confirm',
+            name: 'humanInLoop',
+            message: lang === 'sv' ? 'Kräver mänsklig kontroll?' : 'Requires human in the loop?',
+            default: true,
+          },
+        ]);
+      }
+
+      // Governance
+      const governanceInfo = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'opennessLevel',
+          message: lang === 'sv' ? 'Öppenhetsnivå:' : 'Openness Level:',
+          choices: OPENNESS_LEVELS.map((l) => ({
+            name: PROFILE_LABELS_SV[l] || l,
+            value: l,
+          })),
+        },
+        {
+          type: 'list',
+          name: 'dataLocality',
+          message: lang === 'sv' ? 'Datalokalitet:' : 'Data Locality:',
+          choices: DATA_LOCALITIES.map((l) => ({
+            name: PROFILE_LABELS_SV[l] || l,
+            value: l,
+          })),
+        },
+      ]);
+
+      // Build profile object
+      profileData = {
+        profileVersion: '0.1',
+        architecture: {
+          ui: {
+            platform: uiInfo.platform as UIPlatform,
+            framework: uiInfo.framework || undefined,
+          },
+          backend: {
+            architecture: backendInfo.architecture as BackendArchitecture,
+            runtime: backendInfo.runtime || undefined,
+          },
+        },
+        integration: {
+          apiStyles: integrationInfo.apiStyles as APIStyle[],
+          identity: integrationInfo.identity?.length ? integrationInfo.identity as IdentityMethod[] : undefined,
+        },
+        ai: {
+          enabled: aiInfo.enabled,
+          useCases: aiDetails.useCases?.length ? aiDetails.useCases : undefined,
+          humanInLoop: aiInfo.enabled ? aiDetails.humanInLoop : undefined,
+        },
+        governance: {
+          opennessLevel: governanceInfo.opennessLevel as OpennessLevel,
+          dataHosting: {
+            locality: governanceInfo.dataLocality as DataLocality,
+          },
+        },
+      };
+    }
+
     // Build the publiccode object
     const spinner = ora(
       lang === 'sv' ? 'Skapar publiccode.yml...' : 'Creating publiccode.yml...'
@@ -316,6 +490,11 @@ export const initCommand = new Command('init')
       }
     }
 
+    // Add profile if created
+    if (profileData) {
+      publiccode['x-samhallskodex'] = profileData;
+    }
+
     // Write file
     const yamlContent = stringify(publiccode);
     writeFileSync(outputPath, yamlContent, 'utf-8');
@@ -338,10 +517,37 @@ export const initCommand = new Command('init')
       `\n${lang === 'sv' ? 'DIS-Readiness Score' : 'DIS-Readiness Score'}: ${scoreColor(result.total + '/100')}`
     );
 
+    // Show profile score if profile was added
+    if (profileData) {
+      const profileResult = scoreProfile(profileData, { lang });
+      const profileScoreColor =
+        profileResult.total >= 80
+          ? chalk.green
+          : profileResult.total >= 60
+            ? chalk.yellow
+            : chalk.red;
+
+      console.log(
+        `${lang === 'sv' ? 'Profile Score' : 'Profile Score'}: ${profileScoreColor(profileResult.total + '%')}`
+      );
+
+      // Show profile suggestions
+      if (profileResult.suggestions.length > 0) {
+        console.log(
+          `\n${lang === 'sv' ? 'Profil-förbättringar' : 'Profile Improvements'}:`
+        );
+        for (const suggestion of profileResult.suggestions.slice(0, 3)) {
+          console.log(
+            `  - ${suggestion.message} ${chalk.dim(`(+${suggestion.potentialPoints}%)`)}`
+          );
+        }
+      }
+    }
+
     // Show top suggestions
     if (result.suggestions.length > 0) {
       console.log(
-        `\n${lang === 'sv' ? 'Förbättringsförslag' : 'Suggestions'}:`
+        `\n${lang === 'sv' ? 'DIS-förbättringsförslag' : 'DIS Suggestions'}:`
       );
       for (const suggestion of result.suggestions.slice(0, 3)) {
         console.log(

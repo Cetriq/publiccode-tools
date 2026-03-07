@@ -313,6 +313,10 @@
           "items": { "$ref": "#/definitions/dependency" }
         }
       }
+    },
+    "x-samhallskodex": {
+      "$ref": "https://samhallskodex.se/schemas/x-samhallskodex.schema.json",
+      "description": "SamhällsKodex profile extension for Swedish public sector metadata"
     }
   },
   "definitions": {

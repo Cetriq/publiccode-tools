@@ -6,7 +6,9 @@ import addFormats from 'ajv-formats';
 import { parse as parseYaml } from 'yaml';
 import { readFileSync } from 'fs';
 import { getErrorMessage } from './errors.js';
+import { validateProfile } from './profile-validator.js';
 import schema from '../schema/publiccode.schema.json' with { type: 'json' };
+import xSamhallskodexSchema from '../schema/x-samhallskodex.schema.json' with { type: 'json' };
 // Create and configure Ajv instance
 const ajv = new Ajv({
     allErrors: true,
@@ -14,6 +16,8 @@ const ajv = new Ajv({
     strict: false,
 });
 addFormats(ajv);
+// Add x-samhallskodex schema for reference resolution
+ajv.addSchema(xSamhallskodexSchema);
 // Compile schema
 const validateSchema = ajv.compile(schema);
 /**
@@ -60,10 +64,16 @@ export function validate(yaml, options = {}) {
         const publiccode = data;
         warnings.push(...getWarnings(publiccode, lang));
     }
+    // Validate profile if present
+    const publiccode = data;
+    const profileValidation = publiccode['x-samhallskodex']
+        ? validateProfile(publiccode['x-samhallskodex'], { lang })
+        : undefined;
     return {
         valid: errors.length === 0,
         errors,
         warnings,
+        profileValidation,
     };
 }
 /**

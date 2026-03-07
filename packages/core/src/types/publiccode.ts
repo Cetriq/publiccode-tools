@@ -3,6 +3,8 @@
  * Based on https://yml.publiccode.tools/schema.core.html
  */
 
+import type { XSamhallskodexProfile } from './x-samhallskodex.js';
+
 export interface PublicCode {
   publiccodeYmlVersion: '0.4' | '0.3';
 
@@ -32,6 +34,9 @@ export interface PublicCode {
 
   // DIS-extension (unofficial)
   'x-dis-readinessScore'?: number;
+
+  // SamhällsKodex profile extension
+  'x-samhallskodex'?: XSamhallskodexProfile;
 }
 
 export type Platform = 'web' | 'windows' | 'mac' | 'linux' | 'ios' | 'android';

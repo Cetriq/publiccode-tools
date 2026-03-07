@@ -52,6 +52,30 @@ export const validateCommand = new Command('validate')
             }
         }
     }
+    // Show profile validation if present
+    if (result.profileValidation) {
+        const pv = result.profileValidation;
+        if (pv.valid) {
+            console.log(chalk.green(`\n${lang === 'sv' ? '✓ Profil-validering lyckades!' : '✓ Profile validation passed!'}`));
+        }
+        else {
+            console.log(chalk.red(`\n${lang === 'sv' ? '✗ Profil-validering misslyckades' : '✗ Profile validation failed'}`));
+        }
+        // Show profile errors
+        if (pv.errors.length > 0) {
+            console.log(chalk.red(`${lang === 'sv' ? 'Profil-fel' : 'Profile Errors'} (${pv.errors.length}):`));
+            for (const error of pv.errors) {
+                console.log(chalk.red(`  • ${error.path}: ${error.message}`));
+            }
+        }
+        // Show profile warnings
+        if (pv.warnings.length > 0) {
+            console.log(chalk.yellow(`${lang === 'sv' ? 'Profil-varningar' : 'Profile Warnings'} (${pv.warnings.length}):`));
+            for (const warning of pv.warnings) {
+                console.log(chalk.yellow(`  • ${warning.path}: ${warning.message}`));
+            }
+        }
+    }
     // Exit code
     if (!result.valid || (options.strict && result.warnings.length > 0)) {
         process.exit(1);

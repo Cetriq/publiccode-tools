@@ -8,6 +8,8 @@ import { stringify } from 'yaml';
 import { CATEGORIES } from '@samhallskodex/core/categories';
 // Importera scorer för poängberäkning (samma som används vid registrering)
 import { score as coreScore } from '@samhallskodex/core/scorer';
+import { ProfileSection } from '../../components/ProfileSection';
+import type { XSamhallskodexProfile } from '@samhallskodex/core';
 
 // Score calculation - använder samma logik som core-paketet
 interface ScoreBreakdown {
@@ -399,7 +401,8 @@ const steps = [
   { id: 3, name: 'Beskrivning', description: 'Beskriv vad den gör' },
   { id: 4, name: 'Licens', description: 'Juridisk information' },
   { id: 5, name: 'Underhåll', description: 'Kontaktperson' },
-  { id: 6, name: 'Exportera', description: 'Ladda ner filen' },
+  { id: 6, name: 'Profil', description: 'Teknisk metadata' },
+  { id: 7, name: 'Exportera', description: 'Ladda ner filen' },
 ];
 
 // Category aliases - map common invalid categories to valid ones
@@ -527,6 +530,8 @@ function EditorPage() {
   const [repoUrl, setRepoUrl] = useState<string | null>(null);
   const [isPushing, setIsPushing] = useState(false);
   const [pushResult, setPushResult] = useState<{ success: boolean; message: string; fileUrl?: string } | null>(null);
+  const [profileEnabled, setProfileEnabled] = useState(false);
+  const [profileData, setProfileData] = useState<Partial<XSamhallskodexProfile> | undefined>(undefined);
 
   // Load AI-generated data from sessionStorage if coming from /add-repo with ai=true
   useEffect(() => {
@@ -673,6 +678,15 @@ function EditorPage() {
     };
 
     const cleaned = removeEmpty(cleanData);
+
+    // Add profile data if enabled and has content
+    if (profileEnabled && profileData) {
+      const cleanedProfile = removeEmpty(profileData as Record<string, unknown>);
+      if (Object.keys(cleanedProfile).length > 0) {
+        (cleaned as Record<string, unknown>)['x-samhallskodex'] = cleanedProfile;
+      }
+    }
+
     return stringify(cleaned, { lineWidth: 0 });
   };
 
@@ -898,6 +912,22 @@ function EditorPage() {
               />
             )}
             {currentStep === 6 && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-white">Teknisk profil</h2>
+                  <p className="mt-2 text-slate-400">
+                    Lägg till x-samhallskodex profil med detaljerad teknisk metadata (valfritt).
+                  </p>
+                </div>
+                <ProfileSection
+                  profile={profileData}
+                  onUpdate={setProfileData}
+                  enabled={profileEnabled}
+                  onToggle={setProfileEnabled}
+                />
+              </div>
+            )}
+            {currentStep === 7 && (
               <Step6
                 yaml={generateYaml()}
                 onDownload={downloadYaml}

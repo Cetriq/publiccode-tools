@@ -1,1 +1,1 @@
-{"version":3,"file":"score.d.ts","sourceRoot":"","sources":["../../src/commands/score.ts"],"names":[],"mappings":"AAAA;;GAEG;AAEH,OAAO,EAAE,OAAO,EAAE,MAAM,WAAW,CAAC;AAKpC,eAAO,MAAM,YAAY,SAwHrB,CAAC"}
+{"version":3,"file":"score.d.ts","sourceRoot":"","sources":["../../src/commands/score.ts"],"names":[],"mappings":"AAAA;;GAEG;AAEH,OAAO,EAAE,OAAO,EAAE,MAAM,WAAW,CAAC;AAMpC,eAAO,MAAM,YAAY,SA6MrB,CAAC"}

@@ -1,0 +1,367 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://samhallskodex.se/schemas/x-samhallskodex.schema.json",
+    "title": "x-samhallskodex profile schema",
+    "description": "Schema for the x-samhallskodex extension profile in publiccode.yml files",
+    "type": "object",
+    "required": [
+        "profileVersion",
+        "architecture",
+        "integration",
+        "ai",
+        "governance"
+    ],
+    "properties": {
+        "profileVersion": {
+            "type": "string",
+            "enum": ["0.1"],
+            "description": "Version of the x-samhallskodex profile schema"
+        },
+        "architecture": {
+            "type": "object",
+            "required": ["ui", "backend"],
+            "properties": {
+                "ui": {
+                    "type": "object",
+                    "required": ["platform"],
+                    "properties": {
+                        "platform": {
+                            "type": "string",
+                            "enum": ["web", "desktop", "mobile", "cli", "api-only", "embedded"],
+                            "description": "Primary UI platform"
+                        },
+                        "framework": {
+                            "type": "string",
+                            "enum": ["react", "vue", "angular", "svelte", "nextjs", "nuxt", "remix", "solid", "qwik", "htmx", "blazor", "wpf", "winforms", "swiftui", "flutter", "react-native", "electron", "tauri", "none", "other"],
+                            "description": "UI framework"
+                        },
+                        "buildTool": {
+                            "type": "string",
+                            "enum": ["vite", "webpack", "esbuild", "rollup", "parcel", "turbopack", "rspack", "none", "other"],
+                            "description": "Build tool"
+                        },
+                        "designSystem": {
+                            "type": "string",
+                            "description": "Design system or component library (e.g., mui, shadcn, bootstrap, govuk, custom)"
+                        }
+                    }
+                },
+                "ux": {
+                    "type": "object",
+                    "properties": {
+                        "rating": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 5,
+                            "description": "UX quality rating (1=poor, 5=excellent)"
+                        },
+                        "accessibility": {
+                            "type": "object",
+                            "properties": {
+                                "wcagLevel": {
+                                    "type": "string",
+                                    "enum": ["2.0-A", "2.0-AA", "2.0-AAA", "2.1-A", "2.1-AA", "2.1-AAA", "2.2-A", "2.2-AA", "2.2-AAA", "unknown"],
+                                    "description": "WCAG compliance level"
+                                }
+                            }
+                        },
+                        "mobileFriendly": {
+                            "type": "boolean",
+                            "description": "Whether the UI is mobile-friendly"
+                        }
+                    }
+                },
+                "backend": {
+                    "type": "object",
+                    "required": ["architecture"],
+                    "properties": {
+                        "architecture": {
+                            "type": "string",
+                            "enum": ["container", "vm", "serverless", "native", "mixed"],
+                            "description": "Backend deployment architecture"
+                        },
+                        "style": {
+                            "type": "string",
+                            "enum": ["monolith", "modular-monolith", "microservice", "event-driven", "serverless", "mixed"],
+                            "description": "Application architecture style"
+                        },
+                        "runtime": {
+                            "type": "string",
+                            "enum": ["node", "deno", "bun", "dotnet", "jvm", "python", "go", "rust", "php", "ruby", "other"],
+                            "description": "Backend runtime environment"
+                        },
+                        "language": {
+                            "type": "string",
+                            "enum": ["typescript", "javascript", "csharp", "fsharp", "java", "kotlin", "scala", "python", "go", "rust", "php", "ruby", "other"],
+                            "description": "Primary backend programming language"
+                        },
+                        "database": {
+                            "type": "object",
+                            "properties": {
+                                "primary": {
+                                    "type": "string",
+                                    "enum": ["postgresql", "mysql", "mariadb", "sqlserver", "oracle", "mongodb", "dynamodb", "cosmosdb", "firebase", "supabase", "sqlite", "redis", "elasticsearch", "none", "other"],
+                                    "description": "Primary database"
+                                }
+                            }
+                        }
+                    }
+                },
+                "deployment": {
+                    "type": "object",
+                    "properties": {
+                        "container": {
+                            "type": "string",
+                            "enum": ["docker", "podman", "containerd", "oci", "none"],
+                            "description": "Container technology"
+                        },
+                        "orchestration": {
+                            "type": "string",
+                            "enum": ["kubernetes", "docker-compose", "docker-swarm", "nomad", "openshift", "ecs", "none", "other"],
+                            "description": "Container orchestration platform"
+                        },
+                        "hosting": {
+                            "type": "string",
+                            "enum": ["onprem", "private-cloud", "public-cloud", "hybrid"],
+                            "description": "Hosting model"
+                        },
+                        "iac": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["terraform", "pulumi", "ansible", "chef", "puppet", "cloudformation", "bicep", "cdk", "none", "other"]
+                            },
+                            "description": "Infrastructure as Code tools"
+                        }
+                    }
+                }
+            }
+        },
+        "integration": {
+            "type": "object",
+            "required": ["apiStyles"],
+            "properties": {
+                "apiStyles": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "string",
+                        "enum": ["rest", "graphql", "grpc", "soap", "odata", "websocket", "none"]
+                    },
+                    "description": "API styles supported"
+                },
+                "protocols": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": ["webhook", "mcp", "sftp", "ftp", "amqp", "mqtt", "kafka", "nats", "grpc-stream", "sse", "other"]
+                    },
+                    "description": "Integration protocols supported"
+                },
+                "identity": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": ["oidc", "oauth2", "saml", "ldap", "ad", "bankid", "freja", "eidas", "siths", "basic-auth", "api-key", "jwt", "none", "other"]
+                    },
+                    "description": "Identity/authentication methods supported"
+                },
+                "events": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "Whether event-driven integration is supported"
+                        },
+                        "broker": {
+                            "type": "string",
+                            "enum": ["kafka", "rabbitmq", "redis-pubsub", "azure-service-bus", "aws-sqs", "aws-sns", "gcp-pubsub", "nats", "pulsar", "none", "other"],
+                            "description": "Event broker technology"
+                        }
+                    }
+                },
+                "openApi": {
+                    "type": "object",
+                    "properties": {
+                        "available": {
+                            "type": "boolean",
+                            "description": "Whether OpenAPI specification is available"
+                        },
+                        "url": {
+                            "type": "string",
+                            "format": "uri",
+                            "description": "URL to OpenAPI specification"
+                        }
+                    }
+                }
+            }
+        },
+        "ai": {
+            "type": "object",
+            "required": ["enabled"],
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Whether the software uses AI capabilities"
+                },
+                "useCases": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "assistant",
+                            "chatbot",
+                            "summarization",
+                            "classification",
+                            "extraction",
+                            "translation",
+                            "transcription",
+                            "recommendation",
+                            "decision-support",
+                            "anomaly-detection",
+                            "forecasting",
+                            "image-recognition",
+                            "document-processing",
+                            "code-generation",
+                            "search",
+                            "other"
+                        ]
+                    },
+                    "description": "AI use cases"
+                },
+                "modelExecution": {
+                    "type": "object",
+                    "properties": {
+                        "locality": {
+                            "type": "string",
+                            "enum": ["local", "cloud", "hybrid"],
+                            "description": "Where AI models are executed"
+                        },
+                        "providers": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["openai", "anthropic", "azure-openai", "google-vertex", "aws-bedrock", "huggingface", "local-llm", "mistral", "cohere", "other"]
+                            },
+                            "description": "AI model providers used"
+                        }
+                    }
+                },
+                "humanInLoop": {
+                    "type": "boolean",
+                    "description": "Whether human oversight is required for AI decisions"
+                },
+                "sensitiveDataHandling": {
+                    "type": "string",
+                    "enum": ["none", "anonymized", "restricted", "full-access"],
+                    "description": "How sensitive data is handled by AI"
+                },
+                "decisionImpact": {
+                    "type": "string",
+                    "enum": ["none", "advisory", "semi-automated", "automated"],
+                    "description": "Level of AI involvement in decision-making"
+                }
+            }
+        },
+        "quality": {
+            "type": "object",
+            "properties": {
+                "uxRating": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5,
+                    "description": "User experience quality rating"
+                },
+                "apiMaturity": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5,
+                    "description": "API maturity level"
+                },
+                "documentationMaturity": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5,
+                    "description": "Documentation quality rating"
+                },
+                "observability": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5,
+                    "description": "Observability and monitoring maturity"
+                },
+                "testCoverageLevel": {
+                    "type": "string",
+                    "enum": ["none", "low", "medium", "high"],
+                    "description": "Test coverage level"
+                },
+                "securityAudit": {
+                    "type": "object",
+                    "properties": {
+                        "performed": {
+                            "type": "boolean",
+                            "description": "Whether a security audit has been performed"
+                        },
+                        "lastDate": {
+                            "type": "string",
+                            "format": "date",
+                            "description": "Date of last security audit"
+                        }
+                    }
+                }
+            }
+        },
+        "governance": {
+            "type": "object",
+            "required": ["opennessLevel"],
+            "properties": {
+                "opennessLevel": {
+                    "type": "string",
+                    "enum": ["open-source", "open-core", "source-available", "proprietary"],
+                    "description": "Software openness level"
+                },
+                "dataHosting": {
+                    "type": "object",
+                    "properties": {
+                        "locality": {
+                            "type": "string",
+                            "enum": ["municipality", "sweden", "eu", "non-eu", "hybrid", "unknown"],
+                            "description": "Where data is hosted"
+                        },
+                        "providers": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "Data hosting providers"
+                        }
+                    }
+                },
+                "auditability": {
+                    "type": "string",
+                    "enum": ["low", "medium", "high"],
+                    "description": "Level of audit trail and transparency"
+                },
+                "vendorDependency": {
+                    "type": "string",
+                    "enum": ["low", "medium", "high"],
+                    "description": "Level of dependency on specific vendors"
+                },
+                "lockInRisk": {
+                    "type": "string",
+                    "enum": ["low", "medium", "high"],
+                    "description": "Risk of vendor lock-in"
+                },
+                "sourceAvailableToAuthority": {
+                    "type": "boolean",
+                    "description": "Whether source code is available to procuring authorities"
+                },
+                "dataPortability": {
+                    "type": "string",
+                    "enum": ["low", "medium", "high"],
+                    "description": "Ease of data export/migration"
+                }
+            }
+        }
+    }
+}

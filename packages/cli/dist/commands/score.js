@@ -4,7 +4,8 @@
 import { Command } from 'commander';
 import { readFileSync, existsSync } from 'fs';
 import chalk from 'chalk';
-import { scoreYaml, getBadgeUrl } from '@samhallskodex/core';
+import { parse as parseYaml } from 'yaml';
+import { scoreYaml, scoreProfile, getBadgeUrl } from '@samhallskodex/core';
 export const scoreCommand = new Command('score')
     .description('Beräkna DIS-Readiness Score')
     .argument('[path]', 'Sökväg till publiccode.yml', './publiccode.yml')
@@ -75,7 +76,7 @@ export const scoreCommand = new Command('score')
     }
     // Suggestions
     if (result.suggestions.length > 0) {
-        console.log(`\n${lang === 'sv' ? 'Förbättringsförslag' : 'Suggestions'}:`);
+        console.log(`\n${lang === 'sv' ? 'DIS-förbättringsförslag' : 'DIS Suggestions'}:`);
         for (const suggestion of result.suggestions.slice(0, 5)) {
             const priorityIcon = suggestion.priority === 'high'
                 ? chalk.red('!')
@@ -87,6 +88,65 @@ export const scoreCommand = new Command('score')
         if (result.suggestions.length > 5) {
             console.log(chalk.dim(`  ... ${lang === 'sv' ? 'och' : 'and'} ${result.suggestions.length - 5} ${lang === 'sv' ? 'till' : 'more'}`));
         }
+    }
+    // Profile Score (if present)
+    try {
+        const data = parseYaml(yaml);
+        if (data['x-samhallskodex']) {
+            const profileResult = scoreProfile(data['x-samhallskodex'], { lang });
+            const profileScoreColor = profileResult.total >= 80
+                ? chalk.green
+                : profileResult.total >= 60
+                    ? chalk.yellow
+                    : profileResult.total >= 40
+                        ? chalk.hex('#FFA500')
+                        : chalk.red;
+            console.log(`\n${lang === 'sv' ? 'Profile Score' : 'Profile Score'}: ${profileScoreColor(profileResult.total + '%')}`);
+            // Profile progress bar
+            const profileFilledWidth = Math.round((profileResult.total / 100) * barWidth);
+            const profileBar = '█'.repeat(profileFilledWidth) + '░'.repeat(barWidth - profileFilledWidth);
+            console.log(profileScoreColor(profileBar));
+            // Detailed profile breakdown
+            if (options.detailed) {
+                console.log(`\n${lang === 'sv' ? 'Profil-uppdelning' : 'Profile breakdown'}:`);
+                const sections = [
+                    { key: 'profileVersion', sv: 'Profilversion', en: 'Profile Version' },
+                    { key: 'architecture', sv: 'Arkitektur', en: 'Architecture' },
+                    { key: 'integration', sv: 'Integration', en: 'Integration' },
+                    { key: 'ai', sv: 'AI', en: 'AI' },
+                    { key: 'quality', sv: 'Kvalitet', en: 'Quality' },
+                    { key: 'governance', sv: 'Styrning', en: 'Governance' },
+                ];
+                for (const section of sections) {
+                    const sectionData = profileResult.breakdown[section.key];
+                    const sectionColor = sectionData.percentage === 100 ? chalk.green : chalk.yellow;
+                    console.log(`  ${lang === 'sv' ? section.sv : section.en}: ${sectionColor(`${sectionData.earned}/${sectionData.max} (${sectionData.percentage}%)`)}`);
+                    // Show individual items
+                    for (const item of sectionData.items) {
+                        const icon = item.fulfilled ? chalk.green('✓') : chalk.red('✗');
+                        console.log(`    ${icon} ${item.label}: ${item.points}/${item.maxPoints}`);
+                    }
+                }
+            }
+            // Profile suggestions
+            if (profileResult.suggestions.length > 0) {
+                console.log(`\n${lang === 'sv' ? 'Profil-förbättringsförslag' : 'Profile Suggestions'}:`);
+                for (const suggestion of profileResult.suggestions.slice(0, 5)) {
+                    const priorityIcon = suggestion.priority === 'high'
+                        ? chalk.red('!')
+                        : suggestion.priority === 'medium'
+                            ? chalk.yellow('•')
+                            : chalk.dim('○');
+                    console.log(`  ${priorityIcon} ${suggestion.message} ${chalk.dim(`(+${suggestion.potentialPoints}%)`)}`);
+                }
+                if (profileResult.suggestions.length > 5) {
+                    console.log(chalk.dim(`  ... ${lang === 'sv' ? 'och' : 'and'} ${profileResult.suggestions.length - 5} ${lang === 'sv' ? 'till' : 'more'}`));
+                }
+            }
+        }
+    }
+    catch {
+        // Ignore YAML parsing errors for profile - main score is already calculated
     }
     console.log();
 });
