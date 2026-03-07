@@ -80,6 +80,30 @@ interface ProjectDetail {
   // Timestamps
   lastUpdated: string;
   registeredAt: string;
+
+  // x-samhallskodex profile
+  profile?: {
+    profileVersion?: string;
+    architecture?: {
+      ui?: { platform?: string; framework?: string };
+      backend?: { architecture?: string; runtime?: string };
+      deployment?: { hosting?: string };
+    };
+    integration?: {
+      apiStyles?: string[];
+      identity?: string[];
+    };
+    ai?: {
+      enabled?: boolean;
+      useCases?: string[];
+      humanInLoop?: boolean;
+    };
+    governance?: {
+      opennessLevel?: string;
+      dataHosting?: { locality?: string };
+      vendorDependency?: string;
+    };
+  };
 }
 
 async function getProject(id: string): Promise<ProjectDetail | null> {
@@ -141,6 +165,9 @@ async function getProject(id: string): Promise<ProjectDetail | null> {
       // Timestamps
       lastUpdated: data?.lastUpdated?.toDate?.()?.toISOString() || new Date().toISOString(),
       registeredAt: data?.registeredAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+
+      // x-samhallskodex profile
+      profile: data?.['x-samhallskodex'] || data?.profile || undefined,
     };
   } catch (error) {
     console.error('Error fetching project:', error);
@@ -519,6 +546,11 @@ export default async function ProjectPage({ params }: Props) {
             </div>
           )}
 
+          {/* x-samhallskodex Profile */}
+          {project.profile && (
+            <ProfileInfoSection profile={project.profile} />
+          )}
+
           {/* Used by (municipalities, etc.) */}
           <div className="mb-6">
             <ProjectUsers projectId={project.id} />
@@ -535,6 +567,298 @@ export default async function ProjectPage({ params }: Props) {
       </div>
     </div>
   );
+}
+
+function ProfileInfoSection({ profile }: { profile: NonNullable<ProjectDetail['profile']> }) {
+  const hasArchitecture = profile.architecture?.ui?.platform || profile.architecture?.backend?.architecture;
+  const hasIntegration = profile.integration?.apiStyles?.length || profile.integration?.identity?.length;
+  const hasAI = profile.ai?.enabled !== undefined;
+  const hasGovernance = profile.governance?.opennessLevel;
+
+  if (!hasArchitecture && !hasIntegration && !hasAI && !hasGovernance) {
+    return null;
+  }
+
+  return (
+    <div className="rounded-2xl bg-white/5 p-6 backdrop-blur mb-6">
+      <div className="flex items-center gap-2 mb-4">
+        <svg className="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+        </svg>
+        <h2 className="text-xl font-semibold text-white">Teknisk profil</h2>
+        {profile.profileVersion && (
+          <span className="text-xs text-slate-500 ml-2">v{profile.profileVersion}</span>
+        )}
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Architecture */}
+        {hasArchitecture && (
+          <div className="rounded-lg bg-white/5 p-4">
+            <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wide mb-3 flex items-center gap-2">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              Arkitektur
+            </h3>
+            <div className="space-y-2 text-sm">
+              {profile.architecture?.ui?.platform && (
+                <div className="flex justify-between">
+                  <span className="text-slate-400">UI-plattform:</span>
+                  <span className="text-white">{getProfileLabel('uiPlatform', profile.architecture.ui.platform)}</span>
+                </div>
+              )}
+              {profile.architecture?.ui?.framework && (
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Framework:</span>
+                  <span className="text-white">{profile.architecture.ui.framework}</span>
+                </div>
+              )}
+              {profile.architecture?.backend?.architecture && (
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Backend:</span>
+                  <span className="text-white">{getProfileLabel('backendArchitecture', profile.architecture.backend.architecture)}</span>
+                </div>
+              )}
+              {profile.architecture?.backend?.runtime && (
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Runtime:</span>
+                  <span className="text-white">{profile.architecture.backend.runtime}</span>
+                </div>
+              )}
+              {profile.architecture?.deployment?.hosting && (
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Hosting:</span>
+                  <span className="text-white">{getProfileLabel('hosting', profile.architecture.deployment.hosting)}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Integration */}
+        {hasIntegration && (
+          <div className="rounded-lg bg-white/5 p-4">
+            <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wide mb-3 flex items-center gap-2">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              Integration
+            </h3>
+            <div className="space-y-3 text-sm">
+              {profile.integration?.apiStyles && profile.integration.apiStyles.length > 0 && (
+                <div>
+                  <span className="text-slate-400 block mb-1">API-stilar:</span>
+                  <div className="flex flex-wrap gap-1">
+                    {profile.integration.apiStyles.map((style) => (
+                      <span key={style} className="inline-flex items-center rounded-full bg-blue-500/20 px-2 py-0.5 text-xs text-blue-300">
+                        {getProfileLabel('apiStyle', style)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {profile.integration?.identity && profile.integration.identity.length > 0 && (
+                <div>
+                  <span className="text-slate-400 block mb-1">Identifiering:</span>
+                  <div className="flex flex-wrap gap-1">
+                    {profile.integration.identity.map((method) => (
+                      <span key={method} className="inline-flex items-center rounded-full bg-purple-500/20 px-2 py-0.5 text-xs text-purple-300">
+                        {getProfileLabel('identity', method)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* AI */}
+        {hasAI && (
+          <div className="rounded-lg bg-white/5 p-4">
+            <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wide mb-3 flex items-center gap-2">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              AI / ML
+            </h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                {profile.ai?.enabled ? (
+                  <>
+                    <svg className="h-4 w-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-emerald-400">AI-funktionalitet aktiverad</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="h-4 w-4 text-slate-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-slate-400">Ingen AI-funktionalitet</span>
+                  </>
+                )}
+              </div>
+              {profile.ai?.enabled && profile.ai?.useCases && profile.ai.useCases.length > 0 && (
+                <div>
+                  <span className="text-slate-400 block mb-1">Användningsområden:</span>
+                  <div className="flex flex-wrap gap-1">
+                    {profile.ai.useCases.map((useCase) => (
+                      <span key={useCase} className="inline-flex items-center rounded-full bg-amber-500/20 px-2 py-0.5 text-xs text-amber-300">
+                        {getProfileLabel('aiUseCase', useCase)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {profile.ai?.enabled && profile.ai?.humanInLoop !== undefined && (
+                <div className="flex items-center gap-2 mt-2">
+                  {profile.ai.humanInLoop ? (
+                    <>
+                      <svg className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      <span className="text-blue-300">Human-in-the-loop</span>
+                    </>
+                  ) : (
+                    <span className="text-slate-500">Ingen human-in-the-loop</span>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Governance */}
+        {hasGovernance && (
+          <div className="rounded-lg bg-white/5 p-4">
+            <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wide mb-3 flex items-center gap-2">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              Styrning
+            </h3>
+            <div className="space-y-2 text-sm">
+              {profile.governance?.opennessLevel && (
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Öppenhet:</span>
+                  <span className="text-white">{getProfileLabel('opennessLevel', profile.governance.opennessLevel)}</span>
+                </div>
+              )}
+              {profile.governance?.dataHosting?.locality && (
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Datalagring:</span>
+                  <span className="text-white">{getProfileLabel('dataLocality', profile.governance.dataHosting.locality)}</span>
+                </div>
+              )}
+              {profile.governance?.vendorDependency && (
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Leverantörsberoende:</span>
+                  <span className="text-white">{getProfileLabel('vendorDependency', profile.governance.vendorDependency)}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Swedish labels for profile values
+function getProfileLabel(type: string, value: string): string {
+  const labels: Record<string, Record<string, string>> = {
+    uiPlatform: {
+      web: 'Webb',
+      desktop: 'Skrivbord',
+      mobile: 'Mobil',
+      cli: 'Kommandorad',
+      api: 'Endast API',
+      embedded: 'Inbyggd',
+      none: 'Ingen',
+      other: 'Annat',
+    },
+    backendArchitecture: {
+      container: 'Container',
+      vm: 'Virtuell maskin',
+      serverless: 'Serverlös',
+      native: 'Native/Bare metal',
+      mixed: 'Blandad',
+    },
+    hosting: {
+      'public-cloud': 'Publikt moln',
+      'private-cloud': 'Privat moln',
+      'on-premise': 'On-premise',
+      hybrid: 'Hybrid',
+    },
+    apiStyle: {
+      rest: 'REST',
+      graphql: 'GraphQL',
+      grpc: 'gRPC',
+      soap: 'SOAP',
+      odata: 'OData',
+      websocket: 'WebSocket',
+      none: 'Ingen',
+    },
+    identity: {
+      oidc: 'OpenID Connect',
+      oauth2: 'OAuth 2.0',
+      saml: 'SAML',
+      ldap: 'LDAP',
+      ad: 'Active Directory',
+      bankid: 'BankID',
+      freja: 'Freja eID',
+      eidas: 'eIDAS',
+      siths: 'SITHS',
+      'basic-auth': 'Basic Auth',
+      'api-key': 'API-nyckel',
+      jwt: 'JWT',
+      none: 'Ingen',
+      other: 'Annat',
+    },
+    aiUseCase: {
+      assistant: 'AI-assistent',
+      chatbot: 'Chatbot',
+      summarization: 'Sammanfattning',
+      classification: 'Klassificering',
+      extraction: 'Informationsextraktion',
+      translation: 'Översättning',
+      transcription: 'Transkribering',
+      recommendation: 'Rekommendationer',
+      'decision-support': 'Beslutsstöd',
+      'anomaly-detection': 'Anomalidetektering',
+      forecasting: 'Prognostisering',
+      'image-recognition': 'Bildanalys',
+      'document-processing': 'Dokumenthantering',
+      'code-generation': 'Kodgenerering',
+      search: 'Semantisk sökning',
+      other: 'Annat',
+    },
+    opennessLevel: {
+      'open-source': 'Öppen källkod',
+      'open-core': 'Open core',
+      'source-available': 'Källkod tillgänglig',
+      proprietary: 'Proprietär',
+    },
+    dataLocality: {
+      municipality: 'Kommun',
+      sweden: 'Sverige',
+      eu: 'EU',
+      'non-eu': 'Utanför EU',
+      hybrid: 'Hybrid',
+      unknown: 'Okänd',
+    },
+    vendorDependency: {
+      none: 'Inget',
+      low: 'Lågt',
+      medium: 'Medel',
+      high: 'Högt',
+    },
+  };
+
+  return labels[type]?.[value] || value;
 }
 
 function ScoreBadge({ score }: { score: number }) {
