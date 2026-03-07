@@ -246,18 +246,6 @@ function generateSuggestions(data: PubliccodeData): Suggestion[] {
     });
   }
 
-  if (!data.sv?.disFas1 && hasPriorityCategory) {
-    suggestions.push({
-      id: 'dis-fas1',
-      title: 'Aktivera DIS Fas 1-markering',
-      description: 'Du har valt en prioriterad kategori',
-      points: 4,
-      step: 4,
-      priority: 'medium',
-      action: 'Aktivera DIS Fas 1',
-    });
-  }
-
   // Step 5: Maintenance
   if (!data.maintenance.type) {
     suggestions.push({
@@ -352,10 +340,6 @@ interface PubliccodeData {
       regional?: boolean;
     };
     countryExtensionVersion: string;
-  };
-  sv?: {
-    countryExtensionVersion: string;
-    disFas1: boolean;
   };
   dependsOn?: {
     open?: Array<{ name: string; versionMin?: string; versionMax?: string; optional?: boolean }>;
@@ -1453,7 +1437,7 @@ function Step1({
     <div className="relative space-y-8">
       <div>
         <p className="text-sm font-semibold uppercase tracking-wider text-blue-400">
-          Steg 1 av 6
+          Steg 1 av 7
         </p>
         <h2 className="mt-2 text-2xl font-bold tracking-tight text-white">
           Grundläggande information
@@ -1748,7 +1732,7 @@ function Step2({
     <div className="relative space-y-6">
       <div>
         <p className="text-sm font-semibold uppercase tracking-wider text-blue-400">
-          Steg 2 av 6
+          Steg 2 av 7
         </p>
         <h2 className="mt-2 text-2xl font-bold tracking-tight text-white">
           Kategorier
@@ -1950,7 +1934,7 @@ function Step3({
     <div className="relative space-y-8">
       <div>
         <p className="text-sm font-semibold uppercase tracking-wider text-blue-400">
-          Steg 3 av 6
+          Steg 3 av 7
         </p>
         <h2 className="mt-2 text-2xl font-bold tracking-tight text-white">
           Beskrivning
@@ -2074,15 +2058,11 @@ function Step4({
   updateData: (path: string, value: unknown) => void;
   licenseOptions: Array<{ value: string; label: string; description: string }>;
 }) {
-  const isPriorityCategory = data.categories.some((c) =>
-    ['case-management', 'civic-engagement', 'data-analytics', 'document-management', 'identity-management', 'local-government', 'public-participation', 'reporting-issues', 'workflow-management'].includes(c)
-  );
-
   return (
     <div className="relative space-y-8">
       <div>
         <p className="text-sm font-semibold uppercase tracking-wider text-blue-400">
-          Steg 4 av 6
+          Steg 4 av 7
         </p>
         <h2 className="mt-2 text-2xl font-bold tracking-tight text-white">
           Licens och juridik
@@ -2139,34 +2119,6 @@ function Step4({
         </p>
       </div>
 
-      {/* DIS Fas 1 toggle */}
-      <div className="rounded-xl border border-blue-800 bg-blue-900/20 p-4">
-        <div className="flex items-start gap-4">
-          <div className="flex-1">
-            <h3 className="font-semibold text-blue-100">
-              Prioriterat samhällsområde
-            </h3>
-            <p className="mt-1 text-sm text-blue-300">
-              Markera om detta projekt tillhör ett prioriterat samhällsområde.
-              Detta ger extra synlighet i katalogen.
-            </p>
-            {!isPriorityCategory && (
-              <p className="mt-2 text-xs text-amber-400">
-                Tips: Välj en prioriterad kategori i steg 1 för att kvalificera
-              </p>
-            )}
-          </div>
-          <label className="relative inline-flex cursor-pointer items-center">
-            <input
-              type="checkbox"
-              checked={data.sv?.disFas1 || false}
-              onChange={(e) => updateData('sv.disFas1', e.target.checked)}
-              className="peer sr-only"
-            />
-            <div className="peer h-6 w-11 rounded-full bg-slate-700 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-500 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-800" />
-          </label>
-        </div>
-      </div>
     </div>
   );
 }
@@ -2184,7 +2136,7 @@ function Step5({
     <div className="relative space-y-8">
       <div>
         <p className="text-sm font-semibold uppercase tracking-wider text-blue-400">
-          Steg 5 av 6
+          Steg 5 av 7
         </p>
         <h2 className="mt-2 text-2xl font-bold tracking-tight text-white">
           Underhåll och kontakt
@@ -2353,7 +2305,7 @@ function Step6({
     <div className="relative space-y-8">
       <div>
         <p className="text-sm font-semibold uppercase tracking-wider text-green-400">
-          Steg 6 av 6
+          Steg 7 av 7
         </p>
         <h2 className="mt-2 text-2xl font-bold tracking-tight text-white">
           Redo att exportera!
