@@ -2393,8 +2393,8 @@ function Step6({
         </div>
       )}
 
-      {/* Register in catalog - show after successful push or when in register flow */}
-      {isRegisterFlow && pushResult?.success && !registerResult?.success && (
+      {/* Register in catalog - show after successful push */}
+      {pushResult?.success && !registerResult?.success && (
         <div className="rounded-2xl border-2 border-dashed border-blue-500/50 bg-blue-500/10 p-6">
           <div className="flex items-start gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500/20">
