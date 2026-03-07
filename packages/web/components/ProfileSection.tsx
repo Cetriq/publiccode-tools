@@ -98,10 +98,49 @@ interface ProfileSectionProps {
   onUpdate: (profile: Partial<XSamhallskodexProfile>) => void;
   enabled: boolean;
   onToggle: (enabled: boolean) => void;
+  repoUrl?: string;
 }
 
-export function ProfileSection({ profile, onUpdate, enabled, onToggle }: ProfileSectionProps) {
+export function ProfileSection({ profile, onUpdate, enabled, onToggle, repoUrl }: ProfileSectionProps) {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['architecture']));
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analyzeError, setAnalyzeError] = useState<string | null>(null);
+
+  const analyzeWithAI = async () => {
+    if (!repoUrl) return;
+
+    setIsAnalyzing(true);
+    setAnalyzeError(null);
+
+    try {
+      const response = await fetch('/api/ai/suggest-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: repoUrl }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Kunde inte analysera profilen');
+      }
+
+      if (data.success && data.profile) {
+        // Merge AI suggestions with existing profile
+        onUpdate(data.profile);
+        // Enable profile if not already
+        if (!enabled) {
+          onToggle(true);
+        }
+        // Expand all sections to show results
+        setExpandedSections(new Set(['architecture', 'integration', 'ai', 'governance']));
+      }
+    } catch (err) {
+      setAnalyzeError(err instanceof Error ? err.message : 'Ett fel uppstod');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => {
@@ -147,16 +186,55 @@ export function ProfileSection({ profile, onUpdate, enabled, onToggle }: Profile
             Teknisk metadata för svenska offentlig sektor-projekt
           </p>
         </div>
-        <label className="relative inline-flex cursor-pointer items-center">
-          <input
-            type="checkbox"
-            checked={enabled}
-            onChange={(e) => onToggle(e.target.checked)}
-            className="peer sr-only"
-          />
-          <div className="peer h-6 w-11 rounded-full bg-slate-600 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-500 peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-        </label>
+        <div className="flex items-center gap-4">
+          {/* AI Analyze button */}
+          {repoUrl && (
+            <button
+              onClick={analyzeWithAI}
+              disabled={isAnalyzing}
+              className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-purple-500/25 transition-all hover:from-purple-400 hover:to-blue-400 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isAnalyzing ? (
+                <>
+                  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Analyserar...
+                </>
+              ) : (
+                <>
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Analysera med AI
+                </>
+              )}
+            </button>
+          )}
+          <label className="relative inline-flex cursor-pointer items-center">
+            <input
+              type="checkbox"
+              checked={enabled}
+              onChange={(e) => onToggle(e.target.checked)}
+              className="peer sr-only"
+            />
+            <div className="peer h-6 w-11 rounded-full bg-slate-600 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-500 peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+          </label>
+        </div>
       </div>
+
+      {/* AI Error message */}
+      {analyzeError && (
+        <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3">
+          <div className="flex items-center gap-2 text-red-400">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-sm">{analyzeError}</span>
+          </div>
+        </div>
+      )}
 
       {enabled && (
         <div className="space-y-4">

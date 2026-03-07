@@ -908,6 +908,7 @@ function EditorPage() {
                   onUpdate={setProfileData}
                   enabled={profileEnabled}
                   onToggle={setProfileEnabled}
+                  repoUrl={repoUrl || undefined}
                 />
               </div>
             )}
