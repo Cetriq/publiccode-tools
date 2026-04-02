@@ -5,6 +5,7 @@ import { getDb, COLLECTIONS } from '@/lib/firebase';
 import { ProjectClient } from './ProjectClient';
 import ProjectProviders from '@/components/ProjectProviders';
 import ProjectUsers from '@/components/ProjectUsers';
+import { getCategoryTranslation } from '@samhallskodex/core';
 
 interface Contact {
   name: string;
@@ -910,48 +911,9 @@ function DependencyBadge({ dependency, type }: { dependency: Dependency; type: '
   );
 }
 
-const CATEGORY_TRANSLATIONS: Record<string, string> = {
-  'accounting': 'Bokföring',
-  'case-management': 'Ärendehantering',
-  'civic-engagement': 'Medborgarengagemang',
-  'collaboration': 'Samarbete',
-  'communications': 'Kommunikation',
-  'content-management': 'Innehållshantering',
-  'data-analytics': 'Dataanalys',
-  'data-collection': 'Datainsamling',
-  'document-management': 'Dokumenthantering',
-  'digital-citizenship': 'Digital medborgarservice',
-  'geographic-information-systems': 'GIS',
-  'government-websites': 'Myndighetswebb',
-  'healthcare': 'Hälso- och sjukvård',
-  'help-desk': 'Helpdesk',
-  'hr': 'Personal',
-  'identity-management': 'Identitetshantering',
-  'it-asset-management': 'IT-tillgångshantering',
-  'it-development': 'IT-utveckling',
-  'it-security': 'IT-säkerhet',
-  'it-service-management': 'IT-tjänstehantering',
-  'knowledge-management': 'Kunskapshantering',
-  'learning-management-system': 'Lärandehantering',
-  'local-government': 'Kommunal förvaltning',
-  'marketing': 'Marknadsföring',
-  'office': 'Kontorsproduktivitet',
-  'procurement': 'Upphandling',
-  'project-management': 'Projekthantering',
-  'public-participation': 'Medborgardeltagande',
-  'reporting-issues': 'Felanmälan',
-  'social-media-management': 'Sociala medier',
-  'social-services': 'Socialtjänst',
-  'transportation': 'Transport',
-  'visitor-management': 'Besökshantering',
-  'voting': 'Röstning',
-  'waste-management': 'Avfallshantering',
-  'website-management': 'Webbhantering',
-  'workflow-management': 'Arbetsflöden',
-};
-
 function getCategoryName(categoryId: string): string {
-  return CATEGORY_TRANSLATIONS[categoryId] || categoryId;
+  const category = getCategoryTranslation(categoryId as Parameters<typeof getCategoryTranslation>[0], 'sv');
+  return category?.sv.name || categoryId;
 }
 
 function getStatusName(status: string): string {
