@@ -666,6 +666,12 @@ function EditorPage() {
     // Add profile data if enabled and has content
     if (profileEnabled && profileData) {
       const cleanedProfile = removeEmpty(profileData as Record<string, unknown>);
+
+      // Säkerställ att obligatoriska fält alltid finns med
+      if (!cleanedProfile.ai) {
+        cleanedProfile.ai = { enabled: false };
+      }
+
       if (Object.keys(cleanedProfile).length > 0) {
         (cleaned as Record<string, unknown>)['x-samhallskodex'] = cleanedProfile;
       }
